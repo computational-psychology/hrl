@@ -1,7 +1,7 @@
-# HRL: High Resolution Luminance #
+## HRL: High Resolution Luminance ##
 
 
-## Introduction ##
+### Introduction ###
 
 
 HRL is a library for running high resolution luminance experiments for
@@ -39,7 +39,7 @@ We currently have alpha scripts implementing our desired scenarios, and we will
 publish them when they have been thoroughly tested.
 
 
-## Installation ##
+### Installation ###
 
 
 - Set the desired build path for the libraries in make.inc with the BUILDDIR
@@ -53,10 +53,10 @@ publish them when they have been thoroughly tested.
 - Move misc/hrlrc to ~/.hrlrc and edit it to comply with your system.
 
 
-## Usage ##
+### Usage ###
 
 
-### Finding Documentation ###
+#### Finding Documentation ####
 
 - Start IPython
 - Import HRL: from hrl import *
@@ -66,7 +66,7 @@ publish them when they have been thoroughly tested.
 - Using IPython to interact with an hrl instance can be very helpful
   while designing an experiment.
 
-### Developing an Experiment ###
+#### Developing an Experiment ####
 
 - A demonstration experiment is available under scripts/experiments/sacha and is a good reference for how
   to design an experiment with HRL. You may want to copy it as a
@@ -74,11 +74,11 @@ publish them when they have been thoroughly tested.
 - If you want to use gamma correction, generate lut.txt with the hrl.lut module
 (see below), and pass it to an hrl instance with hrl = HRL(...,lut='LUT.txt')
 
-### Calibrating Hardware ###
+#### Calibrating Hardware ####
 
 - The directory scripts/calibration 
 
-### Building a Lookup Table ###
+#### Building a Lookup Table ####
 
 - 'from hrl import lut'
 - Read the lookup table documentation with 'lut?' and follow them. The end
