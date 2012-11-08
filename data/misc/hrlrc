@@ -1,0 +1,6 @@
+[optiCAL]
+dev=/dev/ttyUSB0
+
+[DataPixx]
+display=:0.0
+
