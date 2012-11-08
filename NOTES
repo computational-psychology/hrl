@@ -1,0 +1,30 @@
+General:
+- Right now users need to be part of the 'root' group in order to
+  properly run the program.
+
+Datapixx:
+- Not properly closing Datapixx can result in problems. After not being
+  properly treated, reading a button for example would produce garbage
+  results and print a 'Mismatch Address' error. This problem could only
+  be fixed by resetting the Datapixx.
+
+Siemens Sondertyp:
+- It seems like the monitor requires a warm up time before it will produce
+accurate results.
+- We had a strange effect that cost us time where the aspect ratio of
+images (their width) would change as a function of their x position on
+the screen. This turned out to be a result of the modeline. The settings
+from the VSG system were copied directly to the linux system, but this
+turned out to be the source of the error. It seems as though the VSG must
+modify these settings before passing them to the monitor, whereas the
+Datapixx passes them directly to the monitor. The original settings provided
+by Siemens are the correct ones.
+- The luminance as a function of intensity changes with respect to the
+display size of the monitor. Typical maximum values for a properly
+sized screen are around 550 cdl/m2.
+- The X session can be restarted by killing the X process with 'sudo
+pkill X' which is useful if you started the computer when the datapixx
+was off.
+- There's a weird screen flicker that occurs every once in a while which
+looks like a lamp being shone from the inside of the screen. This is
+likely the explanation for the spikes in the measurement data.

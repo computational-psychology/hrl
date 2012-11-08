@@ -1,0 +1,8 @@
+ - Measuring hysterisis: Do a luminance test from 0 to max, then max to 0, then random.
+ - CRT test: Small region test at the centre of CRT, check min, middle, max, luminance.  Then,sin wave modulation of the rest of the screen while measuring centre. This is a powersupply issue. Modulate sin wave frequency to measure responsiveness. Square waves are even harsher on the CRT. Allowing naked eye testing is also good, since the frequency of modulation may be intense for crappy photometers.
+ - Gamma curve measurements are actually dependent on the size of the patch being modulated. Full screen monochromes can't be as bright as small patches in front of the photometer. Differences can be as extreme as 15%.
+ - Watch out for energy saving 'features'!
+ - Grey background, square wave patch. Rotate the square wave ninety degrees, and measure the change in mean luminance of the patch. There will be a difference on the flip. Measure the effect as a function of frequency. Second dimension can be contrast of square wave.
+ - Two stimuli, superimposed mean luminance is equal to background. At high enough frequencies, the stimuli should be invisible. The photometer will probably be fine with this, but if one's eyes are moving too much, it will look terrible. Look through a tube and the effect will probably go away. Anyway, the point is, is that this is a great test for frame dropping.
+
+

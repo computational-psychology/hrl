@@ -1,0 +1,65 @@
+Latest:
+- Turning double buffering back on and making it an hrl option. Turning it off
+didn't do what I thought it would do. I believe there are interactions with
+nvidia-settings and such that causes it to behave differently machine to
+machine.
+- Turned off double buffering. This might theoretically be needed again by
+someone doing a graphics intensive experiment, but for now it simply makes
+developing an experiment more conceptually complicated.
+- Now actually finalized fitting function by replacing it with a simple
+smoothing procedure.
+- Calibration scripts updated.
+- Essentially finalized fitting function. Don't give it datasets which are too large.
+
+0.9.5:
+- I changed around the display code a bit which produced weird errors. I fixed this in
+  ways I don't fully understand... I have to now flip the image before I display it. Also
+  I inlined a function at its one point of use and this *fixed* a massive display problem.
+  Strange, and don't forget this.
+- hrl.newTexture() accepts file names and files again, so image files can be give directly
+  to hrl. I still recommend given numpy arrays directly though.
+- Improved the way texture -> greyscale conversion was handled.
+- rmtx and dmtx are now both fields of an hrl object. dmtx you can iterate over to get the
+  design lines of your design matrix, and rmtx is a dictionary, which is written to the
+  result file when hrl.writeResultLine() is called.
+- hrl is now an iterator and iterates over design matrix lines if that functionality is
+  enabled. So now you can write for dsgn in hrl:
+- Removed exit call from hrl.user
+- escapeCheck renamed to checkEscape.
+- Default argument names of HRL have changed.
+- Moved INSTALL into a general README. README updated.
+- Hid various HRL object attributes. Now listing the elements of an hrl object will only
+  list the methods associated with it. HRL instances should now be a very good way of
+  accessing documentation.
+- HRL.tryReadLuminance has been renamed HRL.readLuminance
+- Improved documentation
+- HRL.buttonLoop is now called HRL.readButton. If datapixx isn't present, readButton will
+  call keyboardLoop which causes the coloured buttons to be replaced by the space and
+  arrow keys.
+- HRL.flip now takes a clear buffer and a duration argument.
+- Added 'imageToGreyArray' as a top level hrl function which using PIL can convert most
+  image formats into a normalized numpy array appropriate for use with hrl.
+- Fixed image drawing not coordinating with coordinate system.
+- Deleted luminance scaling for now as it wasn't properly implemented.
+- LUT functionality now actually works. Let's say it's in beta. And HRL
+  works with it too.
+- Added a circle draw function. texture.draw now takes a shape
+  parameter, which defaults to 'square'·
+
+0.9.2:
+- Fixed modeline problems that were distorting our monitor images. Fixed
+  little settings around the code that depended on this.
+- Initial version of Look Up Table builder working. Improvements coming.
+- Cleaned up some documentation as well as compilation options. One can
+  now compile without datapixx. Compilation also works (better, anwyay).
+- buttonLoop no longer accepts None, as that was meant to indicate wait
+  forever, but never did that in the first place.
+- The LUT functions can now manage (and combine) multiple data files.
+
+0.9.1:
+- Implemented controllable coordinate system.
+- hrl.flip now also blanks the screen, so glClear doesn't need to be
+  called by the user.
+
+0.9:
+- First version tag

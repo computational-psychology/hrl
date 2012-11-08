@@ -1,0 +1,24 @@
+Bugs:
+- If images are loaded containing black colours (0) they are displayed
+incorrectly.
+- Grayscale displaying of images on non datapixx enabled monitors is creating
+green tinted images.
+- Currently, images without an alpha channel cannot be handled by hrl.
+- It seems as though image handling is slow when filenames are given to HRL as
+opposed to numpy arrays. This would seem to be because the file is being loaded
+inside of a loop in a way that it shouldn't be.
+- In general, image handling is kind of borked at the moment, it seems.
+
+Documentation:
+- Better documentation of experiment and reviewing of current library
+documentation. A general review/refactoring should probably be done.
+
+Features:
+- Add minolta photometer to HRL API
+- Add the ability to draw text objects with HRL as well
+- Allow a setting of minimum and maximum lookup table values, returning
+maximum linear resolution, maybe with visualiziation and hints and such
+- Develop new C wrapper.
+
+Tasks:
+- Monitor tests?
