@@ -25,7 +25,7 @@ from OpenGL.GL import *
 # should probably try to improve this, but it's relatively a non issue.
 
 cfg = cp.RawConfigParser()
-cfg.read([os.path.expanduser('~/hrlrc'),os.path.expanduser('~/.hrlrc')])
+cfg.read([os.path.expanduser('~/.config/hrlrc'),os.path.expanduser('~/.hrlrc')])
 os.environ['DISPLAY'] = cfg.get('DataPixx','display')
 
 
@@ -85,7 +85,9 @@ class HRL:
     when hrl.writeResultLine() is called.
     """
 
+
     ## Core methods ##
+
 
     def __init__(self,wdth=1024,hght=768,bg=0.0
                  ,coords=(0,1,1,0),flipcoords=True
@@ -187,7 +189,9 @@ class HRL:
         if self._dfl != None: self._dfl.close()
         if self._pgauto: pg.quit()
 
+
     ## OpenGL methods ##
+
 
     def newTexture(self,txt,shape='square'):
         """
@@ -247,7 +251,9 @@ class HRL:
             pg.time.delay(dur)
             pg.display.flip()
 
+
     ## IO methods ##
+
 
     def readButton(self,to=3600):
         """
@@ -309,7 +315,9 @@ class HRL:
                or event.type == KEYDOWN and event.key == K_ESCAPE:
                 return True
 
+
     ## File methods ##
+
 
     def writeResultLine(self,dct=None):
         """
