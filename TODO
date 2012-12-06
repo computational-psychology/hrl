@@ -14,11 +14,13 @@ So general hierarchy:
 
 hrl.user
 hrl.graphics.datapixx
-hrl.graphics.standard
+hrl.graphics.gpu
 hrl.input.responsepixx
 hrl.input.keyboard
 hrl.photometer.minolta
 hrl.photometer.optical
+hrl.clock.datapixx
+hrl.clock.cpu
 
 Each device group will export the same set of functions. At the same time, all non standard device modules (i.e. datapixx, minolta, and optical) will depend on the existence of seperate packages for each device. Key point here: We want to seperate out the datapixx wrapper into its own package.
 

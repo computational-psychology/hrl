@@ -1,3 +1,0 @@
-This python wrapper for datapixx was developed by Ivan. Documentation of the python functions can be found in pydatapixx.c, and can be accessed in python with the standard help framework, e.g. 'help pydatapixx'.
-
-To install, simply run the make file.
