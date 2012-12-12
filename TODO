@@ -24,6 +24,13 @@ hrl.clock.cpu
 
 Each device group will export the same set of functions. At the same time, all non standard device modules (i.e. datapixx, minolta, and optical) will depend on the existence of seperate packages for each device. Key point here: We want to seperate out the datapixx wrapper into its own package.
 
+Each submodule should be self contained - the graphics module should be able to
+display images independent of the existence of hrl. Per module tests should
+then be written. This is a good way to proceed.
+
+hrl will just subclass the various modules as required - this can be done by
+conditional import and then renaming the superclass to a common name.
+
 ---
 
 I'd been working primarily on i) from above, but I'm having trouble settling on a solution. So I think I will need to focus on ii) first. Seperate out the functionality in the desired way, and then we can focus just on getting 'standard' and 'keyboard' working. Once that seems alright, then it will be time to wrap that up in distutils. Then I can decide how exactly I want to manage the scripts.
