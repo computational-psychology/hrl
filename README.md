@@ -53,6 +53,12 @@ publish them when they have been thoroughly tested.
 - Move misc/hrlrc to ~/.hrlrc and edit it to comply with your system.
 
 
+##### Dependencies #####
+
+- Required: pygame
+- Optional: pydatapixx, pyoptical (depends on pyserial)
+
+
 ### Usage ###
 
 
