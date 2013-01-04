@@ -63,7 +63,7 @@ def changeBackground(bg,dpxBool):
     glClearColor(r/mx,g/mx,b/mx,a/mx)
     glClear(GL_COLOR_BUFFER_BIT)
 
-def loadTexture(gar,gammainv,dpxBool):
+def loadTexture(grys,gammainv,dpxBool):
     """
     LoadTexture is the first step in displaying an image. It takes a
     filename and opens it, or a numpy array, and loads it into the
@@ -74,13 +74,13 @@ def loadTexture(gar,gammainv,dpxBool):
     care when shrinking, blowing up, or rotating an image. The resulting
     interpolations can effect experimental results.
     """
-    if type(gar) == str:
-        gar = fileToGreyArray(gar)
+    if type(grys) == str:
+        grys = fileToGreyArray(grys)
 
-    gar = gammainv(gar)
-    wdth = len(gar[0])
-    hght = len(gar[:,0])
-    txbys = chansToInt(floatToChans(gar[::-1,],dpxBool)).tostring()
+    grys = gammainv(grys)
+    wdth = len(grys[0])
+    hght = len(grys[:,0])
+    txbys = chansToInt(floatToChans(grys[::-1,],dpxBool)).tostring()
 
     txid = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, txid)

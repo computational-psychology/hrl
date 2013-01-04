@@ -3,30 +3,33 @@ The Graphics module provides classes which allow the presentation of images in
 HRL. Image presentation in HRL can be understood as a multi step process as
 follows:
 
-    Bitmap image -> Greyscale Array -> Processed Greyscale Array -> OpenGL
-    Texture
+    Bitmap image (The image written in an 8 bit, 4 channel format)
+    -> Greyscale Array (A numpy array of doubles between 0 and 1)
+    -> Processed Greyscale Array (possible remapping with a lookup table)
+    -> Display List (Saved to graphics memory as a 'Display List')
+    -> Texture (Returned as a a python class instance which can be drawn) 
 
 The conversion of Bitmaps to Greyscale arrays is handled by functions in
-'hrl.graphics.auxilliary', though it is recommended when possible to work directly
-with numpy arrays.
+'hrl.graphics.auxilliary', though it is recommended when possible to bypass this step
+and work directly with numpy arrays.
 
 The conversion of Greyscale Arrays to Processed Greyscale Arrays is handled by
 the base 'hrl' class, and consists primarily of gamma correction and contrast
 range selection.
 
-Finally, the conversion of Processed Greyscale Arrays to OpenGL textures is
-handled by the functionality provided by this module.
+Saving Processed Greyscale Arrays as OpenGL Display Lists and then python Texture
+instances is handled by the functionality provided by this module.
 
-The 'Texture' class is essentially an OpenGL wrapper for the display of 2d
-images. The abstract class 'Graphics' on the other hand specifies the interface for
-graphics hardware in HRL. All graphical backends (e.g. gpu or datapixx) must
-satisfy the given interface.
+This module comes with two classes. Firstly, the abstract class 'Graphics' specifies the
+interface for graphics hardware in HRL. Secondly, the 'Texture' class is essentially a
+OpenGL wrapper for certain OpenGL functions for the easy display 2d images.
 
 Texture objects are not meant to be created on their own, but are instead
 created via the 'newTexture' method of Graphics. Graphics.newTexture will take
-the given Processed Greyscale Array (with other optional arguments as well)
-and transform it into a Texture object which will be displayed by OpenGL on the
-appropriate hardware (e.g. gpu or datapixx).
+the given Processed Greyscale Array (with other optional arguments as well),
+and transform it into a Texture instance, saving it in an internal list as well.
+Texture instances have a 'draw' method which uses OpenGL to display the texture
+via the specified hardware (e.g. gpu or datapixx).
 
 The openGL code was based largely on a great tutorial by a mysterious tutor
 here: http://disruption.ca/gutil/introduction.html
@@ -34,7 +37,6 @@ here: http://disruption.ca/gutil/introduction.html
 
 # OpenGL
 from OpenGL.GL import *
-from OpenGL.GLU import *
 
 # PyGame
 import pygame as pg
@@ -47,89 +49,27 @@ import abc
 ### Classes ###
 
 
+## Graphics Class ##
+
 class Graphics(object):
     __metaclass__ = abc.ABCMeta
 
-    ## Abstract Methods ##
+    # Abstract Methods #
 
-    def greyToChannels(self,grey):
+    def greyToChannels(self,gry):
         """
         Converts a single normalized greyscale value (i.e. between 0 and 1)
-        into a 4 colour channel representation appropriate to the graphics
-        device.
+        into a 4 colour channel representation specific to the particular graphics
+        backend.
         """
         return
 
-    def channelsToInt(self,(r,g,b,a)):
+    # Concrete Methods #
+
+    def __init__(self,w,h,bg,fs,db):
         """
-        Converts a 4 channel representation of a colour to an integer.
-        """
-        return
-
-    ## Concrete Methods ##
-
-    def newTexture(self,txt,shape='square'):
-        """
-        Given a numpy array of values between 0 and 1, returns a new
-        Texture object. The texture object comes equipped with the draw
-        method for obvious purposes. If a gamma table has been given,
-        the texture will be adjusted by inverting the gamma
-        function.
-
-        Parameters
-        ----------
-        txt : The numpy corresponding to the texture.
-        shape : The shape 'cut out' of the texture to show. A square
-            will show the whole thing. Available: 'square', 'circle'
-            Default: 'square'
-
-        Returns
-        -------
-        Texture object
-
-        """
-        return Texture(txt,shape,self._gammainv,self._coords,self._flipper
-                       ,self._dpx != None)
-
-
-    def flip(self,clr=True,dur=None):
-        """
-        Flips in the image backbuffer. In general, one will want to draw
-        a set of textures and then call flip to draw them all to the
-        screen at once.
-
-        Takes a clr argument which causes the back buffer to clear after
-        the flip. When off, textures will be drawn on top of the
-        displayed buffer.
-
-        Also takes an optional duration (dur) argument. If dur != None,
-        then the flip command will pause execution for the specified
-        number of milliseconds, and then flip the empty buffer forward.
-        i.e. if you don't use any other draw commands while it is
-        waiting, it will blank the screen after the specified amount of
-        time has elapsed.
-
-        Parameters
-        ----------
-        clr : Whether to clear the back buffer after flip.
-        dur : How long to wait before performing a second flip.
-
-        Returns
-        -------
-        None
-        """
-        pg.display.flip()
-        if clr: glClear(GL_COLOR_BUFFER_BIT)
-        if dur != None:
-            pg.time.delay(dur)
-            pg.display.flip()
-
-    def initialize(self,w,h,bg,coords,fs,db):
-        """
-        InitializeOpenGL is the first function that should be run before other
-        openGL calls. It sets a bunch of basic OpenGL commands, notably the
-        coordinate system, which has the input dimensions with the origin in
-        the lower left corner.
+        The Graphics constructor defines the basic OpenGL initializations that must be
+        performed besides operations specific to particular backends.
         """
 
         # Here we can add other options like fullscreen
@@ -143,11 +83,10 @@ class Graphics(object):
         glClear(GL_COLOR_BUFFER_BIT)
         glDisable(GL_DEPTH_TEST)
 
-        # Set Cartesian coordinate system.
+        # Set Matrix style coordinate system.
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity();
-        (l,r,b,t) = coords
-        gluOrtho2D(int(l*w),int(r*w),int(b*h),int(t*h))
+        glOrtho(0,w,h,0,-1,1)
         glMatrixMode(GL_MODELVIEW)
 
         # Enable texturing
@@ -159,13 +98,54 @@ class Graphics(object):
         # combined.
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+    def newTexture(self,grys,shape='square'):
+        """
+        Given a numpy array of values between 0 and 1, returns a new
+        Texture object. The texture object comes equipped with the draw
+        method for obvious purposes.
+
+        Parameters
+        ----------
+        txt : The greyscale numpy array
+        shape : The shape to 'cut out' of the given greyscale array. A square
+            will render the entire array. Available: 'square', 'circle'
+            Default: 'square'
+
+        Returns
+        -------
+        Texture object
+
+        """
+        return Texture(txt,shape)
+
+    def flip(self,clr=True):
+        """
+        Flips in the image backbuffer. In general, one will want to draw
+        a set of textures and then call flip to draw them all to the
+        screen at once.
+
+        Takes a clr argument which causes the back buffer to clear after
+        the flip. When off, textures will be drawn on top of the
+        displayed buffer.
+
+        Parameters
+        ----------
+        clr : Whether to clear the back buffer after flip.
+
+        Returns
+        -------
+        None
+        """
+        pg.display.flip()
+        if clr: glClear(GL_COLOR_BUFFER_BIT)
+
     def changeBackground(bg,dpxBool):
         mx = float(2**8-1)
         (r,g,b,a) = greyToChans(bg)
         glClearColor(r/mx,g/mx,b/mx,a/mx)
         glClear(GL_COLOR_BUFFER_BIT)
 
-### OpenGL Functions ###
+## Texture Class ##
 
 class Texture:
     """
@@ -174,23 +154,22 @@ class Texture:
     of transformation to be performed on the image before it is
     displayed (e.g. translation, rotation).
     """
-    def __init__(self,tx,shape,gammainv,coords,flipper,dpxBool):
-        self._txid, self.wdth, self.hght = loadTexture(tx,gammainv,dpxBool)
+    def __init__(self,byts,shape):
+        self._txid, self.wdth, self.hght = loadTexture(byts)
         if shape == 'square':
-            self._lsid = createSquareDL(self._txid,self.wdth,self.hght,coords)
+            self._dlid = createSquareDL(self._txid,self.wdth,self.hght)
         elif shape == 'circle':
-            self._lsid = createCircleDL(self._txid,self.wdth,self.hght,coords)
+            self._dlid = createCircleDL(self._txid,self.wdth,self.hght)
         else:
             raise NameError('Invalid Shape')
-        self._flipper = flipper
 
     def __del__(self):
         if self._txid != None:
             deleteTexture(self._txid)
             self._txid = None
-        if self._lsid != None:
-            deleteTextureDL(self._lsid)
-            self._lsid = None
+        if self._dlid != None:
+            deleteTextureDL(self._dlid)
+            self._dlid = None
 
     def draw(self,pos=None,sz=None,rot=0,rotc=None):
         """
@@ -230,28 +209,46 @@ class Texture:
             (wdth,hght) = sz
             glScalef(wdth/(self.wdth*1.0), hght/(self.hght*1.0),1.0)
 
-        glCallList(self._lsid)
+        glCallList(self._dlid)
 
-def loadTexture(gar,dpxBool):
+
+### OpenGL Functions ###
+
+
+## OpenGL Texture Functions ##
+
+def channelsToInt((r,g,b,a)):
     """
-    LoadTexture is the first step in displaying an image. It takes a
-    filename and opens it, or a numpy array, and loads it into the
-    OpenGL texture memory.
+    Takes a channel representation and returns a corresponding unsigned 32 bit int.
+    Running the tostring method on a 2d array which has had this function applied to it
+    will produce a bytestring appropriate for use as a texture with openGL.
+    """
+    R = 2**0
+    G = 2**8
+    B = 2**16
+    A = 2**24
+    return r*R + g*G + b*B + a*A
+
+def loadTexture(grys):
+    """
+    LoadTexture is the first step in displaying an image with HRL. It takes a
+    2d array of doubles between 0 and 1 which represent a greyscale value and loads it
+    into OpenGL texture memory.
 
     In this function we also define our texture minification and
     magnification functions, of which there are many options. Take great
     care when shrinking, blowing up, or rotating an image. The resulting
     interpolations can effect experimental results.
     """
-    wdth = len(gar[0])
-    hght = len(gar[:,0])
-    txbys = chansToInt(floatToChans(gar[::-1,],dpxBool)).tostring()
+    wdth = len(grys[0])
+    hght = len(grys[:,0])
+    txtbyts = channelsToInt(greyToChannels(grys[::-1,],dpxBool)).tostring()
 
     txid = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, txid)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wdth, hght, 0, GL_RGBA, GL_UNSIGNED_BYTE, txbys)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wdth, hght, 0, GL_RGBA, GL_UNSIGNED_BYTE, txtbyts)
 
     return txid,wdth,hght
 
@@ -261,7 +258,9 @@ def deleteTexture(txid):
     """
     glDeleteTextures(txid)
 
-def createSquareDL(txid,wdth,hght,coords):
+## OpenGL Display List Functions ##
+
+def createSquareDL(txid,wdth,hght):
     """
     createSquareDL takes a texture id with width and height and
     generates a display list - an precompiled set of instructions for
@@ -269,24 +268,23 @@ def createSquareDL(txid,wdth,hght,coords):
     compiled are essentially creating a square and binding the texture
     to it.
     """
-    lsid = glGenLists(1)
-    glNewList(lsid,GL_COMPILE)
+    dlid = glGenLists(1)
+    glNewList(dlid,GL_COMPILE)
     glBindTexture(GL_TEXTURE_2D, txid)
-    (l,r,b,t) = coords
 
     glBegin(GL_QUADS)
-    glTexCoord2f(0, 0); glVertex2f(l*wdth, b*hght)
-    glTexCoord2f(0, 1); glVertex2f(l*wdth, t*hght)
-    glTexCoord2f(1, 1); glVertex2f(r*wdth, t*hght)
-    glTexCoord2f(1, 0); glVertex2f(r*wdth, b*hght)
+    glTexCoord2f(0, 0); glVertex2f(0, hght)
+    glTexCoord2f(0, 1); glVertex2f(0, 0)
+    glTexCoord2f(1, 1); glVertex2f(wdth, hght)
+    glTexCoord2f(1, 0); glVertex2f(wdth, 0)
     glEnd()
     glFinish()
 
     glEndList()
 
-    return lsid
+    return dlid
 
-def createCircleDL(txid,wdth,hght,coords):
+def createCircleDL(txid,wdth,hght):
     """
     createCircleDL takes a texture id with width and height and
     generates a display list - an precompiled set of instructions for
@@ -294,31 +292,25 @@ def createCircleDL(txid,wdth,hght,coords):
     compiled are essentially creating a circle and binding the texture
     to it.
     """
-    lsid = glGenLists(1)
-    glNewList(lsid,GL_COMPILE)
+    dlid = glGenLists(1)
+    glNewList(dlid,GL_COMPILE)
     glBindTexture(GL_TEXTURE_2D, txid)
-
-    (l,r,b,t) = coords
-    xstch = r - l
-    ystch = t - b
-    xtrns = (r + l)/2
-    ytrns = (t + b)/2
 
     glBegin(GL_TRIANGLE_FAN)
 
     for ang in np.linspace(0,2*np.pi,360):
         (x,y) = ((np.cos(ang))/2,(np.sin(ang))/2)
-        glTexCoord2f(x, y); glVertex2f(x*wdth*xstch + xtrns,y*hght*ystch + ytrns)
+        glTexCoord2f(x, y); glVertex2f(x*wdth,y*hght)
 
     glEnd()
     glFinish()
 
     glEndList()
 
-    return lsid
+    return dlid
 
-def deleteTextureDL(lsid):
+def deleteTextureDL(dlid):
     """
     deleteTextureDL removes the given display list from memory.
     """
-    glDeleteLists(lsid,1)
+    glDeleteLists(dlid,1)
