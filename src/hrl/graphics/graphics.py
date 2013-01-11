@@ -10,19 +10,19 @@ follows:
     -> Texture (Returned as a a python class instance which can be drawn) 
 
 The conversion of Bitmaps to Greyscale arrays is handled by functions in
-'hrl.graphics.auxilliary', though it is recommended when possible to bypass this step
-and work directly with numpy arrays.
+'hrl.graphics.auxilliary' (it is, however, recommended where possible to bypass this step
+and work directly with numpy arrays).
 
 The conversion of Greyscale Arrays to Processed Greyscale Arrays is handled by
 the base 'hrl' class, and consists primarily of gamma correction and contrast
 range selection.
 
-Saving Processed Greyscale Arrays as OpenGL Display Lists and then python Texture
+The conversion of Processed Greyscale Arrays as OpenGL Display Lists and python Texture
 instances is handled by the functionality provided by this module.
 
 This module comes with two classes. Firstly, the abstract class 'Graphics' specifies the
 interface for graphics hardware in HRL. Secondly, the 'Texture' class is essentially a
-OpenGL wrapper for certain OpenGL functions for the easy display 2d images.
+OpenGL wrapper for certain OpenGL functions for the easy display of 2d images.
 
 Texture objects are not meant to be created on their own, but are instead
 created via the 'newTexture' method of Graphics. Graphics.newTexture will take
@@ -95,7 +95,7 @@ class Graphics(object):
         glEnable(GL_BLEND)
         # Blend settings. Blending is unrelated to e.g. magnification.
         # Blending is how the colours from transluscent objects are
-        # combined.
+        # combined, and is therefore largely irrelevant.
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     def newTexture(self,grys,shape='square'):
@@ -116,7 +116,11 @@ class Graphics(object):
         Texture object
 
         """
-        return Texture(txt,shape)
+        byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
+        wdth = len(grys[0])
+        hght = len(grys[:,0])
+
+        return Texture(byts,wdth,hght,shape)
 
     def flip(self,clr=True):
         """
@@ -139,9 +143,9 @@ class Graphics(object):
         pg.display.flip()
         if clr: glClear(GL_COLOR_BUFFER_BIT)
 
-    def changeBackground(bg,dpxBool):
+    def changeBackground(bg):
         mx = float(2**8-1)
-        (r,g,b,a) = greyToChans(bg)
+        (r,g,b,a) = greyToChannels(bg)
         glClearColor(r/mx,g/mx,b/mx,a/mx)
         glClear(GL_COLOR_BUFFER_BIT)
 
@@ -154,8 +158,8 @@ class Texture:
     of transformation to be performed on the image before it is
     displayed (e.g. translation, rotation).
     """
-    def __init__(self,byts,shape):
-        self._txid, self.wdth, self.hght = loadTexture(byts)
+    def __init__(self,byts,wdth,hght,shape):
+        self._txid, self.wdth, self.hght = loadTexture(byts,wdth,hght)
         if shape == 'square':
             self._dlid = createSquareDL(self._txid,self.wdth,self.hght)
         elif shape == 'circle':
@@ -190,9 +194,6 @@ class Texture:
         -------
         None
         """
-        if pos != None: pos = self._flipper(pos)
-        if sz != None: sz = self._flipper(sz)
-
         if pos:
             glLoadIdentity()
             glTranslate(pos[0],pos[1],0)
@@ -229,26 +230,21 @@ def channelsToInt((r,g,b,a)):
     A = 2**24
     return r*R + g*G + b*B + a*A
 
-def loadTexture(grys):
+def loadTexture(byts,wdth,hght):
     """
-    LoadTexture is the first step in displaying an image with HRL. It takes a
-    2d array of doubles between 0 and 1 which represent a greyscale value and loads it
-    into OpenGL texture memory.
+    LoadTexture takes a bytestring representation of a Processed Greyscale array and loads
+    it into OpenGL texture memory.
 
     In this function we also define our texture minification and
     magnification functions, of which there are many options. Take great
     care when shrinking, blowing up, or rotating an image. The resulting
     interpolations can effect experimental results.
     """
-    wdth = len(grys[0])
-    hght = len(grys[:,0])
-    txtbyts = channelsToInt(greyToChannels(grys[::-1,],dpxBool)).tostring()
-
     txid = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, txid)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wdth, hght, 0, GL_RGBA, GL_UNSIGNED_BYTE, txtbyts)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wdth, hght, 0, GL_RGBA, GL_UNSIGNED_BYTE, byts)
 
     return txid,wdth,hght
 
@@ -273,8 +269,8 @@ def createSquareDL(txid,wdth,hght):
     glBindTexture(GL_TEXTURE_2D, txid)
 
     glBegin(GL_QUADS)
-    glTexCoord2f(0, 0); glVertex2f(0, hght)
-    glTexCoord2f(0, 1); glVertex2f(0, 0)
+    glTexCoord2f(0, 0); glVertex2f(0, 0)
+    glTexCoord2f(0, 1); glVertex2f(0, hght)
     glTexCoord2f(1, 1); glVertex2f(wdth, hght)
     glTexCoord2f(1, 0); glVertex2f(wdth, 0)
     glEnd()

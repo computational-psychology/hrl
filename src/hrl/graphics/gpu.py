@@ -1,12 +1,19 @@
-# Differences between GPU and Datapixx: Channel representation, initialization
-# (datapixx must be initialized as well)
+from graphics import Graphics
+import numpy as np
 
-def nodpxFloatToChans(flt):
-    """
-    Takes a floating point number and returns a 4 channel representation
-    in a normal, 8 bit, greyscale format.
-    """
-    return nodpxIntToChans(np.uint32(flt * (2**8 - 1)))
+## Class ##
+
+class GPU(Graphics):
+
+    def greyToChannels(self,gry):
+        """
+        Converts a single normalized greyscale value (i.e. between 0 and 1)
+        into a 4 colour channel representation specific to the particular graphics
+        backend.
+        """
+        return nodpxIntToChans(np.uint32(gry * (2**8 - 1)))
+
+## Additional Functions ##
 
 def nodpxIntToChans(n):
     """
