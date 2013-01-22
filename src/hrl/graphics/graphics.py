@@ -7,7 +7,7 @@ follows:
     -> Greyscale Array (A numpy array of doubles between 0 and 1)
     -> Processed Greyscale Array (possible remapping with a lookup table)
     -> Display List (Saved to graphics memory as a 'Display List')
-    -> Texture (Returned as a a python class instance which can be drawn) 
+    -> OpenGL Texture (Returned as a a python class instance which can be drawn) 
 
 The conversion of Bitmaps to Greyscale arrays is handled by functions in
 'hrl.graphics.auxilliary' (it is, however, recommended where possible to bypass this step
