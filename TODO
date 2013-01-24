@@ -1,3 +1,8 @@
+keep track of standard deviations of measurements... use it to understand
+actuall interval accuracy
+
+generate a script for error bars on the unprocessed lut (or whatever)
+
 Master Plan:
 
 Okay, so there's been some good ideas about how to expand on datapixx, but it's getting difficult to see the forest for the trees.
