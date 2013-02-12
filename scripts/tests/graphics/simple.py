@@ -1,4 +1,4 @@
-#!/usr/bin/python -O
+#!/usr/bin/python2 -O
 # ranger - a vim-inspired file manager for the console  (coding: utf-8)
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
@@ -22,14 +22,15 @@
 # default is simply "ranger". (Not this file itself!)
 # The other arguments are passed to ranger.
 
-import hrl.graphics.gpu as gpu
 import numpy as np
 import time
 
-grphcs = gpu.GPU(200,200,0.5,False,True)
+import hrl.graphics.gpu as gpu
+
+grphcs = gpu.GPU(600,600,0.5,False,True)
 grphcs.flip()
 txt = grphcs.newTexture(np.array([[1]]))
-txt.draw((50,50),(100,100))
+txt.draw((200,200),(200,200))
 grphcs.flip()
 time.sleep(5)
 

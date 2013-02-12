@@ -1,4 +1,4 @@
-#!/usr/bin/python -O
+#!/usr/bin/python2 -O
 # ranger - a vim-inspired file manager for the console  (coding: utf-8)
 # Copyright (C) 2009, 2010, 2011  Roman Zimbelmann <romanz@lavabit.com>
 #
@@ -22,7 +22,8 @@
 # default is simply "ranger". (Not this file itself!)
 # The other arguments are passed to ranger.
 
-import basic
+import sys
+import tests.graphics.simple
 
 """":
 tempfile='/tmp/chosendir'
