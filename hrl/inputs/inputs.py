@@ -5,9 +5,6 @@ implementing the Input interface should map these inputs to appropriate keys, or
 different keymap with a clear explanation.
 """
 
-# OpenGL
-from OpenGL.GL import *
-
 # PyGame
 import pygame as pg
 from pygame.locals import *
@@ -62,6 +59,7 @@ class Input(object):
         btns : The list of valid button presses.
         """
         self.btns = btns
+        pg.init()
 
     def checkEscape(self):
         """
@@ -70,7 +68,7 @@ class Input(object):
         has. This function be used within the core loop of the program,
         to allow the user to trigger an event which quits the loop, e.g:
 
-        if hrl.checkEscape(): break
+        if in.checkEscape(): break
         """
         eventlist = pg.event.get()
         for event in eventlist:
