@@ -6,7 +6,7 @@ import datapixx as dpx
 
 # Initializing Datapixx
 
-def initializeDPX():
+def initializeDATAPixx():
     """
     InitializeDPX performs a few DataPixx operations in order to ready
     the presentation of images. It returns the datapixx object, which

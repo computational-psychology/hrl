@@ -22,7 +22,7 @@ class Keyboard(Input):
                 btn = checkKey(event.key,btns)
                 if btn != None: break
         t = pg.time.get_ticks()
-        return (btn,t-t0)
+        return (btn,(t-t0)/1000.0)
 
 ## Additional Functions ##
 
