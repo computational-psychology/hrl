@@ -167,13 +167,13 @@ class Texture:
         else:
             raise NameError('Invalid Shape')
 
-    def __del__(self):
-        if self._txid != None:
-            deleteTexture(self._txid)
-            self._txid = None
-        if self._dlid != None:
-            deleteTextureDL(self._dlid)
-            self._dlid = None
+#   def __del__(self):
+#       if self._txid != None:
+#           deleteTexture(self._txid)
+#           self._txid = None
+#       if self._dlid != None:
+#           deleteTextureDL(self._dlid)
+#           self._dlid = None
 
     def draw(self,pos=None,sz=None,rot=0,rotc=None):
         """
