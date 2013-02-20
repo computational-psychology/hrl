@@ -29,8 +29,11 @@ else:
 
                 standard - Basic test for a normal computer
                 datapixx - Basic test for a computer with DATApixx
+                photometer - Take a single reading from an OptiCAL
             """)
         elif args[1] == 'standard':
             import hrl.util.tests.standard
         elif args[1] == 'datapixx':
             import hrl.util.tests.datapixx
+        elif args[1] == 'photometer':
+            import hrl.util.tests.photometer

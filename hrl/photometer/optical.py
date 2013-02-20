@@ -1,20 +1,21 @@
+from photometer import Photometer
 import pyoptical as pop
+import pygame as pg
+import numpy as np
 
-def initializeOptiCAL(dev,timeout=5):
-    return pop.OptiCAL(dev,timeout=timeout)
+class OptiCAL(Photometer):
 
-def tryReadLuminance(phtm,trs,slptm):
-    """ Note that reading the optiCAL ocassionally fails. It's worth
-    testing a few times. """
-    for n in range(trs):
-        try: 
-            pg.time.delay(slptm)
-            lm = phtm.read_luminance()
-            print 'Recorded Luminance:',lm
-            return lm
-        except:
-            print 'error while reading OptiCAL' 
+    def __init__(self,dev,timeout=5):
+        super(OptiCAL,self).__init__()
+        self.phtm = pop.OptiCAL(dev,timeout=timeout)
 
-    return np.nan
-
-
+    def readLuminance(self,n,slp):
+        """ Note that reading the optiCAL ocassionally fails. It's worth
+        testing a few times. If it fails nan will be returned."""
+        for i in range(n):
+            try: 
+                pg.time.delay(slp)
+                lm = self.phtm.read_luminance()
+                return lm
+            except:
+                return np.nan
