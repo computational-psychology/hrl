@@ -36,11 +36,11 @@ here: http://disruption.ca/gutil/introduction.html
 """
 
 # OpenGL
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 # PyGame
 import pygame as pg
-from pygame.locals import *
+#import pygame.locals as pg
 
 # Unqualified Imports
 import abc
@@ -79,24 +79,24 @@ class Graphics(object):
         pg.display.set_mode((w,h), dbit)
         pg.mouse.set_visible(False)
         # Here we can change the default color e.g. to grey
-        glClearColor(bg,bg,bg,1.0)
-        glClear(GL_COLOR_BUFFER_BIT)
-        glDisable(GL_DEPTH_TEST)
+        gl.glClearColor(bg,bg,bg,1.0)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        gl.glDisable(gl.GL_DEPTH_TEST)
 
         # Set Matrix style coordinate system.
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity();
-        glOrtho(0,w,h,0,-1,1)
-        glMatrixMode(GL_MODELVIEW)
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity();
+        gl.glOrtho(0,w,h,0,-1,1)
+        gl.glMatrixMode(gl.GL_MODELVIEW)
 
         # Enable texturing
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
         # Enable blending
-        glEnable(GL_BLEND)
+        gl.glEnable(gl.GL_BLEND)
         # Blend settings. Blending is unrelated to e.g. magnification.
         # Blending is how the colours from transluscent objects are
         # combined, and is therefore largely irrelevant.
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
     def newTexture(self,grys,shape='square'):
         """
@@ -141,13 +141,13 @@ class Graphics(object):
         None
         """
         pg.display.flip()
-        if clr: glClear(GL_COLOR_BUFFER_BIT)
+        if clr: gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
     def changeBackground(bg):
         mx = float(2**8-1)
         (r,g,b,a) = greyToChannels(bg)
-        glClearColor(r/mx,g/mx,b/mx,a/mx)
-        glClear(GL_COLOR_BUFFER_BIT)
+        gl.glClearColor(r/mx,g/mx,b/mx,a/mx)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
 ## Texture Class ##
 
@@ -195,28 +195,29 @@ class Texture:
         None
         """
         if pos:
-            glLoadIdentity()
-            glTranslate(pos[0],pos[1],0)
+            gl.glLoadIdentity()
+            gl.glTranslate(pos[0],pos[1],0)
 
         if rot != 0:
             if rotc == None:
                 rotc = (self.wdth / 2, self.hght / 2)
             (w,h) = rotc
-            glTranslate(rotc[0],rotc[1],0)
-            glRotate(rot,0,0,-1)
-            glTranslate(-rotc[0],-rotc[1],0)
+            gl.glTranslate(rotc[0],rotc[1],0)
+            gl.glRotate(rot,0,0,-1)
+            gl.glTranslate(-rotc[0],-rotc[1],0)
 
         if sz:
             (wdth,hght) = sz
-            glScalef(wdth/(self.wdth*1.0), hght/(self.hght*1.0),1.0)
+            gl.glScalef(wdth/(self.wdth*1.0), hght/(self.hght*1.0),1.0)
 
-        glCallList(self._dlid)
+        gl.glCallList(self._dlid)
 
 
 ### OpenGL Functions ###
 
 
 ## OpenGL Texture Functions ##
+
 
 def channelsToInt((r,g,b,a)):
     """
@@ -240,11 +241,11 @@ def loadTexture(byts,wdth,hght):
     care when shrinking, blowing up, or rotating an image. The resulting
     interpolations can effect experimental results.
     """
-    txid = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, txid)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wdth, hght, 0, GL_RGBA, GL_UNSIGNED_BYTE, byts)
+    txid = gl.glGenTextures(1)
+    gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
+    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
+    gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, wdth, hght, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, byts)
 
     return txid,wdth,hght
 
@@ -252,7 +253,7 @@ def deleteTexture(txid):
     """
     deleteTexture removes the texture from the OpenGL texture memory.
     """
-    glDeleteTextures(txid)
+    gl.glDeleteTextures(txid)
 
 ## OpenGL Display List Functions ##
 
@@ -264,19 +265,19 @@ def createSquareDL(txid,wdth,hght):
     compiled are essentially creating a square and binding the texture
     to it.
     """
-    dlid = glGenLists(1)
-    glNewList(dlid,GL_COMPILE)
-    glBindTexture(GL_TEXTURE_2D, txid)
+    dlid = gl.glGenLists(1)
+    gl.glNewList(dlid,gl.GL_COMPILE)
+    gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
 
-    glBegin(GL_QUADS)
-    glTexCoord2f(0, 0); glVertex2f(0, 0)
-    glTexCoord2f(0, 1); glVertex2f(0, hght)
-    glTexCoord2f(1, 1); glVertex2f(wdth, hght)
-    glTexCoord2f(1, 0); glVertex2f(wdth, 0)
-    glEnd()
-    glFinish()
+    gl.glBegin(gl.GL_QUADS)
+    gl.glTexCoord2f(0, 0); gl.glVertex2f(0, 0)
+    gl.glTexCoord2f(0, 1); gl.glVertex2f(0, hght)
+    gl.glTexCoord2f(1, 1); gl.glVertex2f(wdth, hght)
+    gl.glTexCoord2f(1, 0); gl.glVertex2f(wdth, 0)
+    gl.glEnd()
+    gl.glFinish()
 
-    glEndList()
+    gl.glEndList()
 
     return dlid
 
@@ -288,20 +289,20 @@ def createCircleDL(txid,wdth,hght):
     compiled are essentially creating a circle and binding the texture
     to it.
     """
-    dlid = glGenLists(1)
-    glNewList(dlid,GL_COMPILE)
-    glBindTexture(GL_TEXTURE_2D, txid)
+    dlid = gl.glGenLists(1)
+    gl.glNewList(dlid,gl.GL_COMPILE)
+    gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
 
-    glBegin(GL_TRIANGLE_FAN)
+    gl.glBegin(gl.GL_TRIANGLE_FAN)
 
     for ang in np.linspace(0,2*np.pi,360):
         (x,y) = ((np.cos(ang))/2,(np.sin(ang))/2)
-        glTexCoord2f(x, y); glVertex2f(x*wdth,y*hght)
+        gl.glTexCoord2f(x, y); gl.glVertex2f(x*wdth,y*hght)
 
-    glEnd()
-    glFinish()
+    gl.glEnd()
+    gl.glFinish()
 
-    glEndList()
+    gl.glEndList()
 
     return dlid
 
@@ -309,4 +310,4 @@ def deleteTextureDL(dlid):
     """
     deleteTextureDL removes the given display list from memory.
     """
-    glDeleteLists(dlid,1)
+    gl.glDeleteLists(dlid,1)

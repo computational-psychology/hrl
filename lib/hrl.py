@@ -32,7 +32,7 @@ os.environ['DISPLAY'] = cfg.get('DataPixx','display')
 class HRL:
     """
     HRL (High Resoultion Luminance) is module which provides a set
-    of tools for assembling a psychophysics experiment using OpenGL to
+    of tools for assembling a psychophysics experiment. using OpenGL to
     control the display, and DataPixx to control the datapixx graphics
     card and the ResponsePixx input box. This technology allows the
     presentation of stimuli with high temporal accuracy and contrast
@@ -87,10 +87,11 @@ class HRL:
 
 
     def __init__(self,wdth=1024,hght=768,bg=0.0
-                 ,coords=(0,1,1,0),flipcoords=True
-                 ,pgauto=True,fs=False,db=True
-                 ,dpx=False,btns=['Green','Red']
-                 ,ocal=False
+                 ,fs=False,db=True
+                 ,graphics='gpu'
+                 ,inputs='keyboard'
+                 ,photometer=None
+                 ,btns=['Green','Red']
                  ,lut=None
                  ,dfl=None,rfl=None,rhds=None):
         """
@@ -102,18 +103,14 @@ class HRL:
         wdth : The desired width of the screen. Default: 1024
         hght : The desired height of the screen. Default: 768
         bg : The background luminance on a scale from 0 to 1. Default: 0.0
-        coords,flipcoords : Coordinate system definitions. Default:
-            (0,1,1,0),True (i.e. Matrix style)
         fs : Whether or not to run in Fullscreen. Be warned that this
             prevents output outside of the program. Default: False
         db : Whether or not to use double buffering. By default this is on and
-        should work as expected. However, if the animations aren't behaving as
-        expected, it may be worth turning this off.
-        pgauto : Whether to automatically initialize pygame. Default: True
+        should work. However, if the animations aren't behaving as expected, it may be
+        worth trying to turn this off.
         dpx : Boolean indicating the presence of DataPixx. Default: False
         btns : Which button presses will in fact be registered by the
             DataPixx. Default: ['Green','Red']
-        ocal : Boolean indiciating the presence of OptiCAL. Default: False
         lut : The location of the gamma table. Default: None
         dfl : The read location of the design matrix. Default: None
         rfl : The write location of the result matrix. Default: None
