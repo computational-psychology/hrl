@@ -6,7 +6,7 @@ import pygame as pg
 import time
 
 btns = ['Left','Right','Up','Down','Space']
-kbd = Keyboard(btns)
+kbd = Keyboard()
 
 grphcs = GPU(600,600,0.5,False,True)
 grphcs.flip()

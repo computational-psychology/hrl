@@ -1,13 +1,12 @@
 """
-The Input module provides classes which allow the reading of simple input from a subject
-in HRL. Typical valid inputs are 'Up', 'Down', 'Left', 'Right', and 'Space'. Devices
-implementing the Input interface should map these inputs to appropriate keys, or provide a
-different keymap with a clear explanation.
+This is the HRL submodule for handling subject input. Input methods (e.g.
+keyboards or experiment specific hardware) must implement the Input abstract
+base class, which defines common functions required for reading input and
+measuring time.
 """
 
 # PyGame
 import pygame as pg
-from pygame.locals import *
 
 # Unqualified Imports
 import abc
@@ -16,62 +15,77 @@ import abc
 ### Classes ###
 
 class Input(object):
+    """
+    The Input abstract base class. New hardware inputs must instantiate
+    this class. The core abstract method is 'readButton', which returns
+    information about the key pressed and the amount of time taken.
+    
+    'Keys' will generally just be a string indicating the key pressed. Typical
+    valid inputs are 'Up', 'Down', 'Left', 'Right', and 'Space', but the actual
+    values are specific to the subclasses. Subclasses should come with a
+    a clear explanation of the keymap if it deviates from this typical set.
+    """
     __metaclass__ = abc.ABCMeta
 
     # Abstract Methods #
 
-    def readButton(self,to,btns):
+    def readButton(self,btns,to):
         """
-        Reads a value from the input device, returning a (button,time)
-        pair, where button is the name of the botton pressed, and time
-        is the delay between the initial call and the eventual button
-        press.
-        
-        readButton also depends on the provided list of buttons. Only the
-        provided button colours will register as a button press. If an
-        unlisted colour is pressed, HRL will ignore it and the delay
-        clock will keep counting.
+        Reads a value from the input device, returning a (button,time) pair,
+        where button is the name of the botton pressed, and time is the delay
+        between the initial call and the eventual button press.
 
-        readButton also accepts a timeout, causing readButton to return
-        None if this time is exceeded.
+        readButton also depends on the provided list of buttons. Only the
+        buttons indicated in this list will register as a button press. If an
+        unlisted button is pressed, HRL will ignore it and the delay
+        clock will keep counting. A value of 'None' indicates that all button
+        presses are valid.
+
+        readButton also accepts a timeout, causing readButton to return None if
+        this time is exceeded. If to is equal to zero, then readButton will not
+        time out. (For implementations where this isn't possible, the default
+        wait time should be 1 hour.)
 
         Parameters
         ----------
-        to : How long the readButton will wait for a response in
-        seconds, returning None if it fails. default = 3600.
+        btns : The list of accepted buttons. A value of None indicates that all
+            values are accepted. Default = None
+        to : How long the readButton will wait for a response in seconds,
+            returning None if this time elapses. to=0 indicates no timeout.
+            Default = 0
 
         Returns
         -------
-        (button,time) where button is the colour name of the
-        button pressed, and time is the amount of time in milliseconds
-        it took from the initial call to the press.
+        (button,time) : Button is the name of the button pressed, and time is
+            the amount of time in seconds it took from the initial call to the
+            press.
         """
         return
 
     # Concrete Methods #
 
-    def __init__(self,btns):
+    def __init__(self):
         """
         The Input constructor.
-
-        Parameters
-        ----------
-        btns : The list of valid button presses.
         """
-        self.btns = btns
         pg.init()
 
     def checkEscape(self):
         """
         A simple function which queries pygame as to whether the Escape key
-        has been pressed since the last call, and returns true if it
-        has. This function be used within the core loop of the program,
-        to allow the user to trigger an event which quits the loop, e.g:
+        has been pressed since the last call, and returns true if it has. This
+        function can be used within the core loop of a program to allow the user
+        to trigger an event which quits the loop, e.g:
 
-        if in.checkEscape(): break
+            if in.checkEscape(): break
+
+        Returns
+        -------
+        A boolean indicating whether escape has been pressed since the last
+            call.
         """
         eventlist = pg.event.get()
         for event in eventlist:
-            if event.type == QUIT \
-               or event.type == KEYDOWN and event.key == K_ESCAPE:
+            if event.type == pg.QUIT \
+               or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 return True

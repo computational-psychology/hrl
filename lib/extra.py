@@ -1,28 +1,6 @@
 # Qualified Imports
 import Image as im
 import numpy as np
-import datapixx as dpx
-
-
-# Initializing Datapixx
-
-def initializeDATAPixx():
-    """
-    InitializeDPX performs a few DataPixx operations in order to ready
-    the presentation of images. It returns the datapixx object, which
-    must be maintained in order to continue using DataPixx.
-    """
-    # Open datapixx.
-    dpixx = dpx.open()
-
-    # set videomode: Concatenate Red and Green into a 16 bit luminance
-    # channel.
-    dpixx.setVidMode(dpx.DPREG_VID_CTRL_MODE_M16)
-
-    # Demonstrate successful initialization.
-    dpixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
-                | dpx.BYELLOW | dpx.BRED)
-    return dpixx
 
 # Bitmap Conversion
 

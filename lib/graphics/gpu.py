@@ -4,13 +4,12 @@ import numpy as np
 ## Class ##
 
 class GPU(Graphics):
-
+    """
+    A Graphics implementation for standard GPUs. The 32 bit channel
+    representation is simply an 8-bit integer n equal across the red, green, and
+    blue channels, with the alpha channel set to the max int.
+    """
     def greyToChannels(self,gry):
-        """
-        Converts a single normalized greyscale value (i.e. between 0 and 1)
-        into a 4 colour channel representation specific to the particular graphics
-        backend.
-        """
         return nodpxIntToChans(np.uint32(gry * (2**8 - 1)))
 
 ## Additional Functions ##

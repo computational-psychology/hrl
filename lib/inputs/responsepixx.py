@@ -3,35 +3,34 @@ from inputs import Input
 ## Class ##
 
 class RESPONSEPixx(Input):
+    """
+    An implementation of Input for the RESPONSEPixx box. Accepted keys are 'Up',
+    'Down', 'Left', 'Right', and 'Space' which correspond to the colours of the
+    RESPONSEPixx. These names were chosen to be uniform with the Keyboard
+    implementation.
+    """
 
-    def __init__(self,btns,dpx):
-        super(RESPONSEPixx,self).__init__(btns)
+    def __init__(self,dpx):
+        super(RESPONSEPixx,self).__init__()
         self.dpx = dpx
 
-    def readButton(self,timeout=3600,btns=None):
-        """
-        buttonLoop reads a button off the responsePixx, returning the
-        time and the colour pressed. However, if the the pressed button
-        is not in the HRL's button list, the button pressed will be
-        ignored and the clock will keep ticking.
-        """
-        if btns == None: btns = self.btns
-        rspns = self.dpx.waitButton(timeout)
+    def readButton(self,btns=None,to=3600):
+        rspns = self.dpx.waitButton(to)
         if rspns == None:
-            return (None, timeout)
+            return (None, to)
         else:
-            (clr,tm) = rspns
-            clr = buttonName(clr)
-            if btns.count(clr) > 0:
-                return (clr,tm)
+            (ky,tm) = rspns
+            ky = keyMap(ky)
+            if (btns == None) or (btns.count(ky) > 0):
+                return (ky,tm)
             else:
-                timeout -= tm
-                (clr1,tm1) = self.readButton(timeout,btns)
-                return (clr1,tm1 + tm)
+                to -= tm
+                (ky1,tm1) = self.readButton(to,btns)
+                return (ky1,tm1 + tm)
 
 ## Additional Functions ##
 
-def buttonName(nm):
+def keyMap(nm):
     """
     Translates a number from the responsePixx into a string
     (corresponding to the colour pressed).

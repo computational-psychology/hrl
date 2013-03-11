@@ -1,35 +1,36 @@
 """
-The Graphics module provides classes which allow the presentation of images in
-HRL. Image presentation in HRL can be understood as a multi step process as
-follows:
+This is the HRL submodule for handling graphics devices and OpenGL. Graphics
+devices in HRL instantiate the 'Graphics' abstract class, which defines the
+common functions required for displaying greyscale images.
 
-    Bitmap image (The image written in an 8 bit, 4 channel format)
+Image presentation in HRL can be understood as a multi step process as follows:
+
+    Bitmap (The image written in an 8 bit, 4 channel format)
     -> Greyscale Array (A numpy array of doubles between 0 and 1)
-    -> Processed Greyscale Array (possible remapping with a lookup table)
-    -> Display List (Saved to graphics memory as a 'Display List')
-    -> OpenGL Texture (Returned as a a python class instance which can be drawn) 
+    -> Processed Greyscale Array (A Gresycale Array remapped with a lookup table)
+    -> Display List (An index to a stored texture in graphical memory)
+    -> Texture (A python class instance which can be drawn) 
 
-The conversion of Bitmaps to Greyscale arrays is handled by functions in
-'hrl.graphics.auxilliary' (it is, however, recommended where possible to bypass this step
-and work directly with numpy arrays).
+i) The conversion of Bitmaps to Greyscale arrays is handled by functions in
+'hrl.extra' Where possible, it is recommended to bypass this step and work
+directly with numpy arrays.
 
-The conversion of Greyscale Arrays to Processed Greyscale Arrays is handled by
+ii) The conversion of Greyscale Arrays to Processed Greyscale Arrays is handled by
 the base 'hrl' class, and consists primarily of gamma correction and contrast
 range selection.
 
-The conversion of Processed Greyscale Arrays as OpenGL Display Lists and python Texture
-instances is handled by the functionality provided by this module.
+iii) Saving a Processed Greyscale Array into graphics memory and interacting
+with it as a Texture object is handled in this module.
 
-This module comes with two classes. Firstly, the abstract class 'Graphics' specifies the
-interface for graphics hardware in HRL. Secondly, the 'Texture' class is essentially a
-OpenGL wrapper for certain OpenGL functions for the easy display of 2d images.
+The 'Texture' class is a wrapper for certain OpenGL functions designed to
+simplify the display of individual 2d images.  The sole method of the Texture
+class is 'draw'.
 
 Texture objects are not meant to be created on their own, but are instead
 created via the 'newTexture' method of Graphics. Graphics.newTexture will take
-the given Processed Greyscale Array (with other optional arguments as well),
-and transform it into a Texture instance, saving it in an internal list as well.
-Texture instances have a 'draw' method which uses OpenGL to display the texture
-via the specified hardware (e.g. gpu or datapixx).
+a given Processed Greyscale Array (with other optional arguments as well), and
+return it as Texture object designed to be shown on the particular Graphics
+object.
 
 The openGL code was based largely on a great tutorial by a mysterious tutor
 here: http://disruption.ca/gutil/introduction.html
@@ -40,7 +41,6 @@ import OpenGL.GL as gl
 
 # PyGame
 import pygame as pg
-#import pygame.locals as pg
 
 # Unqualified Imports
 import abc
@@ -52,24 +52,49 @@ import abc
 ## Graphics Class ##
 
 class Graphics(object):
+    """
+    The Graphics abstract base class. New graphics hardware must instantiate
+    this class. The key method is 'greyToChannels', which defines how to
+    represent a greyscale value between 0 and 1 as a 4-tuple (r,g,b,a), so that
+    the given grey value is correctly on the Graphics backend.
+    """
     __metaclass__ = abc.ABCMeta
 
     # Abstract Methods #
 
     def greyToChannels(self,gry):
         """
-        Converts a single normalized greyscale value (i.e. between 0 and 1)
-        into a 4 colour channel representation specific to the particular graphics
-        backend.
+        Converts a single greyscale value into a 4 colour channel representation
+        specific to self (the graphics backend).
+
+        Parameters
+        ----------
+        gry : The grey value
+
+        Returns
+        -------
+        (r,g,b,a) the grey represented as a corresponding 4-tuple
         """
         return
 
     # Concrete Methods #
 
-    def __init__(self,w,h,bg,fs,db):
+    def __init__(self,w,h,bg,fs=False,db=True):
         """
-        The Graphics constructor defines the basic OpenGL initializations that must be
-        performed besides operations specific to particular backends.
+        The Graphics constructor predefines the basic OpenGL initializations
+        that must be performed regardless of the specific backends.
+
+        Parameters
+        ----------
+        w : The width (in pixels) of the openGL window
+        h : The height (in pixels) of the openGL window
+        bg : The default background grey value (between 0 and 1)
+        fs : Enable fullscreen display (Boolean) Default: True
+        db : Enable double buffering (Boolean) Default: True
+
+        Returns
+        -------
+        Graphics object
         """
 
         # Here we can add other options like fullscreen
@@ -78,9 +103,8 @@ class Graphics(object):
         if db: dbit = dbit | pg.DOUBLEBUF
         pg.display.set_mode((w,h), dbit)
         pg.mouse.set_visible(False)
-        # Here we can change the default color e.g. to grey
-        gl.glClearColor(bg,bg,bg,1.0)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+
+        # Disables this thing
         gl.glDisable(gl.GL_DEPTH_TEST)
 
         # Set Matrix style coordinate system.
@@ -98,15 +122,23 @@ class Graphics(object):
         # combined, and is therefore largely irrelevant.
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
+        # Here we change the default color 
+        self.changeBackground(bg)
+        self.flip()
+
     def newTexture(self,grys,shape='square'):
         """
         Given a numpy array of values between 0 and 1, returns a new
         Texture object. The texture object comes equipped with the draw
         method for obvious purposes.
+        
+        NB: Images in HRL are represented in matrix style coordinates. i.e. the
+        origin is in the upper left corner, and increases to the right and
+        downwards.
 
         Parameters
         ----------
-        txt : The greyscale numpy array
+        grys : The greyscale numpy array
         shape : The shape to 'cut out' of the given greyscale array. A square
             will render the entire array. Available: 'square', 'circle'
             Default: 'square'
@@ -114,7 +146,6 @@ class Graphics(object):
         Returns
         -------
         Texture object
-
         """
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
@@ -125,27 +156,30 @@ class Graphics(object):
     def flip(self,clr=True):
         """
         Flips in the image backbuffer. In general, one will want to draw
-        a set of textures and then call flip to draw them all to the
-        screen at once.
+        a set of Textures and then call flip to display them all at once.
 
         Takes a clr argument which causes the back buffer to clear after
-        the flip. When off, textures will be drawn on top of the
-        displayed buffer.
+        the flip. When off, textures will be drawn on top of the current back
+        buffer. By default the back buffer will be cleared automatically, but in
+        performance sensitive scenarios it may be worth turning this off.
 
         Parameters
         ----------
-        clr : Whether to clear the back buffer after flip.
-
-        Returns
-        -------
-        None
+        clr : Whether to clear the back buffer after flip. Default: True
         """
         pg.display.flip()
         if clr: gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-    def changeBackground(bg):
+    def changeBackground(self,bg):
+        """
+        Changes the current background grey value.
+
+        Parameters
+        ----------
+        bg : The new gray value (between 0 and 1)
+        """
         mx = float(2**8-1)
-        (r,g,b,a) = greyToChannels(bg)
+        (r,g,b,a) = self.greyToChannels(bg)
         gl.glClearColor(r/mx,g/mx,b/mx,a/mx)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
@@ -154,11 +188,25 @@ class Graphics(object):
 class Texture:
     """
     The Texture class is a wrapper object for a compiled texture in
-    OpenGL. It's only method is the draw method, which allows a number
-    of transformation to be performed on the image before it is
-    displayed (e.g. translation, rotation).
+    OpenGL. It's only method is the draw method.
     """
     def __init__(self,byts,wdth,hght,shape):
+        """
+        The internal constructor for Textures. Users should use
+        Graphics.newTexture to create textures rather than this constructor.
+
+        Parameters
+        ----------
+        byts : A bytestring representation of the greyscale array
+        wdth : The width of the array
+        hght : The height of the array
+        shape : The shape to 'cut out' of the given greyscale array. A square
+            will render the entire array. Available: 'square', 'circle'
+
+        Returns
+        -------
+        Texture object
+        """
         self._txid, self.wdth, self.hght = loadTexture(byts,wdth,hght)
         if shape == 'square':
             self._dlid = createSquareDL(self._txid,self.wdth,self.hght)
@@ -177,16 +225,18 @@ class Texture:
 
     def draw(self,pos=None,sz=None,rot=0,rotc=None):
         """
-        This method draws the texture based on the coordinate system of
-        the HRL object from which this texture was generated.
+        This method loads the Texture into the back buffer. Calling
+        Graphics.flip will cause it to be drawn to the screen. It also allows a
+        number of transformation to be performed on the image before it is
+        loaded (e.g. translation, rotation)
 
         Parameters
         ----------
-        pos : A tuple representing the position of the image in the chosen coordinate
-            system.
-        sz : A tuple representing the size of the image in the chosen coordinate system.
-            None causes the natural width and height of the image to be used, which
-            prevents an blending of the image.
+        pos : A pair (rows,columns) representing the the position in pixels in
+            the Graphics window of the upper left corner (origin) of the Texture
+        sz : A tuple (width,height) representing the size of the image in
+            pixels.  None causes the natural width and height of the image to be
+            used, which prevents an blending of the image.
         rot : Rotation applied to the image. May result in scaling/interpolation.
         rotc : Defines the centre of the rotation.
 
@@ -213,7 +263,7 @@ class Texture:
         gl.glCallList(self._dlid)
 
 
-### OpenGL Functions ###
+### Internal Functions ###
 
 
 ## OpenGL Texture Functions ##
@@ -221,9 +271,10 @@ class Texture:
 
 def channelsToInt((r,g,b,a)):
     """
-    Takes a channel representation and returns a corresponding unsigned 32 bit int.
-    Running the tostring method on a 2d array which has had this function applied to it
-    will produce a bytestring appropriate for use as a texture with openGL.
+    Takes a channel representation and returns a corresponding unsigned 32 bit
+    int.  Running the tostring method on a 2d array which has had this function
+    applied to it will produce a bytestring appropriate for use as a texture
+    with openGL.
     """
     R = 2**0
     G = 2**8
@@ -233,8 +284,8 @@ def channelsToInt((r,g,b,a)):
 
 def loadTexture(byts,wdth,hght):
     """
-    LoadTexture takes a bytestring representation of a Processed Greyscale array and loads
-    it into OpenGL texture memory.
+    LoadTexture takes a bytestring representation of a Processed Greyscale array
+    and loads it into OpenGL texture memory.
 
     In this function we also define our texture minification and
     magnification functions, of which there are many options. Take great
