@@ -42,50 +42,37 @@ publish them when they have been thoroughly tested.
 ### Installation ###
 
 
-- Set the desired build path for the libraries in make.inc with the BUILDDIR
-  variable, and the desired path for the python libraries with the PYDIR. By
-  default the python libraries will be installed in /usr/local/lib for all users,
-  but this requires sudo access to install.
-- Run make at the base of the hrl directory with sudo access if required, and
-  with a 'nodpx' argument if no datapixx is module is required
-- If you modified PYDIR, add PYDIR to your PYTHONPATH. Otherwise the default
-  path should allow python to detect the libraries automatically.
-- Move misc/hrlrc to ~/.hrlrc and edit it to comply with your system.
-
+HRL uses distutils for installation. Simply run 'sudo python setup.py install' at the root
+of the source directory. Note that HRL is currently python 2 compatible only.
+  
 
 ##### Dependencies #####
 
-- Required: pygame
-- Optional: pydatapixx, pyoptical (depends on pyserial)
+- Required: pygame, pyopengl
+- Optional: pydatapixx, pyoptical, pyserial
 
 
 ### Usage ###
 
 
-##### Finding Documentation #####
+Installing HRL installs both the libraries for developing experiments, as well as scripts
+for running calibrations, tests, and other features. The libraries are installed under the
+base module 'hrl'. The scripts can be accessed by running 'hrl-util' at the command line.
 
-- Start IPython
-- Import HRL: from hrl import *
-- Create and hrl instance: hrl = HRL(...)
-- Examine module documentation: hrl?
-- Access HRL method documentation: hrl.method?
-- Using IPython to interact with an hrl instance can be very helpful
-  while designing an experiment.
+##### Documentation #####
 
-##### Developing an Experiment #####
+- HRL docstrings can be accessed via pydoc. Running 'pydoc hrl' will display an
+  introductory help file which in turn will explain where exactly to find the rest of the
+  documentation.
+- Running 'hrl-util' at the command line without any arguments will display another
+  introductory help file, overviewing the various scripts that can be run via hrl-util.
+- A heavily documented example experiment is available under examples/sacha. Beginning
+  with a copy of examples/sacha is recommended for first time users who wish to code a new
+  experiment.
 
-- A demonstration experiment is available under scripts/experiments/sacha and is a good reference for how
-  to design an experiment with HRL. You may want to copy it as a
-  starting point for your experiment.
-- If you want to use gamma correction, generate lut.txt with the hrl.lut module
-(see below), and pass it to an hrl instance with hrl = HRL(...,lut='LUT.txt')
+##### Calibration #####
 
-##### Calibrating Hardware #####
+- HRL comes with scripts for developing a gamma correction Lookup Table (LUT) as well as
+  various tests for calibrating the scientific hardware. Currently these are deprecated
+  and will be updated soon.
 
-- The directory scripts/calibration 
-
-##### Building a Lookup Table #####
-
-- 'from hrl import lut'
-- Read the lookup table documentation with 'lut?' and follow them. The end
-  result is a file 'lut.txt'.
