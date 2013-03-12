@@ -5,8 +5,9 @@ from inputs import Input
 class RESPONSEPixx(Input):
     """
     An implementation of Input for the RESPONSEPixx box. Accepted keys are 'Up',
-    'Down', 'Left', 'Right', and 'Space' which correspond to the colours of the
-    RESPONSEPixx. These names were chosen to be uniform with the Keyboard
+    'Down', 'Left', 'Right', 'Space', and 'Escape' which correspond to the
+    colours of the RESPONSEPixx, or the actual Escape key in the case of
+    'Escape'. These names were chosen to be uniform with the Keyboard
     implementation.
     """
 
@@ -15,6 +16,9 @@ class RESPONSEPixx(Input):
         self.dpx = dpx
 
     def readButton(self,btns=None,to=3600):
+        if checkEscape():
+            return 'Escape'
+
         rspns = self.dpx.waitButton(to)
         if rspns == None:
             return (None, to)
@@ -42,3 +46,24 @@ def keyMap(nm):
     elif nm == 8: return 'Down'
     elif nm == 16: return 'Space'
 
+def checkEscape():
+    """
+    A simple function which queries pygame as to whether the Escape key
+    has been pressed since the last call, and returns true if it has. This
+    function can be used within the core loop of a program to allow the user
+    to trigger an event which quits the loop, e.g:
+
+        if inputs.checkEscape(): break
+
+    Returns
+    -------
+    A boolean indicating whether escape has been pressed since the last
+        call.
+    """
+    eventlist = pg.event.get()
+    for event in eventlist:
+        if event.type == pg.QUIT \
+           or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            return True
+        else:
+            return False

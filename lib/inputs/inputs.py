@@ -69,23 +69,3 @@ class Input(object):
         The Input constructor.
         """
         pg.init()
-
-    def checkEscape(self):
-        """
-        A simple function which queries pygame as to whether the Escape key
-        has been pressed since the last call, and returns true if it has. This
-        function can be used within the core loop of a program to allow the user
-        to trigger an event which quits the loop, e.g:
-
-            if in.checkEscape(): break
-
-        Returns
-        -------
-        A boolean indicating whether escape has been pressed since the last
-            call.
-        """
-        eventlist = pg.event.get()
-        for event in eventlist:
-            if event.type == pg.QUIT \
-               or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-                return True

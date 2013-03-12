@@ -6,7 +6,7 @@ import pygame as pg
 class Keyboard(Input):
     """
     A Input implementation for a standard PC keyboard. Permitted keys are 'Up',
-    'Down', 'Left', 'Right', and 'Space'.
+    'Down', 'Left', 'Right', 'Space', and 'Escape'.
     """
     def readButton(self,btns=None,to=0):
         t0 = pg.time.get_ticks()
@@ -23,7 +23,7 @@ class Keyboard(Input):
 
 def checkKey(ky,btns):
     kynm = keyMap(ky)
-    if (btns.count(kynm) > 0):
+    if (btns == None or btns.count(kynm) > 0):
         return kynm
     else:
         return None
@@ -39,5 +39,7 @@ def keyMap(ky):
         return 'Left'
     elif (ky == pg.K_SPACE):
         return 'Space'
+    elif (ky == pg.K_ESCAPE):
+        return 'Escape'
     else:
         return None

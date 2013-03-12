@@ -36,13 +36,9 @@ The openGL code was based largely on a great tutorial by a mysterious tutor
 here: http://disruption.ca/gutil/introduction.html
 """
 
-# OpenGL
 import OpenGL.GL as gl
-
-# PyGame
 import pygame as pg
-
-# Unqualified Imports
+import numpy as np
 import abc
 
 

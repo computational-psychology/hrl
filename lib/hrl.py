@@ -10,32 +10,22 @@ import csv
 
 class HRL:
     """
-    HRL (High Resoultion Luminance) is module which provides a set
-    of tools for assembling a psychophysics experiment. using OpenGL to
-    control the display, and DataPixx to control the datapixx graphics
-    card and the ResponsePixx input box. This technology allows the
-    presentation of stimuli with high temporal accuracy and contrast
-    resolution.
+    HRL (High Resoultion Luminance) is a class which interfaces with a set of
+    devices for assembling a psychophysics experiment. The sorts of devices are
+    graphics devices for driving display, inputs for reading input from a
+    subject, and photometers for calibration. For more information about these
+    components, see the relevant help files.
 
-    HRL wraps the control of a number of devices into one object of
-    class HRL, and manages hardware based on a number of initialization
-    arguments. So far this includes openGL, dataPixx, responsePixx, and
-    optiCAL, and gamma correction. For a general overview see the module
-    description.  Ideally, all programming should be possible through
-    HRL alone, without the need to import OpenGL, pygame, or any other
-    such core libraries.
-
-    An optional aspect of HRLs functionality is the ability to
-    automatically read design matrices, and print out result matrices.
-    While this functionality is little more than a reexportation of
-    python's csv package, it can still simplify the code of many
-    experiment scripts. These features can be activated with the
-    appropriate hrl initializaiton arguments. When activated, the
-    corresponding HRL instance has the fields designs, and results added to
-    it. hrl.designs is an iterator over the lines of the design matrix and
-    can be used for example in a for loop - 'for dsgn in hrl.designs:'.
-    hrl.results is a dictionary which is written to the result matrix file
-    when hrl.writeResultLine() is called.
+    An optional aspect of HRLs functionality is the ability to automatically
+    read design matrices, and print out result matrices.  While this
+    functionality is little more than a reexportation of python's csv package,
+    it can still simplify the code of many experiment scripts. These features
+    can be activated with the appropriate hrl initializaiton arguments. When
+    activated, the corresponding HRL instance has the fields 'designs' and
+    'results' added to it. hrl.designs is an iterator over the lines of the
+    design matrix and can be used for example in a for loop - 'for dsgn in
+    hrl.designs:'.  hrl.results is a dictionary which is written to the result
+    matrix file when hrl.writeResultLine() is called.
     """
 
 

@@ -1,3 +1,17 @@
+"""
+This script implements a simple psychophysics experiment which makes use of all
+the functionality of HRL. It forms a good basis from which to write your own
+experiment.
+
+The experiment involves three circles of different luminance, and the objective
+is to set the middle circle to have a luminance in between the two other
+circles. The luminance of the middle circle can be changed via Up and Down for
+big steps, and Right and Left for small steps. When the subject feels that the
+luminance is correct, Space can be pressed to save the results to a file and
+move to the next round. Escape can be pressed at any time to quit the
+experiment. Results will be saved in a file called 'results.csv'.
+"""
+
 ### Imports ###
 
 # Package Imports
@@ -5,7 +19,6 @@ from hrl import HRL
 
 # Qualified Imports
 import numpy as np
-import argparse as ap
 import sys
 import os
 
@@ -13,147 +26,196 @@ import os
 from random import uniform
 
 
-### Argument Parser ###
-
-
-prsr = ap.ArgumentParser(description= "This is an experiment. It takes an argument in the form of a subject name, which it will use to name the result file. The experiment involves asking subjects to set a central circle to the luminance in between two other circles. Fine and coarse controls are provided by directional keys, and the selected luminance is entered with space/white.")
-
-prsr.add_argument('sbj',default='subject',nargs='?',help="The name of the subject of the experiment. Default: subject")
-
-
 ### Main ###
 
 
 def main():
 
-    # Parse args
-    args = prsr.parse_args()
 
-    # HRL parameters
+    ### HRL Parameters ###
+
+
+    # Here we define all the paremeters required to instantiate an HRL object.
+
+    # Screen size
     wdth = 1024
     hght = 768
+    
+    # Whether or not to use fullscreen. You probably want to do this when
+    # actually running experiments, but when just developing one, fullscreen
+    # locks out access to the rest of the computer, so you'll probably want to
+    # turn this off.
+    fs = False
 
-    # Section the screen - used by Core Loop
-    wqtr = wdth/8.0
+    # Design and result matrix information. This allows us the to use the HRL
+    # functionality for automatically reading a design matrix, and
+    # automatically generating a result matrix. See 'pydoc hrl.hrl' for more
+    # information about these.
 
-    # IO Stuff
-    dpxBool = True
+    # Design and Result matrix files names
     dfl = 'design.csv'
-    rfl = 'results/' + args.sbj + '.csv'
+    rfl = 'results.csv'
+
+    # The names of the fields in the results matrix. In each loop of the
+    # script, we write another line of values to results.csv under these
+    # headings.
     flds = ['SelectedMunsell','LeftMunsell','RightMunsell','Trial','TrialTime'
             ,'FramePresent','LeftLuminance','RightLuminance','InitialLuminance'
             ,'InitialMunsell','SelectedLuminance']
-    btns = ['Yellow','Red','Blue','Green','White']
-
-    # Central Coordinates (the origin of the graphics buffers is at the centre of the
-    # screen. Change this if you don't want a central coordinate system. If you delete
-    # this part the default will be a matrix style coordinate system.
-    coords = (-0.5,0.5,-0.5,0.5)
-    flipcoords = False
 
     # Pass this to HRL if we want to use gamma correction.
-    lut = 'lut.txt'
-    # If fs is true, we must provide a way to exit with e.g. checkEscape().
-    fs = True
+    # lut = 'lut.txt'
 
-    # Step sizes for luminance changes
+    # Create the hrl object with the above fields.
+    hrl = HRL(wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=flds,fs=fs)
+
+    # hrl.results is a dictionary which is automatically created by hrl when
+    # give a list of result fields. This can be used to easily write lines to
+    # the result file, as will be seen later.
+    hrl.results['Trial'] = 0
+
+    
+    ### Experiment setup ###
+
+
+    # We are arranging circles and shapes around the screen, so it's helpful to
+    # section the screen into eights and halves.
+    whlf = wdth/2.0
+    hhlf = hght/2.0
+    weht = wdth/8.0
+    heht = hght/8.0
+
+    # These are the big and small step sizes for luminance changes
     smlstp = 0.005
     bgstp = 0.05
 
-    # HRL Init
-    hrl = HRL(wdth,hght,0,dpx=dpxBool,dfl=dfl,rfl=rfl,rhds=flds
-              ,btns=btns,fs=fs,coords=coords,lut=lut,flipcoords=flipcoords)
+    # Here we load the square frame which contains the circles into the back
+    # buffer. This is simply a white square covered by a slightly smaller black
+    # square. The textures loaded are simply 1x1 pixel values, but then we use
+    # the draw function to stretch them to the appropriate size. Since we never
+    # draw these objects again, we don't bother saving the texture objects
+    # returned by newTexture, but rather simply draw them right away and then
+    # throw them away.
+    hrl.graphics.newTexture(np.array([[1]])).draw((1.9*weht,1.9*heht),(0.525*wdth,0.525*hght))
+    hrl.graphics.newTexture(np.array([[0]])).draw((2*weht,2*heht),(0.5*wdth,0.5*hght))
 
-    hrl.rmtx['Trial'] = 0
 
-    # Core Loop
-    for dsgn in hrl.dmtx:
+    ### Core Loop ###
 
-        # Load Trial
+
+    # hrl.designs is an iterator over all the lines in the specified design
+    # matrix, which was loaded at the creation of the hrl object. Looping over
+    # it in a for statement provides a nice way to run each line in a design
+    # matrix. The fields of each design line (dsgn) are drawn from the design
+    # matrix in the design file (design.csv).
+    for dsgn in hrl.designs:
+
+        # Here we save the values of the design line with appropriately cast
+        # types and simple names.
         lmns = float(dsgn['LeftMunsell'])
         rmns = float(dsgn['RightMunsell'])
         rds = float(dsgn['Radius'])
         frm = bool(dsgn['FramePresent'])
 
-        # Draw frame (or not)
-        if hrl.rmtx['Trial'] is 0 and frm:
-            hrl.newTexture(np.array([[0]])).draw((0,0),(wdth,hght))
-            hrl.newTexture(np.array([[1]])).draw((0,0),(0.525*wdth,0.525*hght))
-            hrl.newTexture(np.array([[0]])).draw((0,0),(0.5*wdth,0.5*hght))
+        # And we randomly initialize the luminance of the central circle.
+        cmns = uniform(0.0,1.0)
 
-        # Create Patches
+        # Here we create our circle textures. Again, they are simply 1x1 pixel
+        # textures, but since they are uniform in colour, it serves simply to
+        # stretch them to our desired dimensions.
         llm = munsell2luminance(np.array([[lmns]]))
         rlm = munsell2luminance(np.array([[rmns]]))
-
-        cmns = uniform(0.0,1.0)
         clm = munsell2luminance(np.array([[cmns]]))
 
-        hrl.newTexture(llm,'circle').draw((-wqtr,0),(2*rds,2*rds))
-        hrl.newTexture(rlm,'circle').draw((wqtr,0),(2*rds,2*rds))
-        hrl.newTexture(clm,'circle').draw((0,0),(2*rds,2*rds))
+        # Here we draw the circles to the back buffer
+        hrl.graphics.newTexture(llm,'circle').draw((whlf-weht,hhlf),(2*rds,2*rds))
+        hrl.graphics.newTexture(rlm,'circle').draw((whlf,hhlf),(2*rds,2*rds))
+        hrl.graphics.newTexture(clm,'circle').draw((whlf+weht,hhlf),(2*rds,2*rds))
 
-        # Record some initial values for the result matrix
-        hrl.rmtx['Trial'] += 1
-        hrl.rmtx['FramePresent'] = frm
-        hrl.rmtx['LeftLuminance'] = llm[0,0]
-        hrl.rmtx['LeftMunsell'] = lmns
-        hrl.rmtx['RightLuminance'] = rlm[0,0]
-        hrl.rmtx['RightMunsell'] = rmns
-        hrl.rmtx['InitialLuminance'] = clm[0,0]
-        hrl.rmtx['InitialMunsell'] = cmns
+        # Finally we load our frame and our circles to the screen. We don't
+        # clear the back buffer because we don't want to redraw the frame, and
+        # we'll simply draw new circles ontop of old ones.
+        hrl.graphics.flip(clr=False)
 
-        # Draw but don't clear the back buffer
-        hrl.flip(clr=False)
 
-        # Prepare Core Loop logic
+        # And finally we preload some variables to prepare for our button
+        # reading loop.
+
+        # The button pressed
         btn = None
-        t = 0.0
+        # The time it took to decide on the mean luminance
+        j = 0.0
+        # Whether escape was pressed
         escp = False
 
-        # Note the trial
-        print hrl.rmtx['Trial']
 
-        # Adjust central patch
-        while ((btn != 'White') & (escp != True)):
+        ### Input Loop ####
+        
+        # Until the user finalizes their luminance choice for the central
+        # circle, or pressed escape...
+        while ((btn != 'Space') & (escp != True)):
 
-            (btn,t1) = hrl.readButton()
+            # Read the next button press
+            (btn,t1) = hrl.inputs.readButton()
+            # Add the time it took to press to the decision time
             t += t1
 
-            if btn == 'Yellow':
+            # Respond to the pressed button
+            if btn == 'Up':
                 cmns += bgstp
-            elif btn == 'Red':
+            elif btn == 'Right':
                 cmns += smlstp
-            elif btn == 'Blue':
+            elif btn == 'Down':
                 cmns -= bgstp
-            elif btn == 'Green':
+            elif btn == 'Left':
                 cmns -= smlstp
+            elif btn == 'Escape':
+                escp = True
+                break
 
-            # Bound Checking
+            # Make sure the luminance doesn't fall out of the range [0,1]
             if cmns > 1: cmns = 1
             if cmns < 0: cmns = 0
 
-            # Update display
+            # And update the display with the new value
             clm = munsell2luminance(np.array([[cmns]]))
-            hrl.newTexture(clm,'circle').draw((0,0),(2*rds,2*rds))
-            hrl.flip(clr=False)
+            hrl.graphics.newTexture(clm,'circle').draw((whlf,hhlf),(2*rds,2*rds))
+            hrl.graphics.flip(clr=False)
 
-            if hrl.checkEscape(): escp = True
-
-        # Save results of trial
-        hrl.rmtx['TrialTime'] = t/1000
-        hrl.rmtx['SelectedLuminance'] = clm[0,0]
-        hrl.rmtx['SelectedMunsell'] = cmns
+        # Once a value has been chosen by the subject, we save all the relevant
+        # variables to the result file by loading it all into the hrl.results
+        # dictionary, and then finally running hrl.writeResultLine().
+        hrl.results['Trial'] += 1
+        hrl.results['FramePresent'] = frm
+        hrl.results['LeftLuminance'] = llm[0,0]
+        hrl.results['LeftMunsell'] = lmns
+        hrl.results['RightLuminance'] = rlm[0,0]
+        hrl.results['RightMunsell'] = rmns
+        hrl.results['InitialLuminance'] = clm[0,0]
+        hrl.results['InitialMunsell'] = cmns
+        hrl.results['TrialTime'] = t
+        hrl.results['SelectedLuminance'] = clm[0,0]
+        hrl.results['SelectedMunsell'] = cmns
         hrl.writeResultLine()
 
-        # Check if escape has been pressed
-        if escp: break
+        # We print the trial number simply to keep track during an experiment
+        print hrl.results['Trial']
 
-    # Experiment is over!
+        # If escape has been pressed we break out of the core loop
+        if escp:
+            print "Session cancelled"
+            break
+
+    # And the experiment is over!
     hrl.close()
+    print "Session complete"
 
 
 ### Functions copied from stimuli/utils.py ###
 
+# These functions are used to convert to and from the munsell scale.
+# Understanding these is not particularly important for understanding how to
+# use HRL to run this experiment.
 
 def luminance2munsell(lum_values, reference_white=1.0):
     """
