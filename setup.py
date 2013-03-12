@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import distutils.core
+import os
 
 if __name__ == '__main__':
     distutils.core.setup(
@@ -15,3 +16,6 @@ if __name__ == '__main__':
         packages=('hrl','hrl.graphics','hrl.inputs','hrl.photometer'
             ,'hrl.util','hrl.util.tests'),
         scripts=['bin/hrl-util'])
+
+
+        

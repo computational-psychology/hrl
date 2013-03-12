@@ -30,6 +30,7 @@ else:
                 standard - Basic test for a normal computer
                 datapixx - Basic test for a computer with DATApixx
                 optical - Take a single reading from an OptiCAL
+                class - Tests the HRL class with normal hardware
             """)
         elif args[1] == 'standard':
             import hrl.util.tests.standard
@@ -37,3 +38,5 @@ else:
             import hrl.util.tests.datapixx
         elif args[1] == 'optical':
             import hrl.util.tests.optical
+        elif args[1] == 'class':
+            import hrl.util.tests.classtest
