@@ -1,13 +1,16 @@
 """
-This is the base of the HRL program structure. In order to use HRL, most users
-will simply wish to use 'from hrl import HRL' to loaded the HRL class which
-incorporates the functionality of all the various submodules.
+This is the root of the HRL module hierarchy. In order to use HRL, most users
+will simply need to include 'from hrl import HRL' amongst their imports and
+instantiate the HRL class. The HRL class wraps all the functionality provided by
+the HRL librariers. 
 
+Nevertheless, in order to understand how to use the various components of HRL,
+it is best to consult the documentation of the submodules in the hierarchy.
 Documentation about the various parts of HRL can be accessed via the following
 commands:
 
 pydoc hrl - This file
-pydoc hrl.hrl - HRL class help
+pydoc hrl.hrl - Help for the general HRL class
 pydoc hrl.graphics.graphics - Help for graphics devices in general
 pydoc hrl.graphics.gpu - Help for using a normal video card for display
 pydoc hrl.graphics.datapixx - Help for using the DATAPixx DAC

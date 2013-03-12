@@ -37,6 +37,12 @@ def main():
 
     # Here we define all the paremeters required to instantiate an HRL object.
 
+    # Which devices we wish to use in this experiment. See the documentation for a list of
+    # options.
+    graphics='gpu'
+    inputs='keyboard'
+    photometer=None
+
     # Screen size
     wdth = 1024
     hght = 768
@@ -59,15 +65,17 @@ def main():
     # The names of the fields in the results matrix. In each loop of the
     # script, we write another line of values to results.csv under these
     # headings.
-    flds = ['SelectedMunsell','LeftMunsell','RightMunsell','Trial','TrialTime'
+    rhds = ['SelectedMunsell','LeftMunsell','RightMunsell','Trial','TrialTime'
             ,'FramePresent','LeftLuminance','RightLuminance','InitialLuminance'
             ,'InitialMunsell','SelectedLuminance']
 
     # Pass this to HRL if we want to use gamma correction.
     # lut = 'lut.txt'
 
-    # Create the hrl object with the above fields.
-    hrl = HRL(wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=flds,fs=fs)
+    # Create the hrl object with the above fields. All the default argument names are
+    # given just for illustration.
+    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
+            ,wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=rhds,fs=fs)
 
     # hrl.results is a dictionary which is automatically created by hrl when
     # give a list of result fields. This can be used to easily write lines to
@@ -144,7 +152,7 @@ def main():
         # The button pressed
         btn = None
         # The time it took to decide on the mean luminance
-        j = 0.0
+        t = 0.0
         # Whether escape was pressed
         escp = False
 

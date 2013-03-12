@@ -156,7 +156,7 @@ class HRL:
             self._rfl = open(rfl,'wb')
             self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
             self.results = {}
-            #self._rwtr.writeheader() Python 2.7
+            #self._rwtr.writeheader() - requires Python 2.7
             self._rfl.write(' '.join(rhds) + '\r\n')
 
         # Gamma Function Correction
