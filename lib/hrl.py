@@ -134,7 +134,7 @@ class HRL:
 
         ## Load Photometer ##
 
-        if inputs == 'optical':
+        if photometer == 'optical':
 
             from photometer.optical import OptiCAL
             self.photometer = OptiCAL('/dev/ttyUSB0')

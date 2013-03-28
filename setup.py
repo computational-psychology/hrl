@@ -14,7 +14,7 @@ if __name__ == '__main__':
         url='https://github.com/TUBvision/hrl',
         package_dir = {'hrl' : 'lib', 'hrl.util' : 'bin/util'},
         packages=('hrl','hrl.graphics','hrl.inputs','hrl.photometer'
-            ,'hrl.util','hrl.util.tests'),
+            ,'hrl.util','hrl.util.tests','hrl.util.lut'),
         scripts=['bin/hrl-util'])
 
 

@@ -16,7 +16,7 @@ class RESPONSEPixx(Input):
         self.dpx = dpx
 
     def readButton(self,btns=None,to=3600):
-        if checkEscape():
+        if self.checkEscape():
             return 'Escape'
 
         rspns = self.dpx.waitButton(to)
@@ -45,25 +45,3 @@ def keyMap(nm):
     elif nm == 4: return 'Left'
     elif nm == 8: return 'Down'
     elif nm == 16: return 'Space'
-
-def checkEscape():
-    """
-    A simple function which queries pygame as to whether the Escape key
-    has been pressed since the last call, and returns true if it has. This
-    function can be used within the core loop of a program to allow the user
-    to trigger an event which quits the loop, e.g:
-
-        if inputs.checkEscape(): break
-
-    Returns
-    -------
-    A boolean indicating whether escape has been pressed since the last
-        call.
-    """
-    eventlist = pg.event.get()
-    for event in eventlist:
-        if event.type == pg.QUIT \
-           or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-            return True
-        else:
-            return False
