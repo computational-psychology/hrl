@@ -68,7 +68,7 @@ else:
             creates: 'samples.csv'
         smooth - Apply kernel smoothing to generate an approximate function
             creates: 'gamma.csv'
-        invert - Invert the function approximation to generate a final lookup table
+        linearize - Invert the function approximation to generate a final lookup table
             creates: 'lut.csv'
         plot - Generate helpful plots for the three generated csv files
             """)
@@ -76,4 +76,15 @@ else:
             from hrl.util.lut.measure import measure
             measure(args[2:])
 
+        elif args[1] == 'smooth':
+            from hrl.util.lut.smooth import smooth
+            smooth(args[2:])
+
+        elif args[1] == 'linearize':
+            from hrl.util.lut.linearize import linearize
+            linearize(args[2:])
+
+        elif args[1] == 'plot':
+            from hrl.util.lut.plot import plot
+            plot(args[2:])
 

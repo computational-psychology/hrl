@@ -1,10 +1,11 @@
 ### Imports ###
 
-# Qualified Imports
 import numpy as np
 import argparse as ap
+import scipy as sp
 
-# Argument parser
+### Argument parser ###
+
 prsr = ap.ArgumentParser(prog="hrl-util lut smooth",
     description="""
     This script applies a kernel smoothing algorithm to the data contained in
@@ -27,11 +28,14 @@ prsr = ap.ArgumentParser(prog="hrl-util lut smooth",
 prsr.add_argument('-o',dest='ordr',default=5,type=int,
         help="The number of times (order) to smooth the data. Default: 5")
 
-prsr.add_argument('-c',dest='corr',default=65536,type=int,
-        help='The number of points at the end of the dataset used to estimate
-        the correcting scaling factor. Default: 20')
+prsr.add_argument('-c',dest='corr',default=20,type=int,
+        help='The number of points at the end of the dataset used to estimate the correcting scaling factor. Default: 20')
+
+### Core ###
 
 def smooth(args):
+
+    args = prsr.parse_args(args)
 
     # Create the average table
     hshmp = {}
@@ -53,15 +57,13 @@ def smooth(args):
 
     # And smooth it
     krn=[0.2,0.2,0.2,0.2,0.2]
-    ordr=5
-    corr=20
-    wfl='smooth.txt'
+    wfl='smooth.csv'
 
     xsmps = tbl[:,0]
     ysmps = tbl[:,1]
     smthd = ysmps
 
-    for i in range(ordr): smthd = sp.convolve(smthd,krn)
+    for i in range(args.ordr): smthd = sp.convolve(smthd,krn)
     smthd = smthd[:len(ysmps)]
     mn = min(ysmps)
     def fun(x):
@@ -70,7 +72,8 @@ def smooth(args):
         else:
             return x
     smthd = map(fun,smthd)
-    smthd *= 1 + (np.mean(ysmps[-corr:]) - np.mean(smthd[-corr:]))/np.mean(smthd[-corr:])
+    smthd *= 1 + (np.mean(ysmps[-args.corr:]) -
+            np.mean(smthd[-args.corr:]))/np.mean(smthd[-args.corr:])
 
     print 'Saving to File...'
     rslt = np.array([xsmps,smthd]).transpose()

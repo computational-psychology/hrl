@@ -7,7 +7,7 @@ if __name__ == '__main__':
     distutils.core.setup(
         name='hrl',
         description='Library for designing psychophysics experiments',
-        version='0.5',
+        version='0.6',
         author='Sacha Sokoloski',
         author_email='sacha@cs.toronto.edu',
         license='GPL2',
