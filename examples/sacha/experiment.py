@@ -37,10 +37,10 @@ def main():
 
     # Here we define all the paremeters required to instantiate an HRL object.
 
-    # Which devices we wish to use in this experiment. See the documentation for a list of
-    # options.
-    graphics='gpu'
-    inputs='keyboard'
+    # Which devices we wish to use in this experiment. See the
+    # pydoc documentation for a list of # options.
+    graphics='gpu' # 'datapixx' is another option
+    inputs='keyboard' # 'responsepixx' is another option
     photometer=None
 
     # Screen size
@@ -51,7 +51,7 @@ def main():
     # actually running experiments, but when just developing one, fullscreen
     # locks out access to the rest of the computer, so you'll probably want to
     # turn this off.
-    fs = False
+    fs = True
 
     # Design and result matrix information. This allows us the to use the HRL
     # functionality for automatically reading a design matrix, and
@@ -70,7 +70,7 @@ def main():
             ,'InitialMunsell','SelectedLuminance']
 
     # Pass this to HRL if we want to use gamma correction.
-    # lut = 'lut.txt'
+    lut = 'lut.csv'
 
     # Create the hrl object with the above fields. All the default argument names are
     # given just for illustration.
@@ -104,8 +104,16 @@ def main():
     # draw these objects again, we don't bother saving the texture objects
     # returned by newTexture, but rather simply draw them right away and then
     # throw them away.
-    hrl.graphics.newTexture(np.array([[1]])).draw((1.9*weht,1.9*heht),(0.525*wdth,0.525*hght))
-    hrl.graphics.newTexture(np.array([[0]])).draw((2*weht,2*heht),(0.5*wdth,0.5*hght))
+    frm1 = hrl.graphics.newTexture(np.array([[1]]))
+    frm2 = hrl.graphics.newTexture(np.array([[0]]))
+
+    frm1.draw((1.9*weht,1.9*heht),(0.525*wdth,0.525*hght))
+    frm2.draw((2*weht,2*heht),(0.5*wdth,0.5*hght))
+
+    hrl.graphics.flip(clr=False)
+
+    frm1.draw((1.9*weht,1.9*heht),(0.525*wdth,0.525*hght))
+    frm2.draw((2*weht,2*heht),(0.5*wdth,0.5*hght))
 
 
     ### Core Loop ###
@@ -136,9 +144,16 @@ def main():
         clm = munsell2luminance(np.array([[cmns]]))
 
         # Here we draw the circles to the back buffer
-        hrl.graphics.newTexture(llm,'circle').draw((whlf-weht,hhlf),(2*rds,2*rds))
+        lcrc = hrl.graphics.newTexture(llm,'circle')
+        rcrc = hrl.graphics.newTexture(clm,'circle')
+
+        lcrc.draw((whlf-weht,hhlf),(2*rds,2*rds))
+        rcrc.draw((whlf+weht,hhlf),(2*rds,2*rds))
+        hrl.graphics.flip(clr=False)
+
+        lcrc.draw((whlf-weht,hhlf),(2*rds,2*rds))
+        rcrc.draw((whlf+weht,hhlf),(2*rds,2*rds))
         hrl.graphics.newTexture(rlm,'circle').draw((whlf,hhlf),(2*rds,2*rds))
-        hrl.graphics.newTexture(clm,'circle').draw((whlf+weht,hhlf),(2*rds,2*rds))
 
         # Finally we load our frame and our circles to the screen. We don't
         # clear the back buffer because we don't want to redraw the frame, and

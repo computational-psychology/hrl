@@ -75,7 +75,7 @@ class Graphics(object):
 
     # Concrete Methods #
 
-    def __init__(self,w,h,bg,fs=False,db=True):
+    def __init__(self,w,h,bg,fs=False,db=True,lut=None):
         """
         The Graphics constructor predefines the basic OpenGL initializations
         that must be performed regardless of the specific backends.
@@ -85,7 +85,7 @@ class Graphics(object):
         w : The width (in pixels) of the openGL window
         h : The height (in pixels) of the openGL window
         bg : The default background grey value (between 0 and 1)
-        fs : Enable fullscreen display (Boolean) Default: True
+        fs : Enable fullscreen display (Boolean) Default: False
         db : Enable double buffering (Boolean) Default: True
 
         Returns
@@ -95,9 +95,10 @@ class Graphics(object):
 
         # Here we can add other options like fullscreen
         dbit = pg.OPENGL
-        if fs: dbit = dbit | pg.FULLSCREEN
         if db: dbit = dbit | pg.DOUBLEBUF
-        pg.display.set_mode((w,h), dbit)
+        if fs: dbit = dbit | pg.FULLSCREEN
+        screen = pg.display.set_mode((w,h), dbit)
+
         pg.mouse.set_visible(False)
 
         # Disables this thing
@@ -117,6 +118,13 @@ class Graphics(object):
         # Blending is how the colours from transluscent objects are
         # combined, and is therefore largely irrelevant.
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+
+        # Gamma Function Correction
+        self._lut = None
+        self._gammainv = lambda x: x
+        if lut != None:
+            self._lut = np.genfromtxt(lut,skip_header=1)
+            self._gammainv = lambda x: np.interp(x,self._lut[:,0],self._lut[:,1])
 
         # Here we change the default color 
         self.changeBackground(bg)

@@ -42,8 +42,9 @@ publish them when they have been thoroughly tested.
 ### Installation ###
 
 
-HRL uses distutils for installation. Simply run 'sudo python setup.py install' at the root
-of the source directory. Note that HRL is currently python 2 compatible only.
+HRL uses distutils for installation. First clone the repository via
+'git clone https://github.com/TUBvision/hrl.git'. Then run 'sudo python setup.py install' at the root
+of the repository. Note that HRL is currently python 2 compatible only.
   
 
 ##### Dependencies #####

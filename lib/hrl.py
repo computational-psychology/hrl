@@ -38,7 +38,8 @@ class HRL:
                 ,photometer=None
                 ,wdth=1024,hght=768,bg=0.0
                 ,fs=False,db=True,scrn=0
-                ,dfl=None,rfl=None,rhds=None):
+                ,dfl=None,rfl=None,rhds=None
+                ,lut=None):
         """
         Initialize an HRL object.
 
@@ -63,6 +64,7 @@ class HRL:
             Matrix. The string names should be without spaces, e.g.
             'InputLuminance'. If rfl != None, rhds must be provided.
             Default: None
+        lut : The lookup table. Default: None
         
         Returns
         -------
@@ -158,13 +160,6 @@ class HRL:
             self.results = {}
             #self._rwtr.writeheader() - requires Python 2.7
             self._rfl.write(' '.join(rhds) + '\r\n')
-
-        # Gamma Function Correction
-        #self._lut = None
-        #self._gammainv = lambda x: x
-        #if lut != None:
-            #self._lut = np.genfromtxt(lut,skip_header=1)
-            #self._gammainv = lambda x: np.interp(x,self._lut[:,0],self._lut[:,1])
 
     def close(self):
         """
