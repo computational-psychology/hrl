@@ -50,7 +50,7 @@ class HRL:
             None. Default: 'gpu'
         inputs : The input device to use. Available: 'keyboard', 'responsepixx',
             None. Default: 'keyboard'
-        photometer : The graphics device to use. Available: 'optical', None.
+        photometer : The graphics device to use. Available: 'optical', 'minolta', None.
             Default: None
         wdth : The desired width of the screen. Default: 1024
         hght : The desired height of the screen. Default: 768
@@ -140,6 +140,10 @@ class HRL:
 
             from photometer.optical import OptiCAL
             self.photometer = OptiCAL('/dev/ttyUSB0')
+        if photometer == 'minolta':
+
+            from photometer.minolta import Minolta
+            self.photometer = Minolta('/dev/ttyUSB0')
 
         else:
 

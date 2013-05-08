@@ -50,7 +50,7 @@ of the repository. Note that HRL is currently python 2 compatible only.
 ##### Dependencies #####
 
 - Required: pygame, pyopengl
-- Optional: pydatapixx, pyoptical, pyserial
+- Optional: pydatapixx, pyoptical, pyserial, pyminolta
 
 
 ### Usage ###

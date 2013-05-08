@@ -18,6 +18,7 @@ pydoc hrl.inputs.inputs - Help for input devices in general
 pydoc hrl.inputs.keyboard - Help for using a normal PC keyboard as input
 pydoc hrl.inputs.responsepixx - Help for using a RESPONSEPixx device as input
 pydoc hrl.photometer.photometer - Help for photometers in general
+pydoc hrl.photometer.minolta - Help for using a Minolta device
 pydoc hrl.photometer.optical - Help for using an OptiCAL device
 """
 from hrl import HRL
