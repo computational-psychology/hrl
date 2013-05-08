@@ -20,7 +20,7 @@ class Photometer(object):
 
     def readLuminance(self,n,slp):
         """
-        Reads a value from the photometer, returning a real value in lumens.
+        Reads a value from the photometer, returning a real value in candela/m^2.
 
         (Some decisions need to be made about this interface still wrt arguments.)
         """
