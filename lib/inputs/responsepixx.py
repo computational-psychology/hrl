@@ -29,7 +29,7 @@ class RESPONSEPixx(Input):
                 return (ky,tm)
             else:
                 to -= tm
-                (ky1,tm1) = self.readButton(to,btns)
+                (ky1,tm1) = self.readButton(btns,to)
                 return (ky1,tm1 + tm)
 
 ## Additional Functions ##
