@@ -10,7 +10,7 @@ kbd = Keyboard()
 
 grphcs = GPU(600,600,0.5,False,True)
 grphcs.flip()
-txt = grphcs.newTexture(np.array([[1]]))
+txt = grphcs.newTexture(np.array([[0],[0.5],[1]]))
 txt.draw((200,200),(200,200))
 grphcs.flip()
 

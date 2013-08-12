@@ -151,6 +151,7 @@ class Graphics(object):
         -------
         Texture object
         """
+        grys = np.flipud(grys)
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
         hght = len(grys[:,0])
