@@ -130,7 +130,7 @@ class Graphics(object):
         self.changeBackground(bg)
         self.flip()
 
-    def newTexture(self,grys,shape='square'):
+    def newTexture(self,grys0,shape='square'):
         """
         Given a numpy array of values between 0 and 1, returns a new
         Texture object. The texture object comes equipped with the draw
@@ -151,6 +151,7 @@ class Graphics(object):
         -------
         Texture object
         """
+	grys = np.flipud(grys0)
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
         hght = len(grys[:,0])
