@@ -123,6 +123,7 @@ class Graphics(object):
         self._lut = None
         self._gammainv = lambda x: x
         if lut != None:
+            print "..using look-up table: %s" % lut
             self._lut = np.genfromtxt(lut,skip_header=1)
             self._gammainv = lambda x: np.interp(x,self._lut[:,0],self._lut[:,1])
 
@@ -151,7 +152,9 @@ class Graphics(object):
         -------
         Texture object
         """
-	grys = np.flipud(grys0)
+        grys = np.flipud(grys0)     # flipping up-down necessary
+        grys = self._gammainv(grys) # added gamma correction
+        
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
         hght = len(grys[:,0])

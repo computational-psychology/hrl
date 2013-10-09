@@ -105,12 +105,12 @@ class HRL:
         if graphics == 'gpu':
 
             from graphics.gpu import GPU
-            self.graphics = GPU(wdth,hght,bg,fs,db)
+            self.graphics = GPU(wdth,hght,bg,fs,db,lut)
 
         elif graphics == 'datapixx':
 
             from graphics.datapixx import DATAPixx
-            self.graphics = DATAPixx(wdth,hght,bg,fs,db)
+            self.graphics = DATAPixx(wdth,hght,bg,fs,db,lut)
 
         else:
 
