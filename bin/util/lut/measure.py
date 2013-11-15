@@ -39,10 +39,13 @@ prsr.add_argument('-r',dest='rndm',action='store_true',help='Shall we randomize 
 
 prsr.add_argument('-v',dest='rvs',action='store_true',help='Shall we reverse the order of intensity values (high to low rather than low to high)? Default: False')
 
+prsr.add_argument('-p', dest='photometer', type=str, default='optical', help='The photometer to use. Default: optical')
+
+prsr.add_argument('-o', dest='flnm', type=str, default='measure.csv', help='The output filename. Default: measure.csv')
 # Settings (these can all be changed with system arguments)
 
 def measure(args):
-    
+
     args = prsr.parse_args(args)
 
     wdth = 1024
@@ -50,12 +53,12 @@ def measure(args):
 
     # Initializing HRL
 
-    flnm = 'measure.csv'
+    flnm = args.flnm
     flds = ['Intensity'] + [ 'Luminance' + str(i) for i in range(args.nsmps) ]
 
     graphics = 'datapixx'
     inputs = 'keyboard'
-    photometer = 'optical'
+    photometer = args.photometer
 
     fs = True
 
