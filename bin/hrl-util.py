@@ -71,6 +71,7 @@ else:
         linearize - Invert the function approximation to generate a final lookup table
             creates: 'lut.csv'
         plot - Generate helpful plots for the three generated csv files
+        verify - Take luminance measures given a lookup table
             """)
         elif args[1] == 'measure':
             from hrl.util.lut.measure import measure
@@ -88,3 +89,6 @@ else:
             from hrl.util.lut.plot import plot
             plot(args[2:])
 
+        elif args[1] == 'verify':
+            from hrl.util.lut.verify import verify
+            verify(args[2:])
