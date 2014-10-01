@@ -19,7 +19,7 @@ class Input(object):
     The Input abstract base class. New hardware inputs must instantiate
     this class. The core abstract method is 'readButton', which returns
     information about the key pressed and the amount of time taken.
-    
+
     'Keys' will generally just be a string indicating the key pressed. Typical
     valid inputs are 'Up', 'Down', 'Left', 'Right', and 'Space', but the actual
     values are specific to the subclasses. Subclasses should come with a
@@ -90,5 +90,4 @@ class Input(object):
             if event.type == pg.QUIT \
                or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 return True
-            else:
-                return False
+        return False

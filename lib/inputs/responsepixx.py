@@ -17,7 +17,7 @@ class RESPONSEPixx(Input):
 
     def readButton(self,btns=None,to=3600):
         if self.checkEscape():
-            return 'Escape'
+            return ('Escape', -1)
 
         rspns = self.dpx.waitButton(to)
         if rspns == None:

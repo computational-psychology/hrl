@@ -15,5 +15,7 @@ class Minolta(Photometer):
                 pg.time.delay(slp)
                 lm = self.phtm.getLuminance()
                 return lm
-            except:
-                return np.nan
+            except pym.MinoltaException, (instance):
+                print 'Minolta error:', instance.parameter
+        # if no trial was successful
+        return np.nan

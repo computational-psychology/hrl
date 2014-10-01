@@ -41,12 +41,14 @@ prsr.add_argument('-v',dest='rvs',action='store_true',help='Shall we reverse the
 
 prsr.add_argument('-p', dest='photometer', type=str, default='optical', help='The photometer to use. Default: optical')
 
-prsr.add_argument('-o', dest='flnm', type=str, default='measure.csv', help='The output filename. Default: measure.csv')
+prsr.add_argument('-o', dest='flnm', type=str, default='lut_test.csv', help='The output filename. Default: lut_test.csv')
+
+prsr.add_argument('-l', dest='lut', type=str, default='lut.csv', help='The lookup table filename. Default: lut.csv')
 
 prsr.add_argument('-bg', dest='bg', type=float, default=0.0, help='The background intensity outside of the central patch. Default: 0')
 # Settings (these can all be changed with system arguments)
 
-def measure(args):
+def verify(args):
 
     args = prsr.parse_args(args)
 
@@ -61,13 +63,14 @@ def measure(args):
     graphics = 'datapixx'
     inputs = 'keyboard'
     photometer = args.photometer
+    lut = args.lut
 
     bg = args.bg
 
     fs = True
 
     hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=bg,rfl=flnm,rhds=flds,fs=fs,scrn=1)
+            ,wdth=wdth,hght=hght,bg=bg,rfl=flnm,rhds=flds,fs=fs,lut=lut,scrn=1)
 
     itss = np.linspace(args.mn,args.mx,args.stps)
     if args.rndm: shuffle(itss)

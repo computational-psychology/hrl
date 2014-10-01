@@ -9,7 +9,7 @@ Image presentation in HRL can be understood as a multi step process as follows:
     -> Greyscale Array (A numpy array of doubles between 0 and 1)
     -> Processed Greyscale Array (A Gresycale Array remapped with a lookup table)
     -> Display List (An index to a stored texture in graphical memory)
-    -> Texture (A python class instance which can be drawn) 
+    -> Texture (A python class instance which can be drawn)
 
 i) The conversion of Bitmaps to Greyscale arrays is handled by functions in
 'hrl.extra' Where possible, it is recommended to bypass this step and work
@@ -123,19 +123,20 @@ class Graphics(object):
         self._lut = None
         self._gammainv = lambda x: x
         if lut != None:
+            print "..using look-up table: %s" % lut
             self._lut = np.genfromtxt(lut,skip_header=1)
             self._gammainv = lambda x: np.interp(x,self._lut[:,0],self._lut[:,1])
 
-        # Here we change the default color 
+        # Here we change the default color
         self.changeBackground(bg)
         self.flip()
 
-    def newTexture(self,grys,shape='square'):
+    def newTexture(self,grys0,shape='square'):
         """
         Given a numpy array of values between 0 and 1, returns a new
         Texture object. The texture object comes equipped with the draw
         method for obvious purposes.
-        
+
         NB: Images in HRL are represented in matrix style coordinates. i.e. the
         origin is in the upper left corner, and increases to the right and
         downwards.
@@ -151,7 +152,9 @@ class Graphics(object):
         -------
         Texture object
         """
-        grys = np.flipud(grys)
+        grys = np.flipud(grys0)     # flipping up-down necessary
+        grys = self._gammainv(grys) # added gamma correction
+
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
         hght = len(grys[:,0])
@@ -184,7 +187,7 @@ class Graphics(object):
         bg : The new gray value (between 0 and 1)
         """
         mx = float(2**8-1)
-        (r,g,b,a) = self.greyToChannels(bg)
+        (r,g,b,a) = self.greyToChannels(self._gammainv(bg))
         gl.glClearColor(r/mx,g/mx,b/mx,a/mx)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 

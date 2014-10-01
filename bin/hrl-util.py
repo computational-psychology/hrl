@@ -47,6 +47,7 @@ else:
     elif args[0] == 'lut':
 
         if len(args) == 1 or args[1] == '--help':
+
             print("""
     When considering monitors, one may distinguish between the actual
     luminance produced by the monitor, and the scale free 'intensity'
@@ -71,6 +72,7 @@ else:
         linearize - Invert the function approximation to generate a final lookup table
             creates: 'lut.csv'
         plot - Generate helpful plots for the three generated csv files
+        verify - Take luminance measures given a lookup table
             """)
         elif args[1] == 'measure':
             from hrl.util.lut.measure import measure
@@ -88,3 +90,6 @@ else:
             from hrl.util.lut.plot import plot
             plot(args[2:])
 
+        elif args[1] == 'verify':
+            from hrl.util.lut.verify import verify
+            verify(args[2:])

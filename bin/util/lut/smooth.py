@@ -25,11 +25,9 @@ prsr = ap.ArgumentParser(prog="hrl-util lut smooth",
     different smoothing parameters.
     """)
 
-prsr.add_argument('-o',dest='ordr',default=5,type=int,
-        help="The number of times (order) to smooth the data. Default: 5")
+prsr.add_argument('-o',dest='ordr',default=0,type=int,
+        help="The number of times (order) to smooth the data. Default: 0 (no smoothing, just averaging")
 
-prsr.add_argument('-c',dest='corr',default=20,type=int,
-        help='The number of points at the end of the dataset used to estimate the correcting scaling factor. Default: 20')
 
 ### Core ###
 
@@ -48,10 +46,22 @@ def smooth(args):
                 hshmp[rw[0]] = np.concatenate([hshmp[rw[0]],rw[1:]])
             else:
                 hshmp[rw[0]] = rw[1:]
+
     # Now we average the values, clearing all nans from the picture.
     for ky in hshmp.keys():
-        hshmp[ky] = np.mean(hshmp[ky][np.isnan(hshmp[ky]) == False])
-        if np.isnan(hshmp[ky]): hshmp.pop(ky)
+        values = hshmp[ky][~np.isnan(hshmp[ky])]
+        # set outliers to NaN. Outliers are values that are more than 0.01 cd
+        # or more than 0.1% of their value from the closest measurement at the
+        # same intensity.
+        min_diff = np.empty_like(values)
+        for i in range(len(values)):
+            idx = np.ones(len(values), dtype=bool)
+            idx[i] = False
+            min_diff[i] = np.min(np.abs(values[idx] - values[i]))
+        values[(min_diff > 0.01) & (min_diff / values > 0.001)] = np.NaN
+        hshmp[ky] = np.mean(values[np.isnan(values) == False])
+        if np.isnan(hshmp[ky]):
+            raise RuntimeError('no valid measurement for %f' % ky)
     tbl = np.array([hshmp.keys(),hshmp.values()]).transpose()
     tbl = tbl[tbl[:,0].argsort()]
 
@@ -59,25 +69,15 @@ def smooth(args):
     krn=[0.2,0.2,0.2,0.2,0.2]
     wfl='smooth.csv'
 
-    xsmps = tbl[:,0]
-    ysmps = tbl[:,1]
-    smthd = ysmps
+    smthd = tbl[:,1]
 
-    for i in range(args.ordr): smthd = sp.convolve(smthd,krn)
-    smthd = smthd[:len(ysmps)]
-    mn = min(ysmps)
-    def fun(x):
-        if x < mn:
-            return mn
-        else:
-            return x
-    smthd = map(fun,smthd)
-    smthd *= 1 + (np.mean(ysmps[-args.corr:]) -
-            np.mean(smthd[-args.corr:]))/np.mean(smthd[-args.corr:])
+    for i in range(args.ordr):
+        smthd = np.hstack((np.ones(2) * smthd[0], smthd, np.ones(2) * smthd[-1]))
+        smthd = sp.convolve(smthd, krn, 'valid')
 
     print 'Saving to File...'
-    rslt = np.array([xsmps,smthd]).transpose()
+    tbl[:, 1] = smthd
     ofl = open(wfl,'w')
     ofl.write('Input Luminance\r\n')
-    np.savetxt(ofl,rslt)
+    np.savetxt(ofl,tbl)
     ofl.close()
