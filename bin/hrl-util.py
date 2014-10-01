@@ -23,7 +23,7 @@ else:
 
     if args[0] == 'tests':
 
-        if len(args) == 0 or args[1] == '--help':
+        if len(args) == 1 or args[1] == '--help':
             print("""
     Tests are simple scripts to ensure that HRL software and hardware
     is working correctly.
@@ -46,7 +46,8 @@ else:
 
     elif args[0] == 'lut':
 
-        if len(args) == 0 or args[1] == '--help':
+        if len(args) == 1 or args[1] == '--help':
+
             print("""
     When considering monitors, one may distinguish between the actual
     luminance produced by the monitor, and the scale free 'intensity'
