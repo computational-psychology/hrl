@@ -145,8 +145,7 @@ def main():
     firsttimeon = True
     frameIntervals = []
 
-    for i in range(100):
-    
+    for i in range(1000):    
         s = normalize(np.sin(np.linspace(0, 10*pi, texsize[0])+i))
         grating1 = np.tile(s, (texsize[1], 1))
         
