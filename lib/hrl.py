@@ -149,21 +149,46 @@ class HRL:
 
             self.photometer = None
 
+      
+        ## Results file ##
+        self._rfl = None
+        if rfl != None:
+            # check if the file exists,,, if so then check how many trials have been made, 
+            # then opens file in 'a' mode, and do not write the header
+            if os.path.exists(rfl):
+                # checks how many trials have been run
+                r  = open(rfl,'rb')
+                reader = csv.DictReader(r, delimiter=' ')
+                l = list(reader)
+                r.close()
+                # length of list is the number of rows that has been written (without counting the header)
+                self.starttrial = len(l) 
+                
+                
+                self._rfl = open(rfl,'ab')
+                self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
+                
+                
+            # if it doesnt exist, open in 'wb' mode and write the header    
+            else:
+                self._rfl = open(rfl,'wb')
+                self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
+                self._rfl.write(' '.join(rhds) + '\r\n')  # writes header   
+                self.starttrial = 0               
 
-        ## Design and Result matrices ##
-
+            # initalizing empty results dict (for trial-based saving)
+            self.results = {}
+    
+        ## Design matrix file ##
         self._dfl = None
         if dfl != None:
             self._dfl = open(dfl,'rb')
             self.designs = csv.DictReader(self._dfl,delimiter=' ',skipinitialspace=True)
-        
-        self._rfl = None
-        if rfl != None:
-            self._rfl = open(rfl,'wb')
-            self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
-            self.results = {}
-            #self._rwtr.writeheader() - requires Python 2.7
-            self._rfl.write(' '.join(rhds) + '\r\n')
+            # skip trials already done
+            for i in range(self.starttrial):
+                self.designs.next()
+            
+            
 
     def close(self):
         """
