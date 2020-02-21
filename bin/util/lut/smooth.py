@@ -50,15 +50,15 @@ def smooth(args):
     # Now we average the values, clearing all nans from the picture.
     for ky in hshmp.keys():
         values = hshmp[ky][~np.isnan(hshmp[ky])]
-        # set outliers to NaN. Outliers are values that are more than 0.01 cd
-        # or more than 0.1% of their value from the closest measurement at the
+        # set outliers to NaN. Outliers are values that are more than 0.05 cd
+        # or more than 0.5% of their value from the closest measurement at the
         # same intensity.
         min_diff = np.empty_like(values)
         for i in range(len(values)):
             idx = np.ones(len(values), dtype=bool)
             idx[i] = False
             min_diff[i] = np.min(np.abs(values[idx] - values[i]))
-        values[(min_diff > 0.01) & (min_diff / values > 0.001)] = np.NaN
+        values[(min_diff > 0.05) & (min_diff / values > 0.005)] = np.NaN
         hshmp[ky] = np.mean(values[np.isnan(values) == False])
         if np.isnan(hshmp[ky]):
             raise RuntimeError('no valid measurement for %f' % ky)
