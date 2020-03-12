@@ -44,14 +44,22 @@ prsr.add_argument('-p', dest='photometer', type=str, default='optical', help='Th
 prsr.add_argument('-o', dest='flnm', type=str, default='measure.csv', help='The output filename. Default: measure.csv')
 
 prsr.add_argument('-bg', dest='bg', type=float, default=0.0, help='The background intensity outside of the central patch. Default: 0')
+
+prsr.add_argument('-wd', dest='wd', type=int, default=1024, help='The screen resolution width, in pixels. It should coincide with the settings in xorg.conf. Default: 1024')
+
+prsr.add_argument('-hg', dest='hg', type=int, default=768, help='The screen resolution height, in pixels. It should coincide with the settings in xorg.conf. Default: 768')
+
 # Settings (these can all be changed with system arguments)
 
 def measure(args):
 
     args = prsr.parse_args(args)
 
-    wdth = 1024
-    hght = 768
+    #wdth = 1024
+    wdth = args.wd
+    #hght = 768
+    hght = args.hg
+    
 
     # Initializing HRL
 
