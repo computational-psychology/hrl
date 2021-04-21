@@ -76,8 +76,14 @@ class HRL:
         #data_files=[(os.path.expanduser('~/.config'), ['misc/hrlrc'])]
         #cfg = cp.RawConfigParser()
         #cfg.read([os.path.expanduser('~/.config/hrlrc')])
-        os.environ['DISPLAY'] = ':0.' + str(scrn)
-
+        
+        #######
+        # 30.Aug 2020: this command is commented as it doesnt work in newer versions of linux
+        # in the lab computer it will still have to work
+        # os.environ['DISPLAY'] = ':0.' + str(scrn)
+        print ("OS display number: %s" % os.environ['DISPLAY'])
+        #######
+        
         ## Load Datapixx ##
 
         if (graphics == 'datapixx') or (inputs == 'responsepixx'):
