@@ -76,8 +76,24 @@ class HRL:
         #data_files=[(os.path.expanduser('~/.config'), ['misc/hrlrc'])]
         #cfg = cp.RawConfigParser()
         #cfg.read([os.path.expanduser('~/.config/hrlrc')])
-        os.environ['DISPLAY'] = ':0.' + str(scrn)
+        
+        #######
+        # 30.Aug 2020: this command is commented as it doesnt work in newer versions of linux
+        # in newer versions, default screen numbering is ':1'
+        # in older versions (including lab computer), it is  ':0.1'
+        #os.environ['DISPLAY'] = ':0.' + str(scrn)
+        #
+        print ("OS display number (default): %s" % os.environ['DISPLAY'])
+        
+        if len(os.environ['DISPLAY'])>2:
+            os.environ['DISPLAY'] = ':0.' + str(scrn)
+        else: # legacy option for older configs
+            os.environ['DISPLAY'] = ':' + str(scrn)
+        
+        print ("OS display number (now used): %s" % os.environ['DISPLAY'])
 
+        #######
+        
         ## Load Datapixx ##
 
         if (graphics == 'datapixx') or (inputs == 'responsepixx'):
