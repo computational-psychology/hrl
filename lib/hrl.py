@@ -83,13 +83,15 @@ class HRL:
         # in older versions (including lab computer), it is  ':0.1'
         #os.environ['DISPLAY'] = ':0.' + str(scrn)
         #
-        print ("OS display number: %s" % os.environ['DISPLAY'])
+        print ("OS display number (default): %s" % os.environ['DISPLAY'])
         
         if len(os.environ['DISPLAY'])>2:
             os.environ['DISPLAY'] = ':0.' + str(scrn)
         else: # legacy option for older configs
             os.environ['DISPLAY'] = ':' + str(scrn)
-            
+        
+        print ("OS display number (now used): %s" % os.environ['DISPLAY'])
+
         #######
         
         ## Load Datapixx ##
