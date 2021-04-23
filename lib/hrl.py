@@ -79,9 +79,17 @@ class HRL:
         
         #######
         # 30.Aug 2020: this command is commented as it doesnt work in newer versions of linux
-        # in the lab computer it will still have to work
-        # os.environ['DISPLAY'] = ':0.' + str(scrn)
+        # in newer versions, default screen numbering is ':1'
+        # in older versions (including lab computer), it is  ':0.1'
+        #os.environ['DISPLAY'] = ':0.' + str(scrn)
+        #
         print ("OS display number: %s" % os.environ['DISPLAY'])
+        
+        if len(os.environ['DISPLAY'])>2:
+            os.environ['DISPLAY'] = ':0.' + str(scrn)
+        else: # legacy option for older configs
+            os.environ['DISPLAY'] = ':' + str(scrn)
+            
         #######
         
         ## Load Datapixx ##
