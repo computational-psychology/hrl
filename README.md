@@ -43,8 +43,10 @@ publish them when they have been thoroughly tested.
 
 
 HRL uses distutils for installation. First clone the repository via
-'git clone https://github.com/TUBvision/hrl.git'. Then run 'sudo python setup.py install' at the root
-of the repository. Note that HRL is currently python 2 compatible only.
+```git clone https://github.com/computational-psychology/hrl```.
+Then run 
+```sudo python setup.py install```
+at the root of the repository. Note that HRL is currently python 2 compatible only.
   
 
 ##### Dependencies #####
