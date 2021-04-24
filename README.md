@@ -1,5 +1,5 @@
-## HRL: High Resolution Luminance ##
-
+## HRL: High Resolution Luminance ## 
+(Python 2 version)
 
 ### Introduction ###
 
@@ -69,13 +69,12 @@ base module 'hrl'. The scripts can be accessed by running 'hrl-util' at the comm
   documentation.
 - Running 'hrl-util' at the command line without any arguments will display another
   introductory help file, overviewing the various scripts that can be run via hrl-util.
-- A heavily documented example experiment is available under examples/sacha. Beginning
-  with a copy of examples/sacha is recommended for first time users who wish to code a new
-  experiment.
+- Example experiments using HRL can be found in the [templates repository](https://github.com/computational-psychology/template_experiment). This is a good place to start for beginners using HRL.
+- A heavily documented example experiment is available under examples/sacha.
+
 
 ##### Calibration #####
 
 - HRL comes with scripts for developing a gamma correction Lookup Table (LUT) as well as
-  various tests for calibrating the scientific hardware. Currently these are deprecated
-  and will be updated soon.
+  various tests for calibrating the scientific hardware.
 
