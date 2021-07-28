@@ -85,7 +85,7 @@ class Minolta:
 
 if __name__ == "__main__":
 
-    photometer = Minolta()
+    photometer = Minolta('/dev/ttyUSB0')
     try:
         lum = photometer.getLuminance()
         print 'luminance:', lum
