@@ -49,6 +49,9 @@ prsr.add_argument('-wd', dest='wd', type=int, default=1024, help='The screen res
 
 prsr.add_argument('-hg', dest='hg', type=int, default=768, help='The screen resolution height, in pixels. It should coincide with the settings in xorg.conf. Default: 768')
 
+prsr.add_argument('-gr', dest='graphics', type=str, default='datapixx', help='Whether using the GPU (gpu) or the DataPixx interface (datapixx). Default: datapixx')
+
+
 # Settings (these can all be changed with system arguments)
 
 def measure(args):
@@ -66,7 +69,9 @@ def measure(args):
     flnm = args.flnm
     flds = ['Intensity'] + [ 'Luminance' + str(i) for i in range(args.nsmps) ]
 
-    graphics = 'datapixx'
+    #graphics = 'datapixx'
+    #graphics = 'gpu'
+    graphics = args.graphics
     inputs = 'keyboard'
     photometer = args.photometer
 
