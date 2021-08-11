@@ -37,7 +37,10 @@ class HRL:
                 ,inputs='keyboard'
                 ,photometer=None
                 ,wdth=1024,hght=768,bg=0.0
-                ,fs=False,db=True,scrn=0
+                ,fs=False
+                ,wdth_offset=0
+                ,db=True
+                ,scrn=0
                 ,dfl=None,rfl=None,rhds=None
                 ,lut=None):
         """
@@ -55,7 +58,8 @@ class HRL:
         wdth : The desired width of the screen. Default: 1024
         hght : The desired height of the screen. Default: 768
         bg : The background luminance on a scale from 0 to 1. Default: 0.0
-        fs : Whether or not to run in Fullscreen.Default: False
+        fs : Whether or not to run in Fullscreen. Default: False
+        wdth_offset: The desired horizontal offset of the window. Useful for setups with multiple monitors but a single Xscreen session. Default: 0
         db : Whether or not to use double buffering. Default: True
         scrn: Which monitor to use. Numbered 0,1... Default: 0
         dfl : The read location of the design matrix. Default: None
@@ -85,14 +89,20 @@ class HRL:
         #
         print ("OS display number (default): %s" % os.environ['DISPLAY'])
         
-        if len(os.environ['DISPLAY'])>2:
+        if len(os.environ['DISPLAY'])>2: # legacy option for older configs
             os.environ['DISPLAY'] = ':0.' + str(scrn)
-        else: # legacy option for older configs
+        else: 
             os.environ['DISPLAY'] = ':' + str(scrn)
         
         print ("OS display number (now used): %s" % os.environ['DISPLAY'])
-
+        
+        ## 11. Aug 2021
+        # we add a wdth_offset to be able to run HRL in setups with a 
+        # single Xscreen but multiple monitors (a config with Xinerama enabled)
+        os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,0" % wdth_offset
+        
         #######
+        
         
         ## Load Datapixx ##
 
