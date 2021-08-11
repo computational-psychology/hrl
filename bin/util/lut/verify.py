@@ -45,7 +45,7 @@ prsr.add_argument('-o', dest='flnm', type=str, default='lut_test.csv', help='The
 
 prsr.add_argument('-l', dest='lut', type=str, default='lut.csv', help='The lookup table filename. Default: lut.csv')
 
-prsr.add_argument('-bg', dest='bg', type=float, default=0.0, help='The background intensity outside of the central patch. Default: 0').
+prsr.add_argument('-bg', dest='bg', type=float, default=0.0, help='The background intensity outside of the central patch. Default: 0')
 
 prsr.add_argument('-wd', dest='wd', type=int, default=1024, help='The screen resolution width, in pixels. It should coincide with the settings in xorg.conf. Default: 1024')
 
