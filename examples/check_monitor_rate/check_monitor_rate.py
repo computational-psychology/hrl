@@ -64,8 +64,12 @@ def main():
     photometer=None
 
     # Screen size
-    wdth = 1440
-    hght = 900
+    #wdth = 1440
+    #hght = 900
+
+    wdth = 1280
+    hght = 1024
+    
     
     # background value
     bg = 0.3
@@ -82,7 +86,7 @@ def main():
     # Create the hrl object with the above fields. All the default argument names are
     # given just for illustration.
     hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=bg,fs=fs)
+            ,wdth=wdth,hght=hght,bg=bg,fs=fs,scrn="1.1")
 
     ### measuring frame rate
     nIdentical=10
