@@ -53,7 +53,7 @@ prsr.add_argument('-hg', dest='hg', type=int, default=768, help='The screen reso
 
 prsr.add_argument('-gr', dest='graphics', type=str, default='datapixx', help='Whether using the GPU (gpu) or the DataPixx interface (datapixx). Default: datapixx')
 
-prsr.add_argument('-sc', dest='scrn', type=int, default=1, help='Screen number. Default: 1')
+prsr.add_argument('-sc', dest='scrn', type=str, default=1, help='Screen number. Default: 1')
 
 prsr.add_argument('-wo', dest='wdth_offset', type=int, default=0, help='Horizontal offset for window. Useful for setups with a single Xscreen but multiple monitors (Xinerame). Default: 0')
 
