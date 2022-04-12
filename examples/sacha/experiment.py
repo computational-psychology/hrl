@@ -39,15 +39,16 @@ def main():
 
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
-    graphics='gpu' # 'datapixx' is another option
-    inputs='keyboard' # 'responsepixx' is another option
+    #graphics='gpu' # 'datapixx' is another option
+    #inputs='keyboard' # 'responsepixx' is another option
+    graphics='datapixx' # 'datapixx' is another option
+    inputs='responsepixx' # 'responsepixx' is another option
+    
     photometer=None
 
     # Screen size
-    #wdth = 1024
-    #hght = 768
-    wdth = 1280
-    hght = 1024
+    wdth = 1024
+    hght = 768
     
     # Whether or not to use fullscreen. You probably want to do this when
     # actually running experiments, but when just developing one, fullscreen
@@ -77,7 +78,7 @@ def main():
     # Create the hrl object with the above fields. All the default argument names are
     # given just for illustration.
     hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=rhds,fs=fs, scrn="1.1")
+            ,wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=rhds,fs=fs, scrn="0.1")
 
     # hrl.results is a dictionary which is automatically created by hrl when
     # give a list of result fields. This can be used to easily write lines to
