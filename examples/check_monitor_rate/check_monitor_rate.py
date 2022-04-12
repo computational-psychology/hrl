@@ -1,4 +1,14 @@
 """
+Checks frame rate of the monitor. 
+
+When ran in a "normal" user screen, windowed, you will not get an 
+accurate measurement. 
+
+When ran in the experimental monitor, frame rate should be exactly
+the same as the one reported by the manufacturer. It should also be 
+ZERO dropped frames. That ensures that your graphics pipeline is working
+fine.
+
 
 """
 
@@ -64,14 +74,16 @@ def main():
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
     if inlab:
-		graphics='datapixx' # 'datapixx' is another option
-		inputs='responsepixx' # 'responsepixx' is another option
-		scrn="0.1"
+        graphics='datapixx' 
+        inputs='responsepixx'
+        scrn="0.1"
+        fs = True  # fullscreen 
     else:
-		graphics='gpu' # 'datapixx' is another option
-		inputs='keyboard' # 'responsepixx' is another option
-		scrn=1
-		
+        graphics='gpu' # 'datapixx' is another option
+        inputs='keyboard' # 'responsepixx' is another option
+        scrn=1
+        fs = False # not fullscreen: windowed
+        
     photometer=None
 
     # Screen size
@@ -81,11 +93,6 @@ def main():
     # background value
     bg = 0.3
     
-    # Whether or not to use fullscreen. You probably want to do this when
-    # actually running experiments, but when just developing one, fullscreen
-    # locks out access to the rest of the computer, so you'll probably want to
-    # turn this off.
-    fs = True
 
     # Pass this to HRL if we want to use gamma correction.
     lut = 'lut.csv'

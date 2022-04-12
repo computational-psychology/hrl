@@ -41,25 +41,21 @@ def main():
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
     if inlab:
-		graphics='datapixx' # 'datapixx' is another option
-		inputs='responsepixx' # 'responsepixx' is another option
-		scrn="0.1"
+        graphics='datapixx' # 'datapixx' is another option
+        inputs='responsepixx' # 'responsepixx' is another option
+        scrn="0.1"
+        fs = True
     else:
-		graphics='gpu' # 'datapixx' is another option
-		inputs='keyboard' # 'responsepixx' is another option
-		scrn=1
+        graphics='gpu' # 'datapixx' is another option
+        inputs='keyboard' # 'responsepixx' is another option
+        scrn=1
+        fs = False
 
     photometer=None
 
     # Screen size
     wdth = 1024
     hght = 768
-    
-    # Whether or not to use fullscreen. You probably want to do this when
-    # actually running experiments, but when just developing one, fullscreen
-    # locks out access to the rest of the computer, so you'll probably want to
-    # turn this off.
-    fs = True
 
     # Design and result matrix information. This allows us the to use the HRL
     # functionality for automatically reading a design matrix, and
