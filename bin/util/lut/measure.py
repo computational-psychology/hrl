@@ -51,6 +51,10 @@ prsr.add_argument('-hg', dest='hg', type=int, default=768, help='The screen reso
 
 prsr.add_argument('-gr', dest='graphics', type=str, default='datapixx', help='Whether using the GPU (gpu) or the DataPixx interface (datapixx). Default: datapixx')
 
+prsr.add_argument('-sc', dest='scrn', type=str, default='1', help='Screen number. Default: 1')
+
+prsr.add_argument('-wo', dest='wdth_offset', type=int, default=0, help='Horizontal offset for window. Useful for setups with a single Xscreen but multiple monitors (Xinerame). Default: 0')
+
 
 # Settings (these can all be changed with system arguments)
 
@@ -58,29 +62,25 @@ def measure(args):
 
     args = prsr.parse_args(args)
 
-    #wdth = 1024
     wdth = args.wd
-    #hght = 768
     hght = args.hg
     
-
     # Initializing HRL
-
     flnm = args.flnm
     flds = ['Intensity'] + [ 'Luminance' + str(i) for i in range(args.nsmps) ]
 
-    #graphics = 'datapixx'
-    #graphics = 'gpu'
     graphics = args.graphics
     inputs = 'keyboard'
     photometer = args.photometer
-
+    scrn = args.scrn
     bg = args.bg
+    wdth_offset = args.wdth_offset
 
-    fs = True
 
-    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=bg,rfl=flnm,rhds=flds,fs=fs,scrn=1)
+    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer,
+              wdth=wdth, hght=hght, bg=bg, fs=True,
+              wdth_offset=wdth_offset, db=True, scrn=scrn,
+              rfl=flnm, rhds=flds)
 
     itss = np.linspace(args.mn,args.mx,args.stps)
     if args.rndm: shuffle(itss)

@@ -46,32 +46,48 @@ prsr.add_argument('-o', dest='flnm', type=str, default='lut_test.csv', help='The
 prsr.add_argument('-l', dest='lut', type=str, default='lut.csv', help='The lookup table filename. Default: lut.csv')
 
 prsr.add_argument('-bg', dest='bg', type=float, default=0.0, help='The background intensity outside of the central patch. Default: 0')
+
+prsr.add_argument('-wd', dest='wd', type=int, default=1024, help='The screen resolution width, in pixels. It should coincide with the settings in xorg.conf. Default: 1024')
+
+prsr.add_argument('-hg', dest='hg', type=int, default=768, help='The screen resolution height, in pixels. It should coincide with the settings in xorg.conf. Default: 768')
+
+prsr.add_argument('-gr', dest='graphics', type=str, default='datapixx', help='Whether using the GPU (gpu) or the DataPixx interface (datapixx). Default: datapixx')
+
+prsr.add_argument('-sc', dest='scrn', type=str, default=1, help='Screen number. Default: 1')
+
+prsr.add_argument('-wo', dest='wdth_offset', type=int, default=0, help='Horizontal offset for window. Useful for setups with a single Xscreen but multiple monitors (Xinerame). Default: 0')
+
+
+
 # Settings (these can all be changed with system arguments)
 
 def verify(args):
 
     args = prsr.parse_args(args)
-
-    wdth = 1024
-    hght = 768
+    
+    wdth = args.wd
+    hght = args.hg
 
     # Initializing HRL
 
     flnm = args.flnm
     flds = ['Intensity'] + [ 'Luminance' + str(i) for i in range(args.nsmps) ]
 
-    graphics = 'datapixx'
+    graphics = args.graphics
     inputs = 'keyboard'
     photometer = args.photometer
     lut = args.lut
 
+    scrn = args.scrn
     bg = args.bg
+    wdth_offset = args.wdth_offset
 
-    fs = True
 
-    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=bg,rfl=flnm,rhds=flds,fs=fs,lut=lut,scrn=1)
-
+    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer,
+              wdth=wdth, hght=hght, bg=bg, fs=True, lut=lut,
+              wdth_offset=wdth_offset, db=True, scrn=scrn,
+              rfl=flnm, rhds=flds)
+    
     itss = np.linspace(args.mn,args.mx,args.stps)
     if args.rndm: shuffle(itss)
     if args.rvs: itss = itss[::-1]
