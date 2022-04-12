@@ -24,11 +24,12 @@ import os
 
 # Unqualified Imports
 from random import uniform
+from socket import gethostname
+
+inlab = True if "vlab" in gethostname() else False
 
 
 ### Main ###
-
-
 def main():
 
 
@@ -39,11 +40,15 @@ def main():
 
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
-    #graphics='gpu' # 'datapixx' is another option
-    #inputs='keyboard' # 'responsepixx' is another option
-    graphics='datapixx' # 'datapixx' is another option
-    inputs='responsepixx' # 'responsepixx' is another option
-    
+    if inlab:
+		graphics='datapixx' # 'datapixx' is another option
+		inputs='responsepixx' # 'responsepixx' is another option
+		scrn="0.1"
+    else:
+		graphics='gpu' # 'datapixx' is another option
+		inputs='keyboard' # 'responsepixx' is another option
+		scrn=1
+
     photometer=None
 
     # Screen size
@@ -77,8 +82,9 @@ def main():
 
     # Create the hrl object with the above fields. All the default argument names are
     # given just for illustration.
-    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=rhds,fs=fs, scrn="0.1")
+    hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer,
+              wdth=wdth,hght=hght,bg=0,dfl=dfl,rfl=rfl,rhds=rhds,fs=fs,
+              scrn=scrn)
 
     # hrl.results is a dictionary which is automatically created by hrl when
     # give a list of result fields. This can be used to easily write lines to

@@ -16,10 +16,14 @@ from math import pi
 
 # Unqualified Imports
 from random import uniform
+from socket import gethostname
+
+inlab = True if "vlab" in gethostname() else False
+
 
 import clock
-
 defaultClock = clock.monotonicClock
+
 
 def makeGaussian(size, fwhm = 3, center=None):
     """ Make a square gaussian kernel.
@@ -59,10 +63,15 @@ def main():
 
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
-    #graphics='gpu' # 'datapixx' is another option
-    #inputs='keyboard' # 'responsepixx' is another option
-    graphics='datapixx' # 'datapixx' is another option
-    inputs='responsepixx' # 'responsepixx' is another option
+    if inlab:
+		graphics='datapixx' # 'datapixx' is another option
+		inputs='responsepixx' # 'responsepixx' is another option
+		scrn="0.1"
+    else:
+		graphics='gpu' # 'datapixx' is another option
+		inputs='keyboard' # 'responsepixx' is another option
+		scrn=1
+		
     photometer=None
 
     # Screen size
@@ -84,7 +93,7 @@ def main():
     # Create the hrl object with the above fields. All the default argument names are
     # given just for illustration.
     hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer
-            ,wdth=wdth,hght=hght,bg=bg,fs=fs,scrn="0.1")
+            ,wdth=wdth,hght=hght,bg=bg,fs=fs,scrn=scrn)
 
     ### measuring frame rate
     nIdentical=10
