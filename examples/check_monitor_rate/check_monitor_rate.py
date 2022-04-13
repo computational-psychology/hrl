@@ -76,7 +76,7 @@ def main():
     if inlab:
         graphics='datapixx' 
         inputs='responsepixx'
-        scrn="0.1"
+        scrn=1
         fs = True  # fullscreen 
     else:
         graphics='gpu' # 'datapixx' is another option

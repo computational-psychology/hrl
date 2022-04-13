@@ -81,15 +81,20 @@ class HRL:
         #cfg = cp.RawConfigParser()
         #cfg.read([os.path.expanduser('~/.config/hrlrc')])
         
+        #os.environ['DISPLAY'] = ':0.' + str(scrn)
+        
         #######
         # 30.Aug 2020: this command is commented as it doesnt work in newer versions of linux
         # in newer versions, default screen numbering is ':1'
         # in older versions (including lab computer), it is  ':0.1'
-        #os.environ['DISPLAY'] = ':0.' + str(scrn)
-        #
+        
+        # Update April 2022. I changed the way to recognize the formating. In older systems 
+        # or systems with separate Xscreens, the naming is still :0.0 or :0.1. 
+        # For systems with only one screen, it is :1. So we change the if-else conditional
+        
         print ("OS display number (default): %s" % os.environ['DISPLAY'])
         
-        if len(os.environ['DISPLAY'])>2: # legacy option for older configs
+        if os.environ['DISPLAY']==':0': # legacy option for older configs or separate Xscreens
             os.environ['DISPLAY'] = ':0.' + str(scrn)
         else: 
             os.environ['DISPLAY'] = ':' + str(scrn)

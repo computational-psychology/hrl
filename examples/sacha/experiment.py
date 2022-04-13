@@ -43,8 +43,9 @@ def main():
     if inlab:
         graphics='datapixx' # 'datapixx' is another option
         inputs='responsepixx' # 'responsepixx' is another option
-        scrn="0.1"
+        scrn=1
         fs = True
+
     else:
         graphics='gpu' # 'datapixx' is another option
         inputs='keyboard' # 'responsepixx' is another option

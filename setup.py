@@ -7,7 +7,7 @@ if __name__ == '__main__':
     distutils.core.setup(
         name='hrl',
         description='Library for psychophysics experiments, with support for high-resolution luminance CRT monitors (Siemens SMM series) ',
-        version='0.8.2',
+        version='0.8.3',
         author='Sacha Sokoloski',
         author_email='sacha@cs.toronto.edu',
         maintainer='Guillermo Aguilar',
