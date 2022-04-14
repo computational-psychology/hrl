@@ -13,6 +13,11 @@ import os
 from random import shuffle
 
 
+# Timing
+from timeit import default_timer as timer
+from datetime import timedelta
+
+
 # Argument parser
 prsr = ap.ArgumentParser(prog="hrl-util lut measure",
     description="""
@@ -68,8 +73,10 @@ def verify(args):
     wdth = args.wd
     hght = args.hg
 
+    # Starting timer
+    start = timer()
+    
     # Initializing HRL
-
     flnm = args.flnm
     flds = ['Intensity'] + [ 'Luminance' + str(i) for i in range(args.nsmps) ]
 
@@ -100,7 +107,10 @@ def verify(args):
 
     done = False
 
+    c=0
+
     for its in itss:
+        c+=1
 
         hrl.results['Intensity'] = its
 
@@ -108,7 +118,7 @@ def verify(args):
         ptch.draw(ppos,(pwdth,phght))
         hrl.graphics.flip()
 
-        print 'Current Intensity:', its
+        print 'Current Intensity: %f / progress: %d of %d' % (its, c, args.stps)
         smps = []
         for i in range(args.nsmps):
             smps.append(hrl.photometer.readLuminance(5,args.slptm))
@@ -122,6 +132,14 @@ def verify(args):
 
     # Experiment is over!
     hrl.close()
+    
+    
+    # stop timer
+    end = timer()
+    
+    # Time elapsed
+    print('Time elapsed:')
+    print(timedelta(seconds=end-start))
 
 
 if __name__ == '__main__':
