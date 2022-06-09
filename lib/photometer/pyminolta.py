@@ -1,22 +1,19 @@
 #!/usr/bin/env python
 #coding: CP1250
-
-
-
 import serial
-
 
 DEBUG_MODE = False
 
-error_codes = {"00": 'Command error',\
-               "01": 'Setting error',\
-               "11": 'Memory value error',\
-               "10": 'Measuring range over',\
-               "19": 'Display range over',\
-               "20": 'EEPROM error',\
-               "30": 'Battery exhausted'}
 
-class MinoltaException(Exception):
+error_codes = {b"00": 'Command error',\
+               b"01": 'Setting error',\
+               b"11": 'Memory value error',\
+               b"10": 'Measuring range over',\
+               b"19": 'Display range over',\
+               b"20": 'EEPROM error',\
+               b"30": 'Battery exhausted'}
+
+class MinoltaException(BaseException):
     def __init__(self, value):
         self.parameter = value
 
@@ -32,50 +29,50 @@ class Minolta:
         self.port.flush()
         
     def getLuminance(self):
-        self.port.write("MES\r\n")
+        self.port.write(b"MES\r\n")
         res = self.port.readline()
         if DEBUG_MODE: print('res:', res)
-        if res[:2] == 'OK':
+        if res[0:2] == b'OK':
             if DEBUG_MODE:
                 print('luminance: %s cd/m^2' % res.split()[-1])
             return float(res.split()[-1])
-        elif res[:2] == 'ER':
+        elif res[:2] == b'ER':
             err = res.strip()[2:]
-            raise MinoltaException, error_codes[err]
+            raise MinoltaException(error_codes[err])
         else:
             # Data is corrupt or absent
-            raise MinoltaException, "Data Link Error"
+            raise MinoltaException("Data Link Error")
         
     def getDisplay(self):
-        self.port.write("DSR\r\n")
+        self.port.write(b"DSR\r\n")
         res = self.port.readline()
         if DEBUG_MODE:
             print('DSR:', res)
-        if res[:2] == 'OK':
+        if res[:2] == b'OK':
             return float(res.split()[-1])
-        elif res[:2] == 'ER':
+        elif res[:2] == b'ER':
             err = res.strip()[2:]
             return error_codes[err]
 
     def setMode(self,mode):
-        self.port.write("MDS%s\r\n" % (`mode`.zfill(2)))
+        self.port.write(b"MDS%s\r\n" % (mode.zfill(2)))
         res = self.port.readline()
         if DEBUG_MODE:
-            print('MDS:', res)
-        if res[:2] == 'OK':
+            print(b'MDS:', res)
+        if res[:2] == b'OK':
             return 0
-        elif res[:2] == 'ER':
+        elif res[:2] == b'ER':
             err = res.strip()[2:]
             return error_codes[err]
 
     def clearMem(self):
-        self.port.write("CLE\r\n")
+        self.port.write(b"CLE\r\n")
         res = self.port.readline()
         if DEBUG_MODE:
             print("CLE:", res)
-        if res[:2] == 'OK':
+        if res[:2] == b'OK':
             return 0
-        elif res[:2] == 'ER':
+        elif res[:2] == b'ER':
             err = res.strip()[2:]
             return error_codes[err]
 
@@ -87,11 +84,11 @@ if __name__ == "__main__":
 
     photometer = Minolta('/dev/ttyUSB0')
     try:
+        photometer.getDisplay()
         lum = photometer.getLuminance()
-        print 'luminance:', lum
-    except MinoltaException:
-        pass
-        #print 'caught error:', instance.parameter
+        print('luminance:', lum)
+    except MinoltaException as instance:
+        print('caught error:', instance.parameter)
         
     photometer.close()
 
