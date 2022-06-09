@@ -136,8 +136,8 @@ def main():
                 (np.std(frameIntervals[-nIdentical:]) <(threshold / 1000.0))):
             rate = 1.0 / np.mean(frameIntervals[-nIdentical:])
             
-    print "Measured refresh rate"
-    print "%f +- %f (mean +- 1 SD)" % (1.0/(np.mean(frameIntervals[-nIdentical:])), np.std(1.0/np.array(frameIntervals[-nIdentical:])))
+    print("Measured refresh rate")
+    print("%f +- %f (mean +- 1 SD)" % (1.0/(np.mean(frameIntervals[-nIdentical:])), np.std(1.0/np.array(frameIntervals[-nIdentical:]))))
 
     # setting threshold for dropped frames detection
     refreshThreshold = 1.0 / rate * 1.2
@@ -200,10 +200,10 @@ def main():
                 nDroppedFrames += 1
                 txt = 't of last frame was %.2f ms (=1/%i)'
                 msg = txt % (deltaT * 1000, 1.0/ deltaT)
-                print msg
+                print(msg)
         
 
-    print "total number of dropped frames %d" % nDroppedFrames
+    print("total number of dropped frames %d" % nDroppedFrames)
     
     timestr = time.strftime("%Y%m%d-%H%M%S")
     

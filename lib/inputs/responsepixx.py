@@ -1,4 +1,4 @@
-from inputs import Input
+from .inputs import Input
 
 ## Class ##
 

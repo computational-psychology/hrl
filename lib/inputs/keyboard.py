@@ -1,4 +1,4 @@
-from inputs import Input
+from .inputs import Input
 import pygame as pg
 
 ## Class ##

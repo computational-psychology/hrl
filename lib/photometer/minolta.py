@@ -16,6 +16,6 @@ class Minolta(Photometer):
                 lm = self.phtm.getLuminance()
                 return lm
             except pym.MinoltaException, (instance):
-                print 'Minolta error:', instance.parameter
+                print('Minolta error:', instance.parameter)
         # if no trial was successful
         return np.nan

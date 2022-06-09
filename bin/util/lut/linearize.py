@@ -42,7 +42,7 @@ def linearize(args):
     rslt = np.array([np.linspace(0,1,2**args.res)[smpl_idx],
                         itss[idxs],lmns[idxs]]).transpose()
 
-    print 'Saving to File...'
+    print('Saving to File...')
 
     np.savetxt(ofl,rslt)
     ofl.close()

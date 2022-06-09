@@ -1,4 +1,4 @@
-from graphics import Graphics
+from .graphics import Graphics
 import numpy as np
 
 ## Class ##

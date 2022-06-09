@@ -95,9 +95,9 @@ def measure(args):
 
     (pwdth,phght) = (wdth*args.sz,hght*args.sz)
     ppos = ((wdth - pwdth)/2,(hght - phght)/2)
-    print pwdth
-    print ppos
-    print phght
+    print(pwdth)
+    print(ppos)
+    print(phght)
 
     done = False
     
@@ -111,7 +111,7 @@ def measure(args):
         ptch.draw(ppos,(pwdth,phght))
         hrl.graphics.flip()
 
-        print 'Current Intensity: %f / progress: %d of %d' % (its, c, args.stps)
+        print('Current Intensity: %f / progress: %d of %d' % (its, c, args.stps))
         smps = []
         for i in range(args.nsmps):
             smps.append(hrl.photometer.readLuminance(5,args.slptm))

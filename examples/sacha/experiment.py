@@ -228,16 +228,16 @@ def main():
         hrl.writeResultLine()
 
         # We print the trial number simply to keep track during an experiment
-        print hrl.results['Trial']
+        print(hrl.results['Trial'])
 
         # If escape has been pressed we break out of the core loop
         if escp:
-            print "Session cancelled"
+            print("Session cancelled")
             break
 
     # And the experiment is over!
     hrl.close()
-    print "Session complete"
+    print("Session complete")
 
 
 ### Functions copied from stimuli/utils.py ###

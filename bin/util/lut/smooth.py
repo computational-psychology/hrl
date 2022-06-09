@@ -75,7 +75,7 @@ def smooth(args):
         smthd = np.hstack((np.ones(2) * smthd[0], smthd, np.ones(2) * smthd[-1]))
         smthd = sp.convolve(smthd, krn, 'valid')
 
-    print 'Saving to File...'
+    print('Saving to File...')
     tbl[:, 1] = smthd
     ofl = open(wfl,'w')
     ofl.write('Input Luminance\r\n')
