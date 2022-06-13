@@ -97,7 +97,7 @@ class Graphics(object):
         dbit = pg.OPENGL
         if db: dbit = dbit | pg.DOUBLEBUF
         if fs: dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
-        self.screen = pg.display.set_mode((w,h), dbit)
+        self.screen = pg.display.set_mode((w,h), dbit, vsync=1)
 
         pg.mouse.set_visible(False)
 

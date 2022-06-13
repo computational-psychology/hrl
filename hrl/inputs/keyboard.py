@@ -1,8 +1,9 @@
 from .inputs import Input
 import pygame as pg
 
-## Class ##
+debug = False
 
+## Class ##
 class Keyboard(Input):
     """
     A Input implementation for a standard PC keyboard. Permitted keys are 'Up',
@@ -12,8 +13,12 @@ class Keyboard(Input):
         t0 = pg.time.get_ticks()
         btn = None
         while (to == 0) or (pg.time.get_ticks() - t0 < to):
+            if debug:
+                print('waiting for key press')
             event = pg.event.wait()
             if event.type == pg.KEYDOWN:
+                if debug:
+                    print('key pressed')
                 btn = checkKey(event.key,btns)
                 if btn != None: break
         t = pg.time.get_ticks()

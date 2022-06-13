@@ -113,26 +113,38 @@ class HRL:
 
         if (graphics == 'datapixx') or (inputs == 'responsepixx'):
 
-            import datapixx as dpx
+            from pypixxlib.datapixx import DATAPixx as DPixx
 
             # Open datapixx.
-            self.datapixx = dpx.open()
+            self.device = DPixx()
 
             # set videomode: Concatenate Red and Green into a 16 bit luminance
             # channel.
-            self.datapixx.setVidMode(dpx.DPREG_VID_CTRL_MODE_M16)
+            mode = self.device.getVideoMode()
+            print(mode)
+
+            if mode!='M16':
+                self.device.setVideoMode('M16')
+                self.device.updateRegisterCache()
+
+            mode = self.device.getVideoMode()
+            print(mode)
 
             # Demonstrate successful initialization.
-            self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
-                        | dpx.BYELLOW | dpx.BRED)
+            #self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
+            #            | dpx.BYELLOW | dpx.BRED)
+            # TODO BLINK with pypixxlib
 
         else:
+            self.device = None
 
-            self.datapixx = None
-
+        # we force not fullscreen, even in experimental computer,
+        # because in later versions of pygame
+        # fullscreen on a second screen gives very weird behavior on 
+        # recording of keyboard events, effectively hanging the computer.
+        fs = False
 
         ## Load Graphics Device ##
-        
         if graphics == 'gpu':
 
             from .graphics.gpu import GPU
@@ -226,7 +238,7 @@ class HRL:
         Closes all the devices and systems maintained by the HRL object.
         This should be called at the end of the program.
         """
-        if self.datapixx != None: self.datapixx.close()
+        if self.device != None: self.device.close()
         if self._rfl != None: self._rfl.close()
         if self._dfl != None: self._dfl.close()
         pg.quit()
