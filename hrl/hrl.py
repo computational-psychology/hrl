@@ -170,7 +170,7 @@ class HRL:
         elif inputs == 'responsepixx':
 
             from .inputs.responsepixx import RESPONSEPixx
-            self.inputs = RESPONSEPixx(self.datapixx)
+            self.inputs = RESPONSEPixx(self.device)
 
         else:
 
