@@ -42,7 +42,7 @@ def smooth(args):
     # First we build up a big intensity to luminance map
     for tbl in tbls:
         for rw in tbl:
-            if hshmp.has_key(rw[0]):
+            if rw[0] in hshmp:
                 hshmp[rw[0]] = np.concatenate([hshmp[rw[0]],rw[1:]])
             else:
                 hshmp[rw[0]] = rw[1:]
@@ -62,8 +62,9 @@ def smooth(args):
         hshmp[ky] = np.mean(values[np.isnan(values) == False])
         if np.isnan(hshmp[ky]):
             raise RuntimeError('no valid measurement for %f' % ky)
-    tbl = np.array([hshmp.keys(),hshmp.values()]).transpose()
+    tbl = np.array([list(hshmp.keys()), list(hshmp.values())]).transpose()
     tbl = tbl[tbl[:,0].argsort()]
+    print(tbl.shape)
 
     # And smooth it
     krn=[0.2,0.2,0.2,0.2,0.2]
