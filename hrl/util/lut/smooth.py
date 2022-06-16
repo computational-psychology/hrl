@@ -58,7 +58,7 @@ def smooth(args):
             idx = np.ones(len(values), dtype=bool)
             idx[i] = False
             min_diff[i] = np.min(np.abs(values[idx] - values[i]))
-        values[(min_diff > 0.05) & (min_diff / values > 0.005)] = np.NaN
+        values[(min_diff > 0.075) & (min_diff / values > 0.0075)] = np.NaN
         hshmp[ky] = np.mean(values[np.isnan(values) == False])
         if np.isnan(hshmp[ky]):
             raise RuntimeError('no valid measurement for %f' % ky)
