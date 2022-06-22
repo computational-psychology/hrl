@@ -16,7 +16,7 @@ prsr = ap.ArgumentParser(prog="hrl-util lut linearize",
     final step in generating a look up table.
     """)
 
-prsr.add_argument('-r',dest='res',default=12,type=int,
+prsr.add_argument('-r',dest='res',default=16,type=int,
         help='The subsampling resoultion in bits. Default: 12')
 
 ### Core ###
