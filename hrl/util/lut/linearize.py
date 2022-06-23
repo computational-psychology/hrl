@@ -17,7 +17,7 @@ prsr = ap.ArgumentParser(prog="hrl-util lut linearize",
     """)
 
 prsr.add_argument('-r',dest='res',default=16,type=int,
-        help='The subsampling resoultion in bits. Default: 12')
+        help='The subsampling resoultion in bits. Default: 16')
 
 ### Core ###
 
