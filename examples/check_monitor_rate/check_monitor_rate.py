@@ -28,8 +28,8 @@ from math import pi
 from random import uniform
 from socket import gethostname
 
-inlab = True if "vlab" in gethostname() else False
-
+inlab_siemens = True if "vlab" in gethostname() else False
+inlab_viewpixx =  True if "viewpixx" in gethostname() else False
 
 import clock
 defaultClock = clock.monotonicClock
@@ -73,22 +73,33 @@ def main():
 
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
-    if inlab:
+    if inlab_siemens:
         graphics='datapixx'
         inputs='responsepixx'
         scrn=1
         fs = True  # fullscreen
+        wdth = 1024  # Screen size
+        hght = 768
+
+    elif inlab_viewpixx:
+        graphics='viewpixx'
+        inputs='responsepixx'
+        scrn=1
+        fs = True  # fullscreen
+        wdth = 1920  # Screen size
+        hght = 1080
+        
     else:
         graphics='gpu' # 'datapixx' is another option
         inputs='keyboard' # 'responsepixx' is another option
         scrn=1
         fs = False # not fullscreen: windowed
+        wdth = 1024  # Screen size
+        hght = 768
+
 
     photometer=None
 
-    # Screen size
-    wdth = 1024
-    hght = 768
 
     # background value
     bg = 0.3

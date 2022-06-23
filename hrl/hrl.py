@@ -111,10 +111,13 @@ class HRL:
         
         ## Load Datapixx ##
 
-        if (graphics == 'datapixx') or (inputs == 'responsepixx'):
-
-            from pypixxlib.datapixx import DATAPixx as DPixx
-
+        if (graphics == 'datapixx') or (inputs == 'responsepixx') or (graphics == 'viewpixx') :
+            
+            if graphics == 'datapixx':
+                from pypixxlib.datapixx import DATAPixx as DPixx
+            elif graphics == 'viewpixx':
+                from pypixxlib.viewpixx import VIEWPixx3D as DPixx
+                
             # Open datapixx.
             self.device = DPixx()
 
@@ -150,7 +153,7 @@ class HRL:
             from .graphics.gpu import GPU
             self.graphics = GPU(wdth,hght,bg,fs,db,lut)
 
-        elif graphics == 'datapixx':
+        elif graphics == 'datapixx' or graphics=='viewpixx':
 
             from .graphics.datapixx import DATAPixx
             self.graphics = DATAPixx(wdth,hght,bg,fs,db,lut)

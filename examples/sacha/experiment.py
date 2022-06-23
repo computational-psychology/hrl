@@ -26,7 +26,8 @@ import os
 from random import uniform
 from socket import gethostname
 
-inlab = True if "vlab" in gethostname() else False
+inlab_siemens = True if "vlab" in gethostname() else False
+inlab_viewpixx =  True if "viewpixx" in gethostname() else False
 
 
 ### Main ###
@@ -40,23 +41,33 @@ def main():
 
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
-    if inlab:
-        graphics='datapixx' # 'datapixx' is another option
-        inputs='responsepixx' # 'responsepixx' is another option
+    if inlab_siemens:
+        graphics='datapixx'
+        inputs='responsepixx'
         scrn=1
-        fs = True
+        fs = True  # fullscreen
+        wdth = 1024  # Screen size
+        hght = 768
 
+    elif inlab_viewpixx:
+        graphics='viewpixx'
+        inputs='responsepixx'
+        scrn=1
+        fs = True  # fullscreen
+        wdth = 1920  # Screen size
+        hght = 1080
+        
     else:
         graphics='gpu' # 'datapixx' is another option
         inputs='keyboard' # 'responsepixx' is another option
         scrn=1
-        fs = False
+        fs = False # not fullscreen: windowed
+        wdth = 1024  # Screen size
+        hght = 768
+
 
     photometer=None
 
-    # Screen size
-    wdth = 1024
-    hght = 768
 
     # Design and result matrix information. This allows us the to use the HRL
     # functionality for automatically reading a design matrix, and
