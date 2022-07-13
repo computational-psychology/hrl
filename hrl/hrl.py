@@ -92,14 +92,14 @@ class HRL:
         # or systems with separate Xscreens, the naming is still :0.0 or :0.1. 
         # For systems with only one screen, it is :1. So we change the if-else conditional
         
-        print ("OS display number (default): %s" % os.environ['DISPLAY'])
+        print("OS display number (default): %s" % os.environ['DISPLAY'])
         
         if os.environ['DISPLAY']==':0': # legacy option for older configs or separate Xscreens
             os.environ['DISPLAY'] = ':0.' + str(scrn)
         else: 
             os.environ['DISPLAY'] = ':' + str(scrn)
         
-        print ("OS display number (now used): %s" % os.environ['DISPLAY'])
+        print("OS display number (now used): %s" % os.environ['DISPLAY'])
         
         ## 11. Aug 2021
         # we add a wdth_offset to be able to run HRL in setups with a 
@@ -111,36 +111,51 @@ class HRL:
         
         ## Load Datapixx ##
 
-        if (graphics == 'datapixx') or (inputs == 'responsepixx'):
-
-            import datapixx as dpx
-
+        if (graphics == 'datapixx') or (inputs == 'responsepixx') or (graphics == 'viewpixx') :
+            
+            if graphics == 'datapixx':
+                from pypixxlib.datapixx import DATAPixx as DPixx
+            elif graphics == 'viewpixx':
+                from pypixxlib.viewpixx import VIEWPixx3D as DPixx
+                
             # Open datapixx.
-            self.datapixx = dpx.open()
+            self.device = DPixx()
 
             # set videomode: Concatenate Red and Green into a 16 bit luminance
             # channel.
-            self.datapixx.setVidMode(dpx.DPREG_VID_CTRL_MODE_M16)
+            mode = self.device.getVideoMode()
+            print(mode)
+
+            if mode!='M16':
+                self.device.setVideoMode('M16')
+                self.device.updateRegisterCache()
+
+            mode = self.device.getVideoMode()
+            print(mode)
 
             # Demonstrate successful initialization.
-            self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
-                        | dpx.BYELLOW | dpx.BRED)
+            #self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
+            #            | dpx.BYELLOW | dpx.BRED)
+            # TODO BLINK with pypixxlib
 
         else:
+            self.device = None
 
-            self.datapixx = None
-
+        # we force not fullscreen, even in experimental computer,
+        # because in later versions of pygame
+        # fullscreen on a second screen gives very weird behavior on 
+        # recording of keyboard events, effectively hanging the computer.
+        fs = False
 
         ## Load Graphics Device ##
-        
         if graphics == 'gpu':
 
-            from graphics.gpu import GPU
+            from .graphics.gpu import GPU
             self.graphics = GPU(wdth,hght,bg,fs,db,lut)
 
-        elif graphics == 'datapixx':
+        elif graphics == 'datapixx' or graphics=='viewpixx':
 
-            from graphics.datapixx import DATAPixx
+            from .graphics.datapixx import DATAPixx
             self.graphics = DATAPixx(wdth,hght,bg,fs,db,lut)
 
         else:
@@ -152,13 +167,13 @@ class HRL:
 
         if inputs == 'keyboard':
 
-            from inputs.keyboard import Keyboard
+            from .inputs.keyboard import Keyboard
             self.inputs = Keyboard()
 
         elif inputs == 'responsepixx':
 
-            from inputs.responsepixx import RESPONSEPixx
-            self.inputs = RESPONSEPixx(self.datapixx)
+            from .inputs.responsepixx import RESPONSEPixx
+            self.inputs = RESPONSEPixx(self.device)
 
         else:
 
@@ -169,11 +184,11 @@ class HRL:
 
         if photometer == 'optical':
 
-            from photometer.optical import OptiCAL
+            from .photometer.optical import OptiCAL
             self.photometer = OptiCAL('/dev/ttyUSB0')
         if photometer == 'minolta':
 
-            from photometer.minolta import Minolta
+            from .photometer.minolta import Minolta
             self.photometer = Minolta('/dev/ttyUSB0')
 
         else:
@@ -188,7 +203,7 @@ class HRL:
             # then opens file in 'a' mode, and do not write the header
             if os.path.exists(rfl):
                 # checks how many trials have been run
-                r  = open(rfl,'rb')
+                r  = open(rfl,'r')
                 reader = csv.DictReader(r, delimiter=' ')
                 l = list(reader)
                 r.close()
@@ -196,13 +211,13 @@ class HRL:
                 self.starttrial = len(l) 
                 
                 
-                self._rfl = open(rfl,'ab')
+                self._rfl = open(rfl,'a')
                 self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
                 
                 
             # if it doesnt exist, open in 'wb' mode and write the header    
             else:
-                self._rfl = open(rfl,'wb')
+                self._rfl = open(rfl,'w')
                 self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
                 self._rfl.write(' '.join(rhds) + '\r\n')  # writes header   
                 self.starttrial = 0               
@@ -213,7 +228,7 @@ class HRL:
         ## Design matrix file ##
         self._dfl = None
         if dfl != None:
-            self._dfl = open(dfl,'rb')
+            self._dfl = open(dfl,'r')
             self.designs = csv.DictReader(self._dfl,delimiter=' ',skipinitialspace=True)
             # skip trials already done
             for i in range(self.starttrial):
@@ -226,7 +241,7 @@ class HRL:
         Closes all the devices and systems maintained by the HRL object.
         This should be called at the end of the program.
         """
-        if self.datapixx != None: self.datapixx.close()
+        if self.device != None: self.device.close()
         if self._rfl != None: self._rfl.close()
         if self._dfl != None: self._dfl.close()
         pg.quit()

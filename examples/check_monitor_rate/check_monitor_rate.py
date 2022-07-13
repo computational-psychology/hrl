@@ -1,11 +1,11 @@
 """
-Checks frame rate of the monitor. 
+Checks frame rate of the monitor.
 
-When ran in a "normal" user screen, windowed, you will not get an 
-accurate measurement. 
+When ran in a "normal" user screen, windowed, you will not get an
+accurate measurement.
 
 When ran in the experimental monitor, frame rate should be exactly
-the same as the one reported by the manufacturer. It should also be 
+the same as the one reported by the manufacturer. It should also be
 ZERO dropped frames. That ensures that your graphics pipeline is working
 fine.
 
@@ -28,8 +28,8 @@ from math import pi
 from random import uniform
 from socket import gethostname
 
-inlab = True if "vlab" in gethostname() else False
-
+inlab_siemens = True if "vlab" in gethostname() else False
+inlab_viewpixx =  True if "viewpixx" in gethostname() else False
 
 import clock
 defaultClock = clock.monotonicClock
@@ -58,12 +58,12 @@ def makeGaussian(size, fwhm = 3, center=None):
 def normalize(v, endrange=(0,1)):
     mx = v.max()
     mm = v.min()
-    
+
     n = (v - mm)/(mx-mm)
     r = endrange[1]-endrange[0]
-        
+
     return (n*r+endrange[0])
-    
+
 ### Main ###
 def main():
 
@@ -73,26 +73,37 @@ def main():
 
     # Which devices we wish to use in this experiment. See the
     # pydoc documentation for a list of # options.
-    if inlab:
-        graphics='datapixx' 
+    if inlab_siemens:
+        graphics='datapixx'
         inputs='responsepixx'
         scrn=1
-        fs = True  # fullscreen 
+        fs = True  # fullscreen
+        wdth = 1024  # Screen size
+        hght = 768
+
+    elif inlab_viewpixx:
+        graphics='viewpixx'
+        inputs='responsepixx'
+        scrn=1
+        fs = True  # fullscreen
+        wdth = 1920  # Screen size
+        hght = 1080
+        
     else:
         graphics='gpu' # 'datapixx' is another option
         inputs='keyboard' # 'responsepixx' is another option
         scrn=1
         fs = False # not fullscreen: windowed
-        
+        wdth = 1024  # Screen size
+        hght = 768
+
+
     photometer=None
 
-    # Screen size
-    wdth = 1024
-    hght = 768
-    
+
     # background value
     bg = 0.3
-    
+
 
     # Pass this to HRL if we want to use gamma correction.
     lut = 'lut.csv'
@@ -107,22 +118,22 @@ def main():
     nMaxFrames=100
     nWarmUpFrames=10
     threshold=1
-    refreshThreshold = 1.0 
+    refreshThreshold = 1.0
     nDroppedFrames = 0
     # run warm-ups
     for frameN in range(nWarmUpFrames):
         hrl.graphics.flip()
-        
+
     # run test frames
     firsttimeon = True
     frameIntervals = []
     rate = 0
     for frameN in range(nMaxFrames):
-        
+
         hrl.graphics.flip()
-        
+
         frameTime = now = defaultClock.getTime()
-        
+
         if firsttimeon:
             firsttimeon = False
             lastFrameT = now
@@ -131,13 +142,13 @@ def main():
         deltaT = now - lastFrameT
         lastFrameT = now
         frameIntervals.append(deltaT)
-                            
+
         if (len(frameIntervals) >= nIdentical and
                 (np.std(frameIntervals[-nIdentical:]) <(threshold / 1000.0))):
             rate = 1.0 / np.mean(frameIntervals[-nIdentical:])
-            
-    print "Measured refresh rate"
-    print "%f +- %f (mean +- 1 SD)" % (1.0/(np.mean(frameIntervals[-nIdentical:])), np.std(1.0/np.array(frameIntervals[-nIdentical:])))
+
+    print("Measured refresh rate")
+    print("%f +- %f (mean +- 1 SD)" % (1.0/(np.mean(frameIntervals[-nIdentical:])), np.std(1.0/np.array(frameIntervals[-nIdentical:]))))
 
     # setting threshold for dropped frames detection
     refreshThreshold = 1.0 / rate * 1.2
@@ -152,65 +163,76 @@ def main():
 
     # We create a sinusoidal grating texture
     texsize = (256, 256)
-    
+
     contrast = 0.4
-    
+
     gauss =  normalize(makeGaussian(texsize[0], fwhm = 80, center=(128, 128)))
-    
-    
-    # timing and drawing 100 frames
+
+
+    # timing and drawing 1000 frames
     nDroppedFrames = 0
     firsttimeon = True
     frameIntervals = []
 
-    for i in range(1000):    
+
+    for i in range(1000):
         s = normalize(np.sin(np.linspace(0, 10*pi, texsize[0])+i))
         grating1 = np.tile(s, (texsize[1], 1))
-        
+
         s = normalize(np.sin(np.linspace(0, 20*pi, texsize[0])+i))
         grating2 = np.tile(s, (texsize[1], 1))
-        
+
         gabor1 = normalize(grating1 * gauss, (bg, bg+contrast))
         gabor2 = normalize(grating2 * gauss, (bg, bg+contrast))
-       
+
         # draw to texture
         tex1 = hrl.graphics.newTexture(gabor1)
         tex1.draw(pos=(wqtr-texsize[0]/2.0, hhlf-texsize[1]/2.0), sz=texsize)
 
         tex2 = hrl.graphics.newTexture(gabor2)
         tex2.draw(pos=(3*wqtr-texsize[0]/2.0, hhlf-texsize[1]/2.0), sz=texsize, rot=90)
-        
+
         # flip
         hrl.graphics.flip(clr=True)
-        
+
         # timing
         frameTime = defaultClock.getTime()
 
         if firsttimeon:
             firsttimeon = False
             lastFrameT = frameTime
-            
+
         else:
             deltaT = frameTime - lastFrameT
             lastFrameT = frameTime
             frameIntervals.append(deltaT)
-            
+
             # throw warning if dropped frame
             if deltaT > refreshThreshold:
                 nDroppedFrames += 1
                 txt = 't of last frame was %.2f ms (=1/%i)'
                 msg = txt % (deltaT * 1000, 1.0/ deltaT)
-                print msg
-        
+                print(msg)
 
-    print "total number of dropped frames %d" % nDroppedFrames
-    
+    print("")
+    print("total number of dropped frames %d" % nDroppedFrames)
+    print("")
+    print("Interpretation:")
+    print("""
+    To have 1 and only 1 dropped frame is NORMAL.
+
+    To have more than 1 dropped frame is NOT NORMAL.
+    It might mean that there is something wrong the graphic card settings or
+    graphic card's driver. You should check that synchronizing
+    to VSYNC is enabled.""")
+
+
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    
+
     with open('%s.txt' % timestr, 'w') as f:
         for t in frameIntervals:
             f.write("%f\n" % t)
-    
+
 
 ### Run Main ###
 if __name__ == '__main__':

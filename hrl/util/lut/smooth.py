@@ -42,7 +42,7 @@ def smooth(args):
     # First we build up a big intensity to luminance map
     for tbl in tbls:
         for rw in tbl:
-            if hshmp.has_key(rw[0]):
+            if rw[0] in hshmp:
                 hshmp[rw[0]] = np.concatenate([hshmp[rw[0]],rw[1:]])
             else:
                 hshmp[rw[0]] = rw[1:]
@@ -58,12 +58,13 @@ def smooth(args):
             idx = np.ones(len(values), dtype=bool)
             idx[i] = False
             min_diff[i] = np.min(np.abs(values[idx] - values[i]))
-        values[(min_diff > 0.05) & (min_diff / values > 0.005)] = np.NaN
+        values[(min_diff > 0.075) & (min_diff / values > 0.0075)] = np.NaN
         hshmp[ky] = np.mean(values[np.isnan(values) == False])
         if np.isnan(hshmp[ky]):
             raise RuntimeError('no valid measurement for %f' % ky)
-    tbl = np.array([hshmp.keys(),hshmp.values()]).transpose()
+    tbl = np.array([list(hshmp.keys()), list(hshmp.values())]).transpose()
     tbl = tbl[tbl[:,0].argsort()]
+    print(tbl.shape)
 
     # And smooth it
     krn=[0.2,0.2,0.2,0.2,0.2]
@@ -75,7 +76,7 @@ def smooth(args):
         smthd = np.hstack((np.ones(2) * smthd[0], smthd, np.ones(2) * smthd[-1]))
         smthd = sp.convolve(smthd, krn, 'valid')
 
-    print 'Saving to File...'
+    print('Saving to File...')
     tbl[:, 1] = smthd
     ofl = open(wfl,'w')
     ofl.write('Input Luminance\r\n')

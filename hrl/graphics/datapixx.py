@@ -1,4 +1,4 @@
-from graphics import Graphics
+from .graphics import Graphics
 import numpy as np
 
 ## Class ##
@@ -19,6 +19,6 @@ def dpxIntToChans(n):
     Takes a 16-bit integer and returns a 4-channel * 8-bit representation in the
     datapixx R-G concatenated format.
     """
-    return (n / (2**8),n % (2**8),0,2**8 - 1)
+    return (n // (2**8), n % (2**8), 0, 2**8 - 1)
 
 

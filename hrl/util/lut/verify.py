@@ -12,6 +12,7 @@ import os
 # Unqualified Imports
 from random import shuffle
 
+
 # Timing
 from timeit import default_timer as timer
 from datetime import timedelta
@@ -45,7 +46,9 @@ prsr.add_argument('-v',dest='rvs',action='store_true',help='Shall we reverse the
 
 prsr.add_argument('-p', dest='photometer', type=str, default='optical', help='The photometer to use. Default: optical')
 
-prsr.add_argument('-o', dest='flnm', type=str, default='measure.csv', help='The output filename. Default: measure.csv')
+prsr.add_argument('-o', dest='flnm', type=str, default='lut_test.csv', help='The output filename. Default: lut_test.csv')
+
+prsr.add_argument('-l', dest='lut', type=str, default='lut.csv', help='The lookup table filename. Default: lut.csv')
 
 prsr.add_argument('-bg', dest='bg', type=float, default=0.0, help='The background intensity outside of the central patch. Default: 0')
 
@@ -55,20 +58,21 @@ prsr.add_argument('-hg', dest='hg', type=int, default=768, help='The screen reso
 
 prsr.add_argument('-gr', dest='graphics', type=str, default='datapixx', help='Whether using the GPU (gpu) or the DataPixx interface (datapixx). Default: datapixx')
 
-prsr.add_argument('-sc', dest='scrn', type=str, default='1', help='Screen number. Default: 1')
+prsr.add_argument('-sc', dest='scrn', type=str, default=1, help='Screen number. Default: 1')
 
 prsr.add_argument('-wo', dest='wdth_offset', type=int, default=0, help='Horizontal offset for window. Useful for setups with a single Xscreen but multiple monitors (Xinerame). Default: 0')
 
 
+
 # Settings (these can all be changed with system arguments)
 
-def measure(args):
+def verify(args):
 
     args = prsr.parse_args(args)
-
+    
     wdth = args.wd
     hght = args.hg
-    
+
     # Starting timer
     start = timer()
     
@@ -79,39 +83,42 @@ def measure(args):
     graphics = args.graphics
     inputs = 'keyboard'
     photometer = args.photometer
+    lut = args.lut
+
     scrn = args.scrn
     bg = args.bg
     wdth_offset = args.wdth_offset
 
 
     hrl = HRL(graphics=graphics,inputs=inputs,photometer=photometer,
-              wdth=wdth, hght=hght, bg=bg, fs=True,
+              wdth=wdth, hght=hght, bg=bg, fs=True, lut=lut,
               wdth_offset=wdth_offset, db=True, scrn=scrn,
               rfl=flnm, rhds=flds)
-
+    
     itss = np.linspace(args.mn,args.mx,args.stps)
     if args.rndm: shuffle(itss)
     if args.rvs: itss = itss[::-1]
 
     (pwdth,phght) = (wdth*args.sz,hght*args.sz)
     ppos = ((wdth - pwdth)/2,(hght - phght)/2)
-    print pwdth
-    print ppos
-    print phght
+    print(pwdth)
+    print(ppos)
+    print(phght)
 
     done = False
-    
+
     c=0
 
     for its in itss:
         c+=1
+
         hrl.results['Intensity'] = its
 
         ptch = hrl.graphics.newTexture(np.array([[its]]))
         ptch.draw(ppos,(pwdth,phght))
         hrl.graphics.flip()
 
-        print 'Current Intensity: %f / progress: %d of %d' % (its, c, args.stps)
+        print('Current Intensity: %f / progress: %d of %d' % (its, c, args.stps))
         smps = []
         for i in range(args.nsmps):
             smps.append(hrl.photometer.readLuminance(5,args.slptm))
@@ -126,13 +133,13 @@ def measure(args):
     # Experiment is over!
     hrl.close()
     
+    
     # stop timer
     end = timer()
     
     # Time elapsed
     print('Time elapsed:')
     print(timedelta(seconds=end-start))
-
 
 
 if __name__ == '__main__':

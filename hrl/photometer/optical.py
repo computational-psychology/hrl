@@ -1,4 +1,4 @@
-from photometer import Photometer
+from .photometer import Photometer
 import pyoptical as pop
 import pygame as pg
 import numpy as np

@@ -97,7 +97,7 @@ class Graphics(object):
         dbit = pg.OPENGL
         if db: dbit = dbit | pg.DOUBLEBUF
         if fs: dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
-        self.screen = pg.display.set_mode((w,h), dbit)
+        self.screen = pg.display.set_mode((w,h), dbit, vsync=1)
 
         pg.mouse.set_visible(False)
 
@@ -123,7 +123,7 @@ class Graphics(object):
         self._lut = None
         self._gammainv = lambda x: x
         if lut != None:
-            print "..using look-up table: %s" % lut
+            print("..using look-up table: %s" % lut)
             self._lut = np.genfromtxt(lut,skip_header=1)
             self._gammainv = lambda x: np.interp(x,self._lut[:,0],self._lut[:,1])
 
@@ -277,13 +277,14 @@ class Texture:
 ## OpenGL Texture Functions ##
 
 
-def channelsToInt((r,g,b,a)):
+def channelsToInt(t):
     """
     Takes a channel representation and returns a corresponding unsigned 32 bit
     int.  Running the tostring method on a 2d array which has had this function
     applied to it will produce a bytestring appropriate for use as a texture
     with openGL.
     """
+    r,g,b,a = t
     R = 2**0
     G = 2**8
     B = 2**16

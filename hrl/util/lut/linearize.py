@@ -16,8 +16,8 @@ prsr = ap.ArgumentParser(prog="hrl-util lut linearize",
     final step in generating a look up table.
     """)
 
-prsr.add_argument('-r',dest='res',default=12,type=int,
-        help='The subsampling resoultion in bits. Default: 12')
+prsr.add_argument('-r',dest='res',default=16,type=int,
+        help='The subsampling resoultion in bits. Default: 16')
 
 ### Core ###
 
@@ -42,7 +42,7 @@ def linearize(args):
     rslt = np.array([np.linspace(0,1,2**args.res)[smpl_idx],
                         itss[idxs],lmns[idxs]]).transpose()
 
-    print 'Saving to File...'
+    print('Saving to File...')
 
     np.savetxt(ofl,rslt)
     ofl.close()
