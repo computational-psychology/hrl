@@ -91,3 +91,42 @@ class Input(object):
                or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 return True
         return False
+        
+    def check_mouse_press(self):
+        """
+        Queries if a mouse button has been pressed since the last call,
+        returning also the cursor position in case it has been pressed.
+         
+        Like checkEscape(), this function can be used within the core 
+        loop of a program to allow the user to trigger an event.
+
+        Returns
+        -------
+        A tuple containing
+        - a boolean indicating whether a button has been pressed or not 
+        since the last call
+        - the name of the button (leftbutton, middlebutton, rightbutton)
+        - the x,y position of the cursor when the button was pressed
+        
+        """
+        pg.event.get()
+        btn = pg.mouse.get_pressed()
+        if btn[0]:
+            pressed=True
+            button = 'leftbutton'
+            pos = pg.mouse.get_pos()
+        elif btn[1]:
+            pressed=True
+            button = 'middlebutton'
+            pos = pg.mouse.get_pos()
+        elif btn[2]:
+            pressed=True
+            button = 'rightbutton'
+            pos = pg.mouse.get_pos()
+        else:
+            pressed=False
+            button = None
+            pos = (None, None)
+
+        return (pressed, button, pos)
+

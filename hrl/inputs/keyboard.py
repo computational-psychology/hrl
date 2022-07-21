@@ -15,7 +15,7 @@ class Keyboard(Input):
         while (to == 0) or (pg.time.get_ticks() - t0 < to):
             if debug:
                 print('waiting for key press')
-            event = pg.event.wait()
+            event = pg.event.wait(1)       # waits for only 1 ms     
             if event.type == pg.KEYDOWN:
                 if debug:
                     print('key pressed')

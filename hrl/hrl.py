@@ -42,7 +42,8 @@ class HRL:
                 ,db=True
                 ,scrn=0
                 ,dfl=None,rfl=None,rhds=None
-                ,lut=None):
+                ,lut=None
+                ,mouse=False):
         """
         Initialize an HRL object.
 
@@ -69,6 +70,7 @@ class HRL:
             'InputLuminance'. If rfl != None, rhds must be provided.
             Default: None
         lut : The lookup table. Default: None
+        mouse: enables or disables the mouse cursor. Default: False
         
         Returns
         -------
@@ -151,12 +153,12 @@ class HRL:
         if graphics == 'gpu':
 
             from .graphics.gpu import GPU
-            self.graphics = GPU(wdth,hght,bg,fs,db,lut)
+            self.graphics = GPU(wdth,hght,bg,fs,db,lut,mouse)
 
         elif graphics == 'datapixx' or graphics=='viewpixx':
 
             from .graphics.datapixx import DATAPixx
-            self.graphics = DATAPixx(wdth,hght,bg,fs,db,lut)
+            self.graphics = DATAPixx(wdth,hght,bg,fs,db,lut,mouse)
 
         else:
 
