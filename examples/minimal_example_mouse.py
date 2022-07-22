@@ -29,11 +29,14 @@ last_pos = (None, None)
 
 
 while True:
-    mp, mbtn, mpos = hrl.inputs.check_mouse_press() # function without wait time by default
+    # we check if a mouse button has been pressed
+    mp, mbtn, mpos = hrl.inputs.check_mouse_press(thr=0.2) 
+    # thr: 'threshold' in s. Any button press happening in less than thr seconds gets ignored.
+    # this is necessary as the function reports many times the same single button press
     
     # we wait for a keyboard / responsepixx button press for only 10 ms
     # default is indefinite time, so we pass the parameter timeout (to) in seconds.
-    btn, t1 = hrl.inputs.readButton(to=0.010) 
+    btn, t1 = hrl.inputs.readButton(to=0.020) 
     
     # checking if something has been pressed
     # keyboard / responsepixx press
@@ -42,16 +45,8 @@ while True:
      
     # mouse pressed?
     if mp:
-        # if mouse is pressed, we report only if it is a new position
-        # so to avoid multiple reports for the same event
-        # alteratively one could also filter the events according to time 
-        # instead of position (a mininum time has to have passed since last press
-        # this option is not implemented here but you could do it with time.time()
-        if mpos != last_pos:
-            print(mbtn)
-            print(mpos)
-            last_mbtn = mbtn
-            last_pos = mpos
+        print(mbtn)
+        print(mpos)
 
     if btn=='Escape':
         break

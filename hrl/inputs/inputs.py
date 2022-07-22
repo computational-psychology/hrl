@@ -69,6 +69,7 @@ class Input(object):
         The Input constructor.
         """
         pg.init()
+        self.lastmbtn = pg.time.get_ticks()
 
 
     def checkEscape(self):
@@ -92,13 +93,22 @@ class Input(object):
                 return True
         return False
         
-    def check_mouse_press(self):
+    def check_mouse_press(self, thr=0):
         """
         Queries if a mouse button has been pressed since the last call,
         returning also the cursor position in case it has been pressed.
          
         Like checkEscape(), this function can be used within the core 
         loop of a program to allow the user to trigger an event.
+        
+        
+        Arguments
+        ----------
+        
+        thr: 'threshold' in seconds. Any button press happening in less than 
+              thr seconds gets ignored. This argument is necessary
+              as pygame reports many times the same single button press.
+              Default = 0 (all events are reported)    
 
         Returns
         -------
@@ -111,18 +121,26 @@ class Input(object):
         """
         pg.event.get()
         btn = pg.mouse.get_pressed()
-        if btn[0]:
+        t = pg.time.get_ticks()
+                                
+        if btn[0] and (t-self.lastmbtn > thr*1000):
             pressed=True
             button = 'leftbutton'
             pos = pg.mouse.get_pos()
-        elif btn[1]:
+            self.lastmbtn = pg.time.get_ticks()
+            
+        elif btn[1] and (t-self.lastmbtn > thr*1000):
             pressed=True
             button = 'middlebutton'
             pos = pg.mouse.get_pos()
-        elif btn[2]:
+            self.lastmbtn = pg.time.get_ticks()
+            
+        elif btn[2] and (t-self.lastmbtn > thr*1000):
             pressed=True
             button = 'rightbutton'
             pos = pg.mouse.get_pos()
+            self.lastmbtn = pg.time.get_ticks()
+            
         else:
             pressed=False
             button = None
