@@ -75,7 +75,7 @@ class Graphics(object):
 
     # Concrete Methods #
 
-    def __init__(self,w,h,bg,fs=False,db=True,lut=None):
+    def __init__(self,w,h,bg,fs=False,db=True,lut=None,mouse=False):
         """
         The Graphics constructor predefines the basic OpenGL initializations
         that must be performed regardless of the specific backends.
@@ -87,6 +87,7 @@ class Graphics(object):
         bg : The default background grey value (between 0 and 1)
         fs : Enable fullscreen display (Boolean) Default: False
         db : Enable double buffering (Boolean) Default: True
+        mouse: Enable mouse cursor to be visible. Default: False
 
         Returns
         -------
@@ -98,8 +99,9 @@ class Graphics(object):
         if db: dbit = dbit | pg.DOUBLEBUF
         if fs: dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
         self.screen = pg.display.set_mode((w,h), dbit, vsync=1)
-
-        pg.mouse.set_visible(False)
+        
+        if not mouse:
+            pg.mouse.set_visible(False)
 
         # Disables this thing
         gl.glDisable(gl.GL_DEPTH_TEST)

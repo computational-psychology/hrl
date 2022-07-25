@@ -69,6 +69,7 @@ class Input(object):
         The Input constructor.
         """
         pg.init()
+        self.lastmbtn = pg.time.get_ticks()
 
 
     def checkEscape(self):
@@ -91,3 +92,59 @@ class Input(object):
                or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 return True
         return False
+        
+    def check_mouse_press(self, thr=0):
+        """
+        Queries if a mouse button has been pressed since the last call,
+        returning also the cursor position in case it has been pressed.
+         
+        Like checkEscape(), this function can be used within the core 
+        loop of a program to allow the user to trigger an event.
+        
+        
+        Arguments
+        ----------
+        
+        thr: 'threshold' in seconds. Any button press happening in less than 
+              thr seconds gets ignored. This argument is necessary
+              as pygame reports many times the same single button press.
+              Default = 0 (all events are reported)    
+
+        Returns
+        -------
+        A tuple containing
+        - a boolean indicating whether a button has been pressed or not 
+        since the last call
+        - the name of the button (leftbutton, middlebutton, rightbutton)
+        - the x,y position of the cursor when the button was pressed
+        
+        """
+        pg.event.get()
+        btn = pg.mouse.get_pressed()
+        t = pg.time.get_ticks()
+                                
+        if btn[0] and (t-self.lastmbtn > thr*1000):
+            pressed=True
+            button = 'leftbutton'
+            pos = pg.mouse.get_pos()
+            self.lastmbtn = pg.time.get_ticks()
+            
+        elif btn[1] and (t-self.lastmbtn > thr*1000):
+            pressed=True
+            button = 'middlebutton'
+            pos = pg.mouse.get_pos()
+            self.lastmbtn = pg.time.get_ticks()
+            
+        elif btn[2] and (t-self.lastmbtn > thr*1000):
+            pressed=True
+            button = 'rightbutton'
+            pos = pg.mouse.get_pos()
+            self.lastmbtn = pg.time.get_ticks()
+            
+        else:
+            pressed=False
+            button = None
+            pos = (None, None)
+
+        return (pressed, button, pos)
+
