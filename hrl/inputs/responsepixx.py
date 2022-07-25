@@ -39,11 +39,15 @@ class RESPONSEPixx(Input):
             print('waiting for button press')
         
         self.startTime = self.device.getTime()
+        if debug:
+            print(self.startTime)
             
         finished = False
         
         while not finished:
-            
+            if (self.device.getTime() - self.startTime) > to:
+                finished = True
+                
             #read device status
             self.device.updateRegisterCache()
             self.device.din.getDinLogStatus(self.log)

@@ -6,23 +6,44 @@ Minimal example of how to use mouse events in HRL 3.
 """
 
 from hrl import HRL
+from socket import gethostname
 
 # size of Siements monitor
 WIDTH = 1024
 HEIGHT = 768
 
+# Figure out if we're running in the vision lab
+inlab = True if "vlab" in gethostname() else False
 
-hrl = HRL(
-    graphics="gpu",
-    inputs="keyboard",
-    photometer=None,
-    wdth=WIDTH,
-    hght=HEIGHT,
-    bg=0.5,
-    scrn=1,
-    db=True,
-    fs=False,
-    mouse=True)  # need to be passed as True, so the cursor is visible
+
+if inlab:
+    hrl = HRL(
+        graphics="datapixx",
+        inputs="responsepixx",
+        photometer=None,
+        wdth=WIDTH,
+        hght=HEIGHT,
+        bg=0.5,
+        scrn=1,
+        db=True,
+        fs=False,
+        mouse=True)  # need to be passed as True, so the cursor is visible
+        
+else:
+    hrl = HRL(
+        graphics="gpu",
+        inputs="keyboard",
+        photometer=None,
+        wdth=WIDTH,
+        hght=HEIGHT,
+        bg=0.5,
+        scrn=1,
+        db=True,
+        fs=False,
+        mouse=True)  # need to be passed as True, so the cursor is visible
+        
+           
+
 
 
 while True:
@@ -53,7 +74,7 @@ while True:
     if btn != None:
         print(btn)
 
-    if btn=='Escape':
+    if btn=='Escape' or hrl.inputs.checkEscape():
         break
 
     # mouse pressed?
