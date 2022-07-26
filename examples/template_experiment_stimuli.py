@@ -7,15 +7,27 @@ import sys
 import numpy as np
 from stimuli.papers.RHS2007 import WE_thick
 
-# size of Siements monitor
-WIDTH = 1024
-HEIGHT = 768
 
+inlab_siemens = True if "vlab" in gethostname() else False
+inlab_viewpixx =  True if "viewpixx" in gethostname() else False
 
+if inlab_siemens:
+	# size of Siements monitor
+	WIDTH = 1024
+	HEIGHT = 768
+	
+elif inlab_viewpixx:
+	# size of Siements monitor
+	WIDTH = 1920
+	HEIGHT = 1080
+else:
+	WIDTH = 1024
+	HEIGHT = 768
+   
 # center of screen
 whlf = WIDTH / 2.0
 hhlf = HEIGHT / 2.0
-
+    
 
 def show_stim(hrl):
     stim = WE_thick()
@@ -82,10 +94,8 @@ def run_block(hrl):
 def run_experiment():
     lut = os.path.dirname(os.path.abspath(__file__)) + "/lut.csv"
 
-    # Figure out if we're running in the vision lab
-    inlab = True if "vlab" in gethostname() else False
-
-    if inlab:
+    
+    if inlab_siemens:
         # create HRL object
         hrl = HRL(
             graphics="datapixx",
@@ -99,7 +109,21 @@ def run_experiment():
             db=True,
             fs=True,
         )
-
+    elif inlab_viewpixx:
+        
+        hrl = HRL(
+            graphics="viewpixx",
+            inputs="responsepixx",
+            photometer=None,
+            wdth=WIDTH,
+            hght=HEIGHT,
+            bg=0.2,
+            scrn=1,
+            lut=lut,
+            db=True,
+            fs=True,
+        )
+        
     else:
         hrl = HRL(
             graphics="gpu",
@@ -113,7 +137,7 @@ def run_experiment():
             db=True,
             fs=False,
         )
-
+        
     run_block(hrl)
 
 
