@@ -24,23 +24,22 @@ is designed so that experiments could be written on a home computer, and then
 transfered to a lab computer with scientific hardware as required.
 
 The most important component to achieving HRL's full functionality is a
-DATAPixx digital to analogue converter. With an appropriate analogue monitor,
-a DATAPixx box can convert digital signals into 16 bit luminance values.
-Datapixx also includes functionality for high precision temporal control.
+DATAPixx device or ViewPixx device. The first version of HRL was designed to 
+work with an CRT analogue monitor, so that the DATAPixx box could use the full
+16-bit resolution by converting digital signals into 16 bit luminance values.
+In the current version we have also adapted HRL to work with the newest ViewPixx 
+LCD monitor, which also allows achromatic 16-bit luminance presentation.
+ViewPixx and Datapixx also includes functionality for high precision temporal control.
 
 Another component of HRL is that it is designed to work with certain luminance
 measurement devices. HRL comes with a suite of calibration scripts designed to
 help tune scientific hardware using these measurement devices.
 
-Our lab also makes use of the EyeLink 1000 Desktop Mount in parallel with HRL.
-We currently have alpha scripts implementing our desired scenarios, and we will
-publish them when they have been thoroughly tested.
 
 ## Installation ##
 
-HRL is a full Python(3) package, and can be installed using pip or conda.
-It is not (yet) on PyPI, so
-first clone the repository via
+HRL is a full Python 3 package, and can be installed using pip or conda.
+It is not (yet) on PyPI, so first clone the repository via
 
 ```
 git clone https://github.com/computational-psychology/hrl
@@ -63,10 +62,10 @@ for an editable installation.
 ### Dependencies ###
 
 - Required: `pygame`, `pyopengl`, `numpy`
-- Optional: `pydatapixx`, `pyoptical`, `pyserial`, `pyminolta`.
+- Optional: `pyoptical`, `pyserial`, `pyminolta, and `pypixxlib`, the propertary library from VPixx Technologies.
 
 ```pip install .``` will automatically install the *required* dependencies.
-NOTE that HRL is currently python 3 compatible only.
+
 
 ## Usage ##
 
