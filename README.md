@@ -62,7 +62,7 @@ for an editable installation.
 ### Dependencies ###
 
 - Required: `pygame`, `pyopengl`, `numpy`
-- Optional: `pyoptical`, `pyserial`, `pyminolta, and `pypixxlib`, the propertary library from VPixx Technologies.
+- Optional: `pyoptical`, `pyserial`, `pyminolta`, and `pypixxlib`, [the propertary library from VPixx Technologies](https://www.vpixx.com/manuals/python/html/index.html).
 
 ```pip install .``` will automatically install the *required* dependencies.
 
