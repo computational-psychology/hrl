@@ -22,19 +22,20 @@ class RESPONSEPixx(Input):
     def __init__(self, device):
         super(RESPONSEPixx,self).__init__()
         self.device = device
-        
-        self.log = self.device.din.setDinLog(12e6, 1000)
-        self.device.din.startDinLog()
-        self.device.updateRegisterCache()
-        
-        self.startTime = self.device.getTime()
-   
+
     ## new function in HRL3. waitButton() function implemented in python
     ## in previous version of HRL waitButton() was a function of the 
     ## datapixx.so python wrapper
     ## Adapted from example code in: 
     ## https://www.vpixx.com/manuals/python/html/basicdemo.html#example-8-how-to-read-button-presses-from-a-responsepixx
     def waitButton(self, to):
+        
+        self.log = self.device.din.setDinLog(12e6, 1000)
+        self.device.din.startDinLog()
+        self.device.updateRegisterCache()
+        self.startTime = self.device.getTime()
+   
+        
         if debug:
             print('waiting for button press')
         
@@ -62,6 +63,11 @@ class RESPONSEPixx(Input):
                 # taking only the first event
                 #for x in eventList:
                 x = eventList[0]
+                if debug:
+                    print('number events: ', len(eventList))
+                    print('event:')
+                    print(x)
+                    
                 if x[1] != 65535: # ommiting button releases
                     #get the time of the press, since we started logging
                     t = round(x[0] - self.startTime, 5) # 5 decimal precision
@@ -69,9 +75,18 @@ class RESPONSEPixx(Input):
                         printStr = 'Button pressed! Button code: ' + str(x[1]) + ', Time:' + str(t)
                         print(printStr)
                     finished = True
+                    
+                    #Stop logging
+                    self.device.din.stopDinLog()
+                    self.device.updateRegisterCache()
+                    
                     return(x[1], t)
            
             time.sleep(0.05) # waiting 50 ms until next software poll.
+        
+        #Stop logging
+        self.device.din.stopDinLog()
+        self.device.updateRegisterCache()
 
         return None
     
