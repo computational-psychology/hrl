@@ -4,6 +4,7 @@ import numpy as np
 import pygame as pg
 import os
 import csv
+import platform
 
 
 ### HRL Class ###
@@ -60,7 +61,8 @@ class HRL:
         hght : The desired height of the screen. Default: 768
         bg : The background luminance on a scale from 0 to 1. Default: 0.0
         fs : Whether or not to run in Fullscreen. Default: False
-        wdth_offset: The desired horizontal offset of the window. Useful for setups with multiple monitors but a single Xscreen session. Default: 0
+        wdth_offset: The desired horizontal offset of the window. Useful for setups
+              with multiple monitors but a single Xscreen session. Default: 0
         db : Whether or not to use double buffering. Default: True
         scrn: Which monitor to use. Numbered 0,1... Default: 0
         dfl : The read location of the design matrix. Default: None
@@ -94,19 +96,20 @@ class HRL:
         # or systems with separate Xscreens, the naming is still :0.0 or :0.1. 
         # For systems with only one screen, it is :1. So we change the if-else conditional
         
-        print("OS display number (default): %s" % os.environ['DISPLAY'])
-        
-        if os.environ['DISPLAY']==':0': # legacy option for older configs or separate Xscreens
-            os.environ['DISPLAY'] = ':0.' + str(scrn)
-        else: 
-            os.environ['DISPLAY'] = ':' + str(scrn)
-        
-        print("OS display number (now used): %s" % os.environ['DISPLAY'])
-        
-        ## 11. Aug 2021
-        # we add a wdth_offset to be able to run HRL in setups with a 
-        # single Xscreen but multiple monitors (a config with Xinerama enabled)
-        os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,0" % wdth_offset
+        if platform.system() == 'Linux':
+            print("OS display number (default): %s" % os.environ['DISPLAY'])
+            
+            if os.environ['DISPLAY']==':0': # legacy option for older configs or separate Xscreens
+                os.environ['DISPLAY'] = ':0.' + str(scrn)
+            else: 
+                os.environ['DISPLAY'] = ':' + str(scrn)
+            
+            print("OS display number (now used): %s" % os.environ['DISPLAY'])
+            
+            ## 11. Aug 2021
+            # we add a wdth_offset to be able to run HRL in setups with a 
+            # single Xscreen but multiple monitors (a config with Xinerama enabled)
+            os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,0" % wdth_offset
         
         #######
         

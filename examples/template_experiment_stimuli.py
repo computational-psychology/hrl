@@ -12,17 +12,17 @@ inlab_siemens = True if "vlab" in gethostname() else False
 inlab_viewpixx =  True if "viewpixx" in gethostname() else False
 
 if inlab_siemens:
-	# size of Siements monitor
-	WIDTH = 1024
-	HEIGHT = 768
-	
+    # size of Siements monitor
+    WIDTH = 1024
+    HEIGHT = 768
+    
 elif inlab_viewpixx:
-	# size of Siements monitor
-	WIDTH = 1920
-	HEIGHT = 1080
+    # size of Siements monitor
+    WIDTH = 1920
+    HEIGHT = 1080
 else:
-	WIDTH = 1024
-	HEIGHT = 768
+    WIDTH = 1024
+    HEIGHT = 768
    
 # center of screen
 whlf = WIDTH / 2.0
@@ -132,7 +132,7 @@ def run_experiment():
             wdth=WIDTH,
             hght=HEIGHT,
             bg=0.2,
-            scrn=1,
+            scrn=0,
             lut=lut,
             db=True,
             fs=False,
