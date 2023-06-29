@@ -1,13 +1,14 @@
 ### Imports ###
 
-import numpy as np
-import pygame as pg
-import os
 import csv
+import os
 import platform
 
+import numpy as np
+import pygame as pg
 
 ### HRL Class ###
+
 
 class HRL:
     """
@@ -29,22 +30,26 @@ class HRL:
     matrix file when hrl.writeResultLine() is called.
     """
 
-
     ## Core methods ##
 
-
-    def __init__(self
-                ,graphics='gpu'
-                ,inputs='keyboard'
-                ,photometer=None
-                ,wdth=1024,hght=768,bg=0.0
-                ,fs=False
-                ,wdth_offset=0
-                ,db=True
-                ,scrn=0
-                ,dfl=None,rfl=None,rhds=None
-                ,lut=None
-                ,mouse=False):
+    def __init__(
+        self,
+        graphics="gpu",
+        inputs="keyboard",
+        photometer=None,
+        wdth=1024,
+        hght=768,
+        bg=0.0,
+        fs=False,
+        wdth_offset=0,
+        db=True,
+        scrn=0,
+        dfl=None,
+        rfl=None,
+        rhds=None,
+        lut=None,
+        mouse=False,
+    ):
         """
         Initialize an HRL object.
 
@@ -73,7 +78,7 @@ class HRL:
             Default: None
         lut : The lookup table. Default: None
         mouse: enables or disables the mouse cursor. Default: False
-        
+
         Returns
         -------
         hrl instance. Comes with a number of methods required to run an
@@ -81,48 +86,48 @@ class HRL:
         """
 
         ### Load Config ###
-        #data_files=[(os.path.expanduser('~/.config'), ['misc/hrlrc'])]
-        #cfg = cp.RawConfigParser()
-        #cfg.read([os.path.expanduser('~/.config/hrlrc')])
-        
-        #os.environ['DISPLAY'] = ':0.' + str(scrn)
-        
+        # data_files=[(os.path.expanduser('~/.config'), ['misc/hrlrc'])]
+        # cfg = cp.RawConfigParser()
+        # cfg.read([os.path.expanduser('~/.config/hrlrc')])
+
+        # os.environ['DISPLAY'] = ':0.' + str(scrn)
+
         #######
         # 30.Aug 2020: this command is commented as it doesnt work in newer versions of linux
         # in newer versions, default screen numbering is ':1'
         # in older versions (including lab computer), it is  ':0.1'
-        
-        # Update April 2022. I changed the way to recognize the formating. In older systems 
-        # or systems with separate Xscreens, the naming is still :0.0 or :0.1. 
+
+        # Update April 2022. I changed the way to recognize the formating. In older systems
+        # or systems with separate Xscreens, the naming is still :0.0 or :0.1.
         # For systems with only one screen, it is :1. So we change the if-else conditional
-        
-        if platform.system() == 'Linux':
-            print("OS display number (default): %s" % os.environ['DISPLAY'])
-            
-            if os.environ['DISPLAY']==':0': # legacy option for older configs or separate Xscreens
-                os.environ['DISPLAY'] = ':0.' + str(scrn)
-            else: 
-                os.environ['DISPLAY'] = ':' + str(scrn)
-            
-            print("OS display number (now used): %s" % os.environ['DISPLAY'])
-            
+
+        if platform.system() == "Linux":
+            print("OS display number (default): %s" % os.environ["DISPLAY"])
+
+            if (
+                os.environ["DISPLAY"] == ":0"
+            ):  # legacy option for older configs or separate Xscreens
+                os.environ["DISPLAY"] = ":0." + str(scrn)
+            else:
+                os.environ["DISPLAY"] = ":" + str(scrn)
+
+            print("OS display number (now used): %s" % os.environ["DISPLAY"])
+
             ## 11. Aug 2021
-            # we add a wdth_offset to be able to run HRL in setups with a 
+            # we add a wdth_offset to be able to run HRL in setups with a
             # single Xscreen but multiple monitors (a config with Xinerama enabled)
-            os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,0" % wdth_offset
-        
+            os.environ["SDL_VIDEO_WINDOW_POS"] = "%d,0" % wdth_offset
+
         #######
-        
-        
+
         ## Load Datapixx ##
 
-        if (graphics == 'datapixx') or (inputs == 'responsepixx') or (graphics == 'viewpixx') :
-            
-            if graphics == 'datapixx':
+        if (graphics == "datapixx") or (inputs == "responsepixx") or (graphics == "viewpixx"):
+            if graphics == "datapixx":
                 from pypixxlib.datapixx import DATAPixx as DPixx
-            elif graphics == 'viewpixx':
+            elif graphics == "viewpixx":
                 from pypixxlib.viewpixx import VIEWPixx3D as DPixx
-                
+
             # Open datapixx.
             self.device = DPixx()
 
@@ -131,15 +136,15 @@ class HRL:
             mode = self.device.getVideoMode()
             print(mode)
 
-            if mode!='M16':
-                self.device.setVideoMode('M16')
+            if mode != "M16":
+                self.device.setVideoMode("M16")
                 self.device.updateRegisterCache()
 
             mode = self.device.getVideoMode()
             print(mode)
 
             # Demonstrate successful initialization.
-            #self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
+            # self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
             #            | dpx.BYELLOW | dpx.BRED)
             # TODO BLINK with pypixxlib
 
@@ -148,114 +153,105 @@ class HRL:
 
         # we force not fullscreen, even in experimental computer,
         # because in later versions of pygame
-        # fullscreen on a second screen gives very weird behavior on 
+        # fullscreen on a second screen gives very weird behavior on
         # recording of keyboard events, effectively hanging the computer.
         fs = False
 
         ## Load Graphics Device ##
-        if graphics == 'gpu':
-
+        if graphics == "gpu":
             from .graphics.gpu import GPU
-            self.graphics = GPU(wdth,hght,bg,fs,db,lut,mouse)
 
-        elif graphics == 'datapixx' or graphics=='viewpixx':
+            self.graphics = GPU(wdth, hght, bg, fs, db, lut, mouse)
 
+        elif graphics == "datapixx" or graphics == "viewpixx":
             from .graphics.datapixx import DATAPixx
-            self.graphics = DATAPixx(wdth,hght,bg,fs,db,lut,mouse)
+
+            self.graphics = DATAPixx(wdth, hght, bg, fs, db, lut, mouse)
 
         else:
-
             self.graphics = None
-
 
         ## Load Input Device ##
 
-        if inputs == 'keyboard':
-
+        if inputs == "keyboard":
             from .inputs.keyboard import Keyboard
+
             self.inputs = Keyboard()
 
-        elif inputs == 'responsepixx':
-
+        elif inputs == "responsepixx":
             from .inputs.responsepixx import RESPONSEPixx
+
             self.inputs = RESPONSEPixx(self.device)
 
         else:
-
             self.inputs = None
-
 
         ## Load Photometer ##
 
-        if photometer == 'optical':
-
+        if photometer == "optical":
             from .photometer.optical import OptiCAL
-            self.photometer = OptiCAL('/dev/ttyUSB0')
-        if photometer == 'minolta':
 
+            self.photometer = OptiCAL("/dev/ttyUSB0")
+        if photometer == "minolta":
             from .photometer.minolta import Minolta
-            self.photometer = Minolta('/dev/ttyUSB0')
+
+            self.photometer = Minolta("/dev/ttyUSB0")
 
         else:
-
             self.photometer = None
 
-      
         ## Results file ##
         self._rfl = None
         if rfl != None:
-            # check if the file exists,,, if so then check how many trials have been made, 
+            # check if the file exists,,, if so then check how many trials have been made,
             # then opens file in 'a' mode, and do not write the header
             if os.path.exists(rfl):
                 # checks how many trials have been run
-                r  = open(rfl,'r')
-                reader = csv.DictReader(r, delimiter=' ')
+                r = open(rfl, "r")
+                reader = csv.DictReader(r, delimiter=" ")
                 l = list(reader)
                 r.close()
                 # length of list is the number of rows that has been written (without counting the header)
-                self.starttrial = len(l) 
-                
-                
-                self._rfl = open(rfl,'a')
-                self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
-                
-                
-            # if it doesnt exist, open in 'wb' mode and write the header    
+                self.starttrial = len(l)
+
+                self._rfl = open(rfl, "a")
+                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=" ")
+
+            # if it doesnt exist, open in 'wb' mode and write the header
             else:
-                self._rfl = open(rfl,'w')
-                self._rwtr = csv.DictWriter(self._rfl,rhds,delimiter=' ')
-                self._rfl.write(' '.join(rhds) + '\r\n')  # writes header   
-                self.starttrial = 0               
+                self._rfl = open(rfl, "w")
+                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=" ")
+                self._rfl.write(" ".join(rhds) + "\r\n")  # writes header
+                self.starttrial = 0
 
             # initalizing empty results dict (for trial-based saving)
             self.results = {}
-    
+
         ## Design matrix file ##
         self._dfl = None
         if dfl != None:
-            self._dfl = open(dfl,'r')
-            self.designs = csv.DictReader(self._dfl,delimiter=' ',skipinitialspace=True)
+            self._dfl = open(dfl, "r")
+            self.designs = csv.DictReader(self._dfl, delimiter=" ", skipinitialspace=True)
             # skip trials already done
             for i in range(self.starttrial):
                 self.designs.next()
-            
-            
 
     def close(self):
         """
         Closes all the devices and systems maintained by the HRL object.
         This should be called at the end of the program.
         """
-        if self.device != None: self.device.close()
-        if self._rfl != None: self._rfl.close()
-        if self._dfl != None: self._dfl.close()
+        if self.device != None:
+            self.device.close()
+        if self._rfl != None:
+            self._rfl.close()
+        if self._dfl != None:
+            self._dfl.close()
         pg.quit()
-
 
     ## File methods ##
 
-
-    def writeResultLine(self,dct=None):
+    def writeResultLine(self, dct=None):
         """
         Given an appropriate dicitonary of values, writes the line to
         the result file. The dictionary must include all the names given

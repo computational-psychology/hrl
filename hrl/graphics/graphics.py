@@ -36,9 +36,9 @@ The openGL code was based largely on a great tutorial by a mysterious tutor
 here: http://disruption.ca/gutil/introduction.html
 """
 
+import numpy as np
 import OpenGL.GL as gl
 import pygame as pg
-import numpy as np
 import abc
 
 
@@ -47,6 +47,7 @@ import abc
 
 ## Graphics Class ##
 
+
 class Graphics(object):
     """
     The Graphics abstract base class. New graphics hardware must instantiate
@@ -54,11 +55,12 @@ class Graphics(object):
     represent a greyscale value between 0 and 1 as a 4-tuple (r,g,b,a), so that
     the given grey value is correctly on the Graphics backend.
     """
+
     __metaclass__ = abc.ABCMeta
 
     # Abstract Methods #
 
-    def greyToChannels(self,gry):
+    def greyToChannels(self, gry):
         """
         Converts a single greyscale value into a 4 colour channel representation
         specific to self (the graphics backend).
@@ -75,7 +77,7 @@ class Graphics(object):
 
     # Concrete Methods #
 
-    def __init__(self,w,h,bg,fs=False,db=True,lut=None,mouse=False):
+    def __init__(self, w, h, bg, fs=False, db=True, lut=None, mouse=False):
         """
         The Graphics constructor predefines the basic OpenGL initializations
         that must be performed regardless of the specific backends.
@@ -96,10 +98,12 @@ class Graphics(object):
 
         # Here we can add other options like fullscreen
         dbit = pg.OPENGL
-        if db: dbit = dbit | pg.DOUBLEBUF
-        if fs: dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
-        self.screen = pg.display.set_mode((w,h), dbit, vsync=1)
-        
+        if db:
+            dbit = dbit | pg.DOUBLEBUF
+        if fs:
+            dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
+        self.screen = pg.display.set_mode((w, h), dbit, vsync=1)
+
         if not mouse:
             pg.mouse.set_visible(False)
 
@@ -108,8 +112,8 @@ class Graphics(object):
 
         # Set Matrix style coordinate system.
         gl.glMatrixMode(gl.GL_PROJECTION)
-        gl.glLoadIdentity();
-        gl.glOrtho(0,w,h,0,-1,1)
+        gl.glLoadIdentity()
+        gl.glOrtho(0, w, h, 0, -1, 1)
         gl.glMatrixMode(gl.GL_MODELVIEW)
 
         # Enable texturing
@@ -126,14 +130,14 @@ class Graphics(object):
         self._gammainv = lambda x: x
         if lut != None:
             print("..using look-up table: %s" % lut)
-            self._lut = np.genfromtxt(lut,skip_header=1)
-            self._gammainv = lambda x: np.interp(x,self._lut[:,0],self._lut[:,1])
+            self._lut = np.genfromtxt(lut, skip_header=1)
+            self._gammainv = lambda x: np.interp(x, self._lut[:, 0], self._lut[:, 1])
 
         # Here we change the default color
         self.changeBackground(bg)
         self.flip()
 
-    def newTexture(self,grys0,shape='square'):
+    def newTexture(self, grys0, shape="square"):
         """
         Given a numpy array of values between 0 and 1, returns a new
         Texture object. The texture object comes equipped with the draw
@@ -154,16 +158,16 @@ class Graphics(object):
         -------
         Texture object
         """
-        grys = np.flipud(grys0)     # flipping up-down necessary
-        grys = self._gammainv(grys) # added gamma correction
+        grys = np.flipud(grys0)  # flipping up-down necessary
+        grys = self._gammainv(grys)  # added gamma correction
 
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
-        hght = len(grys[:,0])
+        hght = len(grys[:, 0])
 
-        return Texture(byts,wdth,hght,shape)
+        return Texture(byts, wdth, hght, shape)
 
-    def flip(self,clr=True):
+    def flip(self, clr=True):
         """
         Flips in the image backbuffer. In general, one will want to draw
         a set of Textures and then call flip to display them all at once.
@@ -178,9 +182,10 @@ class Graphics(object):
         clr : Whether to clear the back buffer after flip. Default: True
         """
         pg.display.flip()
-        if clr: gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        if clr:
+            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
-    def changeBackground(self,bg):
+    def changeBackground(self, bg):
         """
         Changes the current background grey value.
 
@@ -188,19 +193,22 @@ class Graphics(object):
         ----------
         bg : The new gray value (between 0 and 1)
         """
-        mx = float(2**8-1)
-        (r,g,b,a) = self.greyToChannels(self._gammainv(bg))
-        gl.glClearColor(r/mx,g/mx,b/mx,a/mx)
+        mx = float(2**8 - 1)
+        (r, g, b, a) = self.greyToChannels(self._gammainv(bg))
+        gl.glClearColor(r / mx, g / mx, b / mx, a / mx)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
+
 ## Texture Class ##
+
 
 class Texture:
     """
     The Texture class is a wrapper object for a compiled texture in
     OpenGL. It's only method is the draw method.
     """
-    def __init__(self,byts,wdth,hght,shape):
+
+    def __init__(self, byts, wdth, hght, shape):
         """
         The internal constructor for Textures. Users should use
         Graphics.newTexture to create textures rather than this constructor.
@@ -217,23 +225,23 @@ class Texture:
         -------
         Texture object
         """
-        self._txid, self.wdth, self.hght = loadTexture(byts,wdth,hght)
-        if shape == 'square':
-            self._dlid = createSquareDL(self._txid,self.wdth,self.hght)
-        elif shape == 'circle':
-            self._dlid = createCircleDL(self._txid,self.wdth,self.hght)
+        self._txid, self.wdth, self.hght = loadTexture(byts, wdth, hght)
+        if shape == "square":
+            self._dlid = createSquareDL(self._txid, self.wdth, self.hght)
+        elif shape == "circle":
+            self._dlid = createCircleDL(self._txid, self.wdth, self.hght)
         else:
-            raise NameError('Invalid Shape')
+            raise NameError("Invalid Shape")
 
-#   def __del__(self):
-#       if self._txid != None:
-#           deleteTexture(self._txid)
-#           self._txid = None
-#       if self._dlid != None:
-#           deleteTextureDL(self._dlid)
-#           self._dlid = None
+    #   def __del__(self):
+    #       if self._txid != None:
+    #           deleteTexture(self._txid)
+    #           self._txid = None
+    #       if self._dlid != None:
+    #           deleteTextureDL(self._dlid)
+    #           self._dlid = None
 
-    def draw(self,pos=None,sz=None,rot=0,rotc=None):
+    def draw(self, pos=None, sz=None, rot=0, rotc=None):
         """
         This method loads the Texture into the back buffer. Calling
         Graphics.flip will cause it to be drawn to the screen. It also allows a
@@ -256,19 +264,19 @@ class Texture:
         """
         if pos:
             gl.glLoadIdentity()
-            gl.glTranslate(pos[0],pos[1],0)
+            gl.glTranslate(pos[0], pos[1], 0)
 
         if rot != 0:
             if rotc == None:
                 rotc = (self.wdth / 2, self.hght / 2)
-            (w,h) = rotc
-            gl.glTranslate(rotc[0],rotc[1],0)
-            gl.glRotate(rot,0,0,-1)
-            gl.glTranslate(-rotc[0],-rotc[1],0)
+            (w, h) = rotc
+            gl.glTranslate(rotc[0], rotc[1], 0)
+            gl.glRotate(rot, 0, 0, -1)
+            gl.glTranslate(-rotc[0], -rotc[1], 0)
 
         if sz:
-            (wdth,hght) = sz
-            gl.glScalef(wdth/(self.wdth*1.0), hght/(self.hght*1.0),1.0)
+            (wdth, hght) = sz
+            gl.glScalef(wdth / (self.wdth * 1.0), hght / (self.hght * 1.0), 1.0)
 
         gl.glCallList(self._dlid)
 
@@ -286,14 +294,15 @@ def channelsToInt(t):
     applied to it will produce a bytestring appropriate for use as a texture
     with openGL.
     """
-    r,g,b,a = t
+    r, g, b, a = t
     R = 2**0
     G = 2**8
     B = 2**16
     A = 2**24
-    return r*R + g*G + b*B + a*A
+    return r * R + g * G + b * B + a * A
 
-def loadTexture(byts,wdth,hght):
+
+def loadTexture(byts, wdth, hght):
     """
     LoadTexture takes a bytestring representation of a Processed Greyscale array
     and loads it into OpenGL texture memory.
@@ -307,9 +316,12 @@ def loadTexture(byts,wdth,hght):
     gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
     gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
     gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
-    gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, wdth, hght, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, byts)
+    gl.glTexImage2D(
+        gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, wdth, hght, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, byts
+    )
 
-    return txid,wdth,hght
+    return txid, wdth, hght
+
 
 def deleteTexture(txid):
     """
@@ -317,9 +329,11 @@ def deleteTexture(txid):
     """
     gl.glDeleteTextures(txid)
 
+
 ## OpenGL Display List Functions ##
 
-def createSquareDL(txid,wdth,hght):
+
+def createSquareDL(txid, wdth, hght):
     """
     createSquareDL takes a texture id with width and height and
     generates a display list - an precompiled set of instructions for
@@ -328,14 +342,18 @@ def createSquareDL(txid,wdth,hght):
     to it.
     """
     dlid = gl.glGenLists(1)
-    gl.glNewList(dlid,gl.GL_COMPILE)
+    gl.glNewList(dlid, gl.GL_COMPILE)
     gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
 
     gl.glBegin(gl.GL_QUADS)
-    gl.glTexCoord2f(0, 0); gl.glVertex2f(0, 0)
-    gl.glTexCoord2f(0, 1); gl.glVertex2f(0, hght)
-    gl.glTexCoord2f(1, 1); gl.glVertex2f(wdth, hght)
-    gl.glTexCoord2f(1, 0); gl.glVertex2f(wdth, 0)
+    gl.glTexCoord2f(0, 0)
+    gl.glVertex2f(0, 0)
+    gl.glTexCoord2f(0, 1)
+    gl.glVertex2f(0, hght)
+    gl.glTexCoord2f(1, 1)
+    gl.glVertex2f(wdth, hght)
+    gl.glTexCoord2f(1, 0)
+    gl.glVertex2f(wdth, 0)
     gl.glEnd()
     gl.glFinish()
 
@@ -343,7 +361,8 @@ def createSquareDL(txid,wdth,hght):
 
     return dlid
 
-def createCircleDL(txid,wdth,hght):
+
+def createCircleDL(txid, wdth, hght):
     """
     createCircleDL takes a texture id with width and height and
     generates a display list - an precompiled set of instructions for
@@ -352,14 +371,15 @@ def createCircleDL(txid,wdth,hght):
     to it.
     """
     dlid = gl.glGenLists(1)
-    gl.glNewList(dlid,gl.GL_COMPILE)
+    gl.glNewList(dlid, gl.GL_COMPILE)
     gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
 
     gl.glBegin(gl.GL_TRIANGLE_FAN)
 
-    for ang in np.linspace(0,2*np.pi,360):
-        (x,y) = ((np.cos(ang))/2,(np.sin(ang))/2)
-        gl.glTexCoord2f(x, y); gl.glVertex2f(x*wdth,y*hght)
+    for ang in np.linspace(0, 2 * np.pi, 360):
+        (x, y) = ((np.cos(ang)) / 2, (np.sin(ang)) / 2)
+        gl.glTexCoord2f(x, y)
+        gl.glVertex2f(x * wdth, y * hght)
 
     gl.glEnd()
     gl.glFinish()
@@ -368,8 +388,9 @@ def createCircleDL(txid,wdth,hght):
 
     return dlid
 
+
 def deleteTextureDL(dlid):
     """
     deleteTextureDL removes the given display list from memory.
     """
-    gl.glDeleteLists(dlid,1)
+    gl.glDeleteLists(dlid, 1)

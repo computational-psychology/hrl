@@ -4,6 +4,7 @@ import numpy as np
 
 # Bitmap Conversion
 
+
 def fileToGreyArray(fl):
     """
     fileToGreyArray uses PIL to convert an image into a numpy array of floats between 0
@@ -13,4 +14,4 @@ def fileToGreyArray(fl):
     div = 255.0
     pix = np.array(pic.getdata())
     pix = pix.reshape(pic.size[1], pic.size[0], pix.shape[1])
-    return np.mean(pix[:,:,:3],2)/div
+    return np.mean(pix[:, :, :3], 2) / div

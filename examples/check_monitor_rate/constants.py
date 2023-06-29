@@ -38,8 +38,7 @@ FOREVER = 1000000000  # seconds
 # its use from psychopy) is arbitrary and optional. Having it standardized
 # and fixed will also help people who develop their own http-log analysis
 # tools for use with contrib.http.upload()
-PSYCHOPY_USERAGENT = ("PsychoPy: open-source Psychology & Neuroscience tools; "
-                      "www.psychopy.org")
+PSYCHOPY_USERAGENT = "PsychoPy: open-source Psychology & Neuroscience tools; " "www.psychopy.org"
 
 
 # find a copy of git if possible to do push/pull as needed
@@ -48,19 +47,18 @@ PSYCHOPY_USERAGENT = ("PsychoPy: open-source Psychology & Neuroscience tools; "
 # see https://github.com/dulwich/dulwich/issues/666
 ENVIRON = copy.copy(os.environ)
 gitExe = None
-if sys.platform == 'darwin':
-    _gitStandalonePath = abspath(join(sys.executable, '..', '..',
-                                      'Resources', 'git-core'))
+if sys.platform == "darwin":
+    _gitStandalonePath = abspath(join(sys.executable, "..", "..", "Resources", "git-core"))
     if os.path.exists(_gitStandalonePath):
         ENVIRON["PATH"] = "{}:".format(_gitStandalonePath) + ENVIRON["PATH"]
-        gitExe = join(_gitStandalonePath, 'git')
+        gitExe = join(_gitStandalonePath, "git")
 
-elif sys.platform == 'win32':
-    _gitStandalonePath = abspath(join(sys.executable, '..', 'MinGit', 'cmd'))
+elif sys.platform == "win32":
+    _gitStandalonePath = abspath(join(sys.executable, "..", "MinGit", "cmd"))
     if os.path.exists(_gitStandalonePath):
         ENVIRON["PATH"] = "{};".format(_gitStandalonePath) + ENVIRON["PATH"]
         os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = _gitStandalonePath
-        gitExe = join(_gitStandalonePath, 'git.exe')
+        gitExe = join(_gitStandalonePath, "git.exe")
 
 if gitExe:
     os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = gitExe

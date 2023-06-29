@@ -7,7 +7,6 @@ def main():
     args = sys.argv[1:]
 
     if len(args) == 0 or args[0] == "--help":
-
         print(
             """
         Welcome to the HRL utility program. From here, various scripts can be
@@ -24,9 +23,7 @@ def main():
         )
 
     else:
-
         if args[0] == "tests":
-
             if len(args) == 1 or args[1] == "--help":
                 print(
                     """
@@ -51,9 +48,7 @@ def main():
                 import hrl.util.tests.classtest
 
         elif args[0] == "lut":
-
             if len(args) == 1 or args[1] == "--help":
-
                 print(
                     """
         When considering monitors, one may distinguish between the actual

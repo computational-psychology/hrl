@@ -9,13 +9,13 @@ from stimuli.papers.RHS2007 import WE_thick
 
 
 inlab_siemens = True if "vlab" in gethostname() else False
-inlab_viewpixx =  True if "viewpixx" in gethostname() else False
+inlab_viewpixx = True if "viewpixx" in gethostname() else False
 
 if inlab_siemens:
     # size of Siements monitor
     WIDTH = 1024
     HEIGHT = 768
-    
+
 elif inlab_viewpixx:
     # size of Siements monitor
     WIDTH = 1920
@@ -23,11 +23,11 @@ elif inlab_viewpixx:
 else:
     WIDTH = 1024
     HEIGHT = 768
-   
+
 # center of screen
 whlf = WIDTH / 2.0
 hhlf = HEIGHT / 2.0
-    
+
 
 def show_stim(hrl):
     stim = WE_thick()
@@ -94,7 +94,6 @@ def run_block(hrl):
 def run_experiment():
     lut = os.path.dirname(os.path.abspath(__file__)) + "/lut.csv"
 
-    
     if inlab_siemens:
         # create HRL object
         hrl = HRL(
@@ -110,7 +109,6 @@ def run_experiment():
             fs=True,
         )
     elif inlab_viewpixx:
-        
         hrl = HRL(
             graphics="viewpixx",
             inputs="responsepixx",
@@ -123,7 +121,7 @@ def run_experiment():
             db=True,
             fs=True,
         )
-        
+
     else:
         hrl = HRL(
             graphics="gpu",
@@ -137,7 +135,7 @@ def run_experiment():
             db=True,
             fs=False,
         )
-        
+
     run_block(hrl)
 
 

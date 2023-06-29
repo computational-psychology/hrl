@@ -8,17 +8,19 @@ import abc
 
 ### Classes ###
 
+
 class Photometer(object):
     """
     The Photometer abstract base class. New photometers must instantiate
     this class. The only method is 'readLuminance', which returns a luminance
     reading from the device.
     """
+
     __metaclass__ = abc.ABCMeta
 
     # Abstract Methods #
 
-    def readLuminance(self,n,slp):
+    def readLuminance(self, n, slp):
         """
         Reads a value from the photometer, returning a real value in candela/m^2.
 
