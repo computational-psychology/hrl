@@ -265,6 +265,14 @@ class HRL:
             self._dfl.close()
         pg.quit()
 
+    @property
+    def height(self):
+        return self.graphics.height if self.graphics else None
+
+    @property
+    def width(self):
+        return self.graphics.width if self.graphics else None
+
     ## File methods ##
 
     def writeResultLine(self, dct=None):
