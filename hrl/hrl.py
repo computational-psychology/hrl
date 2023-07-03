@@ -161,12 +161,28 @@ class HRL:
         if graphics == "gpu":
             from .graphics.gpu import GPU
 
-            self.graphics = GPU(wdth, hght, bg, fs, db, lut, mouse)
+            self.graphics = GPU(
+                width=wdth,
+                height=hght,
+                background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
 
         elif graphics == "datapixx" or graphics == "viewpixx":
             from .graphics.datapixx import DATAPixx
 
-            self.graphics = DATAPixx(wdth, hght, bg, fs, db, lut, mouse)
+            self.graphics = DATAPixx(
+                width=wdth,
+                height=hght,
+                background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
 
         else:
             self.graphics = None

@@ -67,18 +67,28 @@ class Graphics(ABC):
         """
         ...
 
-    def __init__(self, w, h, bg, fs=False, db=True, lut=None, mouse=False):
+    def __init__(
+        self,
+        width,
+        height,
+        background,
+        fullscreen=False,
+        double_buffer=True,
+        lut=None,
+        mouse=False,
+    ):
         """
         The Graphics constructor predefines the basic OpenGL initializations
         that must be performed regardless of the specific backends.
 
         Parameters
         ----------
-        w : The width (in pixels) of the openGL window
-        h : The height (in pixels) of the openGL window
-        bg : The default background grey value (between 0 and 1)
-        fs : Enable fullscreen display (Boolean) Default: False
-        db : Enable double buffering (Boolean) Default: True
+        width : The width (in pixels) of the openGL window
+        height : The height (in pixels) of the openGL window
+        background : The default background grey value (between 0 and 1)
+        fullscreen : Enable fullscreen display (Boolean) Default: False
+        double_buffer : Enable double buffering (Boolean) Default: True
+        lut : filepath to lookup table to use
         mouse: Enable mouse cursor to be visible. Default: False
 
         Returns
@@ -86,14 +96,17 @@ class Graphics(ABC):
         Graphics object
         """
 
-        # Here we can add other options like fullscreen
+        # Process options
         dbit = pg.OPENGL
-        if db:
+        if double_buffer:
             dbit = dbit | pg.DOUBLEBUF
-        if fs:
+        if fullscreen:
             dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
-        self.screen = pg.display.set_mode((w, h), dbit, vsync=1)
 
+        # Initialize screen
+        self.screen = pg.display.set_mode((width, height), dbit, vsync=1)
+
+        # Hide mouse cursor
         if not mouse:
             pg.mouse.set_visible(False)
 
@@ -103,11 +116,12 @@ class Graphics(ABC):
         # Set Matrix style coordinate system.
         gl.glMatrixMode(gl.GL_PROJECTION)
         gl.glLoadIdentity()
-        gl.glOrtho(0, w, h, 0, -1, 1)
+        gl.glOrtho(0, width, height, 0, -1, 1)
         gl.glMatrixMode(gl.GL_MODELVIEW)
 
         # Enable texturing
         gl.glEnable(gl.GL_TEXTURE_2D)
+
         # Enable blending
         gl.glEnable(gl.GL_BLEND)
         # Blend settings. Blending is unrelated to e.g. magnification.
@@ -124,7 +138,7 @@ class Graphics(ABC):
             self._gammainv = lambda x: np.interp(x, self._lut[:, 0], self._lut[:, 1])
 
         # Here we change the default color
-        self.changeBackground(bg)
+        self.changeBackground(background)
         self.flip()
 
     def newTexture(self, grys0, shape="square"):
