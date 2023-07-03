@@ -145,6 +145,9 @@ class Graphics(ABC):
         self.changeBackground(background)
         self.flip()
 
+    def gamma_correct(self, img):
+        return self._gammainv(img)
+
     def newTexture(self, grys0, shape="square"):
         """
         Given a numpy array of values between 0 and 1, returns a new
@@ -167,7 +170,7 @@ class Graphics(ABC):
         Texture object
         """
         grys = np.flipud(grys0)  # flipping up-down necessary
-        grys = self._gammainv(grys)  # added gamma correction
+        grys = self.gamma_correct(grys)
 
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
         wdth = len(grys[0])
