@@ -81,6 +81,15 @@ class Texture:
     #           deleteTextureDL(self._dlid)
     #           self._dlid = None
 
+    def delete(self):
+        """Remove this texture from the OpenGL texture memory"""
+        if self._txid != None:
+            opengl.glDeleteTextures(self._txid)
+            self._txid = None
+        if self._dlid != None:
+            opengl.glDeleteLists(self._dlid, 1)
+            self._dlid = None
+
 
 def loadTexture(byts, wdth, hght):
     """
