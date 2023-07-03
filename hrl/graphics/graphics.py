@@ -36,19 +36,14 @@ The openGL code was based largely on a great tutorial by a mysterious tutor
 here: http://disruption.ca/gutil/introduction.html
 """
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 import OpenGL.GL as gl
 import pygame as pg
-import abc
 
 
-### Classes ###
-
-
-## Graphics Class ##
-
-
-class Graphics(object):
+class Graphics(ABC):
     """
     The Graphics abstract base class. New graphics hardware must instantiate
     this class. The key method is 'greyToChannels', which defines how to
@@ -56,10 +51,7 @@ class Graphics(object):
     the given grey value is correctly on the Graphics backend.
     """
 
-    __metaclass__ = abc.ABCMeta
-
-    # Abstract Methods #
-
+    @abstractmethod
     def greyToChannels(self, gry):
         """
         Converts a single greyscale value into a 4 colour channel representation
@@ -73,9 +65,7 @@ class Graphics(object):
         -------
         (r,g,b,a) the grey represented as a corresponding 4-tuple
         """
-        return
-
-    # Concrete Methods #
+        ...
 
     def __init__(self, w, h, bg, fs=False, db=True, lut=None, mouse=False):
         """

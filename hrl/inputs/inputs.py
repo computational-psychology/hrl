@@ -5,16 +5,12 @@ base class, which defines common functions required for reading input and
 measuring time.
 """
 
-# Unqualified Imports
-import abc
+from abc import ABC, abstractmethod
 
-# PyGame
 import pygame as pg
 
-### Classes ###
 
-
-class Input(object):
+class Input(ABC):
     """
     The Input abstract base class. New hardware inputs must instantiate
     this class. The core abstract method is 'readButton', which returns
@@ -26,10 +22,7 @@ class Input(object):
     a clear explanation of the keymap if it deviates from this typical set.
     """
 
-    __metaclass__ = abc.ABCMeta
-
-    # Abstract Methods #
-
+    @abstractmethod
     def readButton(self, btns, to):
         """
         Reads a value from the input device, returning a (button,time) pair,
@@ -61,9 +54,7 @@ class Input(object):
             the amount of time in seconds it took from the initial call to the
             press.
         """
-        return
-
-    # Concrete Methods #
+        ...
 
     def __init__(self):
         """
