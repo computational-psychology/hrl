@@ -99,39 +99,39 @@ class Graphics(ABC):
         """
 
         # Process options
-        dbit = pg.OPENGL
+        dbit = pygame.OPENGL
         if double_buffer:
-            dbit = dbit | pg.DOUBLEBUF
+            dbit = dbit | pygame.DOUBLEBUF
         if fullscreen:
-            dbit = dbit | pg.FULLSCREEN | pg.NOFRAME
+            dbit = dbit | pygame.FULLSCREEN | pygame.NOFRAME
 
         # Initialize screen
-        self.screen = pg.display.set_mode((width, height), dbit, vsync=1)
+        self.screen = pygame.display.set_mode((width, height), dbit, vsync=1)
         self.width = width
         self.height = height
 
         # Hide mouse cursor
         if not mouse:
-            pg.mouse.set_visible(False)
+            pygame.mouse.set_visible(False)
 
         # Disables this thing
-        gl.glDisable(gl.GL_DEPTH_TEST)
+        opengl.glDisable(opengl.GL_DEPTH_TEST)
 
         # Set Matrix style coordinate system.
-        gl.glMatrixMode(gl.GL_PROJECTION)
-        gl.glLoadIdentity()
-        gl.glOrtho(0, width, height, 0, -1, 1)
-        gl.glMatrixMode(gl.GL_MODELVIEW)
+        opengl.glMatrixMode(opengl.GL_PROJECTION)
+        opengl.glLoadIdentity()
+        opengl.glOrtho(0, width, height, 0, -1, 1)
+        opengl.glMatrixMode(opengl.GL_MODELVIEW)
 
         # Enable texturing
-        gl.glEnable(gl.GL_TEXTURE_2D)
+        opengl.glEnable(opengl.GL_TEXTURE_2D)
 
         # Enable blending
-        gl.glEnable(gl.GL_BLEND)
+        opengl.glEnable(opengl.GL_BLEND)
         # Blend settings. Blending is unrelated to e.g. magnification.
         # Blending is how the colours from transluscent objects are
         # combined, and is therefore largely irrelevant.
-        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+        opengl.glBlendFunc(opengl.GL_SRC_ALPHA, opengl.GL_ONE_MINUS_SRC_ALPHA)
 
         # Gamma Function Correction
         self._lut = None
@@ -189,9 +189,9 @@ class Graphics(ABC):
         ----------
         clr : Whether to clear the back buffer after flip. Default: True
         """
-        pg.display.flip()
+        pygame.display.flip()
         if clr:
-            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+            opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
     def changeBackground(self, bg):
         """
@@ -203,8 +203,8 @@ class Graphics(ABC):
         """
         mx = float(2**8 - 1)
         (r, g, b, a) = self.greyToChannels(self._gammainv(bg))
-        gl.glClearColor(r / mx, g / mx, b / mx, a / mx)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        opengl.glClearColor(r / mx, g / mx, b / mx, a / mx)
+        opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
 
 def channelsToInt(t):
