@@ -39,8 +39,10 @@ here: http://disruption.ca/gutil/introduction.html
 from abc import ABC, abstractmethod
 
 import numpy as np
-import OpenGL.GL as gl
-import pygame as pg
+import OpenGL.GL as opengl
+import pygame
+
+from hrl.graphics.texture import Texture
 
 
 class Graphics(ABC):
@@ -205,94 +207,6 @@ class Graphics(ABC):
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
 
-## Texture Class ##
-
-
-class Texture:
-    """
-    The Texture class is a wrapper object for a compiled texture in
-    OpenGL. It's only method is the draw method.
-    """
-
-    def __init__(self, byts, wdth, hght, shape):
-        """
-        The internal constructor for Textures. Users should use
-        Graphics.newTexture to create textures rather than this constructor.
-
-        Parameters
-        ----------
-        byts : A bytestring representation of the greyscale array
-        wdth : The width of the array
-        hght : The height of the array
-        shape : The shape to 'cut out' of the given greyscale array. A square
-            will render the entire array. Available: 'square', 'circle'
-
-        Returns
-        -------
-        Texture object
-        """
-        self._txid, self.wdth, self.hght = loadTexture(byts, wdth, hght)
-        if shape == "square":
-            self._dlid = createSquareDL(self._txid, self.wdth, self.hght)
-        elif shape == "circle":
-            self._dlid = createCircleDL(self._txid, self.wdth, self.hght)
-        else:
-            raise NameError("Invalid Shape")
-
-    #   def __del__(self):
-    #       if self._txid != None:
-    #           deleteTexture(self._txid)
-    #           self._txid = None
-    #       if self._dlid != None:
-    #           deleteTextureDL(self._dlid)
-    #           self._dlid = None
-
-    def draw(self, pos=None, sz=None, rot=0, rotc=None):
-        """
-        This method loads the Texture into the back buffer. Calling
-        Graphics.flip will cause it to be drawn to the screen. It also allows a
-        number of transformation to be performed on the image before it is
-        loaded (e.g. translation, rotation)
-
-        Parameters
-        ----------
-        pos : A pair (rows,columns) representing the the position in pixels in
-            the Graphics window of the upper left corner (origin) of the Texture
-        sz : A tuple (width,height) representing the size of the image in
-            pixels.  None causes the natural width and height of the image to be
-            used, which prevents an blending of the image.
-        rot : Rotation applied to the image. May result in scaling/interpolation.
-        rotc : Defines the centre of the rotation.
-
-        Returns
-        -------
-        None
-        """
-        if pos:
-            gl.glLoadIdentity()
-            gl.glTranslate(pos[0], pos[1], 0)
-
-        if rot != 0:
-            if rotc == None:
-                rotc = (self.wdth / 2, self.hght / 2)
-            (w, h) = rotc
-            gl.glTranslate(rotc[0], rotc[1], 0)
-            gl.glRotate(rot, 0, 0, -1)
-            gl.glTranslate(-rotc[0], -rotc[1], 0)
-
-        if sz:
-            (wdth, hght) = sz
-            gl.glScalef(wdth / (self.wdth * 1.0), hght / (self.hght * 1.0), 1.0)
-
-        gl.glCallList(self._dlid)
-
-
-### Internal Functions ###
-
-
-## OpenGL Texture Functions ##
-
-
 def channelsToInt(t):
     """
     Takes a channel representation and returns a corresponding unsigned 32 bit
@@ -306,97 +220,3 @@ def channelsToInt(t):
     B = 2**16
     A = 2**24
     return r * R + g * G + b * B + a * A
-
-
-def loadTexture(byts, wdth, hght):
-    """
-    LoadTexture takes a bytestring representation of a Processed Greyscale array
-    and loads it into OpenGL texture memory.
-
-    In this function we also define our texture minification and
-    magnification functions, of which there are many options. Take great
-    care when shrinking, blowing up, or rotating an image. The resulting
-    interpolations can effect experimental results.
-    """
-    txid = gl.glGenTextures(1)
-    gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
-    gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
-    gl.glTexImage2D(
-        gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, wdth, hght, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, byts
-    )
-
-    return txid, wdth, hght
-
-
-def deleteTexture(txid):
-    """
-    deleteTexture removes the texture from the OpenGL texture memory.
-    """
-    gl.glDeleteTextures(txid)
-
-
-## OpenGL Display List Functions ##
-
-
-def createSquareDL(txid, wdth, hght):
-    """
-    createSquareDL takes a texture id with width and height and
-    generates a display list - an precompiled set of instructions for
-    rendering the image. This speeds up image display. The instructions
-    compiled are essentially creating a square and binding the texture
-    to it.
-    """
-    dlid = gl.glGenLists(1)
-    gl.glNewList(dlid, gl.GL_COMPILE)
-    gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
-
-    gl.glBegin(gl.GL_QUADS)
-    gl.glTexCoord2f(0, 0)
-    gl.glVertex2f(0, 0)
-    gl.glTexCoord2f(0, 1)
-    gl.glVertex2f(0, hght)
-    gl.glTexCoord2f(1, 1)
-    gl.glVertex2f(wdth, hght)
-    gl.glTexCoord2f(1, 0)
-    gl.glVertex2f(wdth, 0)
-    gl.glEnd()
-    gl.glFinish()
-
-    gl.glEndList()
-
-    return dlid
-
-
-def createCircleDL(txid, wdth, hght):
-    """
-    createCircleDL takes a texture id with width and height and
-    generates a display list - an precompiled set of instructions for
-    rendering the image. This speeds up image display. The instructions
-    compiled are essentially creating a circle and binding the texture
-    to it.
-    """
-    dlid = gl.glGenLists(1)
-    gl.glNewList(dlid, gl.GL_COMPILE)
-    gl.glBindTexture(gl.GL_TEXTURE_2D, txid)
-
-    gl.glBegin(gl.GL_TRIANGLE_FAN)
-
-    for ang in np.linspace(0, 2 * np.pi, 360):
-        (x, y) = ((np.cos(ang)) / 2, (np.sin(ang)) / 2)
-        gl.glTexCoord2f(x, y)
-        gl.glVertex2f(x * wdth, y * hght)
-
-    gl.glEnd()
-    gl.glFinish()
-
-    gl.glEndList()
-
-    return dlid
-
-
-def deleteTextureDL(dlid):
-    """
-    deleteTextureDL removes the given display list from memory.
-    """
-    gl.glDeleteLists(dlid, 1)
