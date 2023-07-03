@@ -105,6 +105,8 @@ class Graphics(ABC):
 
         # Initialize screen
         self.screen = pg.display.set_mode((width, height), dbit, vsync=1)
+        self.width = width
+        self.height = height
 
         # Hide mouse cursor
         if not mouse:
