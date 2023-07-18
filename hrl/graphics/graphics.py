@@ -42,7 +42,7 @@ import numpy as np
 import OpenGL.GL as opengl
 import pygame
 
-from hrl.graphics.texture import Texture
+from hrl.graphics.texture import Texture, deleteTexture, deleteTextureDL
 
 
 class Graphics(ABC):

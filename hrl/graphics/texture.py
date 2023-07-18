@@ -1,3 +1,5 @@
+import warnings
+
 import numpy as np
 import OpenGL.GL as opengl
 
@@ -177,3 +179,25 @@ def createCircleDL(txid, wdth, hght):
     opengl.glEndList()
 
     return dlid
+
+
+def deleteTexture(txid):
+    """
+    deleteTexture removes the texture from the OpenGL texture memory.
+    """
+    warnings.warn(
+        "This function has been deprecated (2023) -- use the Texture.delete() method instead",
+        DeprecationWarning,
+    )
+    opengl.glDeleteTextures(txid)
+
+
+def deleteTextureDL(dlid):
+    """
+    deleteTextureDL removes the given display list from memory.
+    """
+    warnings.warn(
+        "This function has been deprecated (2023) -- use the Texture.delete() method instead",
+        DeprecationWarning,
+    )
+    opengl.glDeleteLists(dlid, 1)
