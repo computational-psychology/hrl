@@ -172,7 +172,7 @@ class Graphics(ABC):
         grys = np.flipud(grys0)  # flipping up-down necessary
         grys = self.gamma_correct(grys)
 
-        byts = channelsToInt(self.greyToChannels(grys[::-1,])).tostring()
+        byts = channelsToInt(self.greyToChannels(grys[::-1,])).tobytes()
         wdth = len(grys[0])
         hght = len(grys[:, 0])
 
@@ -196,7 +196,7 @@ class Graphics(ABC):
         if clr:
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
-    def changeBackground(self, bg):
+    def changeBackground(self, intensity_background):
         """
         Changes the current background grey value.
 
@@ -204,12 +204,12 @@ class Graphics(ABC):
         ----------
         bg : The new gray value (between 0 and 1)
         """
-        mx = float(2**8 - 1)
-        (r, g, b, a) = self.greyToChannels(self._gammainv(bg))
-        opengl.glClearColor(r / mx, g / mx, b / mx, a / mx)
+        maximum = float(2**8 - 1)
+        (r, g, b, a) = self.greyToChannels(self._gammainv(intensity_background))
+        opengl.glClearColor(r / maximum, g / maximum, b / maximum, a / maximum)
         opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
-        self.background = bg
+        self.background = intensity_background
 
 
 def channelsToInt(t):
