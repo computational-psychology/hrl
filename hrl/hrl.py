@@ -273,6 +273,10 @@ class HRL:
     def width(self):
         return self.graphics.width if self.graphics else None
 
+    @property
+    def background(self):
+        return self.graphics.background if self.graphics else None
+
     ## File methods ##
 
     def writeResultLine(self, dct=None):

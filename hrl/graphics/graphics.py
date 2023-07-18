@@ -209,6 +209,8 @@ class Graphics(ABC):
         opengl.glClearColor(r / mx, g / mx, b / mx, a / mx)
         opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
+        self.background = bg
+
 
 def channelsToInt(t):
     """
