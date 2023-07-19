@@ -2,7 +2,7 @@
 name = "hrl"
 dynamic = ['version']
 description = "Library for psychophysics experiments, with support for high-resolution luminance CRT monitors (Siemens SMM series)"
-license = {file = "LICENSE"}
+license = {text = "GPL v2"}
 authors = [
     {name = "Sacha Sokoloski"},
     {name = "Guillermo Aguilar"},
@@ -33,15 +33,16 @@ hrl-util = "hrl.util:main"
 [project.urls]
 repository = 'https://github.com/computational-psychology/hrl'
 
+
+
 [build-system]
 requires = [
   "setuptools >= 40.9.0",
 ]
 build-backend = "setuptools.build_meta"
 
-
 [tool.setuptools.packages.find]
-where = ["."]  # list of folders that contain the packages (["."] by default)
+where = ["."]       # list of folders that contain the packages (["."] by default)
 include = ["hrl*"]  # package names should match these glob patterns (["*"] by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
