@@ -92,7 +92,7 @@ def main():
     else:
         graphics = "gpu"  # 'datapixx' is another option
         inputs = "keyboard"  # 'responsepixx' is another option
-        scrn = 1
+        scrn = 0
         fs = False  # not fullscreen: windowed
         wdth = 1024  # Screen size
         hght = 768
