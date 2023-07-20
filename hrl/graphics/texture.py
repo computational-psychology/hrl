@@ -75,6 +75,9 @@ class Texture:
         opengl.glCallList(self._dlid)
 
     # JV: Why are we not using this automatic __del__ method?
+    # GA: Python's garbage collection was not working properly somehow,
+    # that's why I explicitly called the functions to delete textures.
+
     #   def __del__(self):
     #       if self._txid != None:
     #           deleteTexture(self._txid)
@@ -186,8 +189,8 @@ def deleteTexture(txid):
     deleteTexture removes the texture from the OpenGL texture memory.
     """
     warnings.warn(
-        "This function has been deprecated (2023) -- use the Texture.delete() method instead",
-        DeprecationWarning,
+        "The function deleteTexture() will be deprecated -- use the Texture.delete() method instead",
+        FutureWarning,
     )
     opengl.glDeleteTextures(txid)
 
@@ -197,7 +200,7 @@ def deleteTextureDL(dlid):
     deleteTextureDL removes the given display list from memory.
     """
     warnings.warn(
-        "This function has been deprecated (2023) -- use the Texture.delete() method instead",
-        DeprecationWarning,
+        "The function deleteTextureDL() will be deprecated -- use the Texture.delete() method instead",
+        FutureWarning,
     )
     opengl.glDeleteLists(dlid, 1)

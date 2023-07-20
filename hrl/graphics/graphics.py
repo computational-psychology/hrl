@@ -98,7 +98,7 @@ class Graphics(ABC):
         Graphics object
         """
 
-        # Process options
+        # OpenGL options
         dbit = pygame.OPENGL
         if double_buffer:
             dbit = dbit | pygame.DOUBLEBUF
@@ -114,7 +114,8 @@ class Graphics(ABC):
         if not mouse:
             pygame.mouse.set_visible(False)
 
-        # Disables this thing
+        # Disables depth test
+        # not needed as we're only doing 2D rendering
         opengl.glDisable(opengl.GL_DEPTH_TEST)
 
         # Set Matrix style coordinate system.
