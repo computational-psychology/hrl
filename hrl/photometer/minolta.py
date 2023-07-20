@@ -1,7 +1,7 @@
 from .photometer import Photometer
 from .pyminolta import Minolta as Min
 from .pyminolta import MinoltaException
-import pygame as pg
+import pygame
 import numpy as np
 
 
@@ -13,7 +13,7 @@ class Minolta(Photometer):
     def readLuminance(self, n=3, slp=1):
         for i in range(n):
             try:
-                pg.time.delay(slp)
+                pygame.time.delay(slp)
                 lm = self.phtm.getLuminance()
                 return lm
             except MinoltaException as instance:

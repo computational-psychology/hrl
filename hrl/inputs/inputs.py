@@ -7,7 +7,7 @@ measuring time.
 
 from abc import ABC, abstractmethod
 
-import pygame as pg
+import pygame
 
 
 class Input(ABC):
@@ -60,8 +60,8 @@ class Input(ABC):
         """
         The Input constructor.
         """
-        pg.init()
-        self.lastmbtn = pg.time.get_ticks()
+        pygame.init()
+        self.lastmbtn = pygame.time.get_ticks()
 
     def checkEscape(self):
         """
@@ -77,9 +77,9 @@ class Input(ABC):
         A boolean indicating whether escape has been pressed since the last
         call.
         """
-        eventlist = pg.event.get()
+        eventlist = pygame.event.get()
         for event in eventlist:
-            if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return True
         return False
 
@@ -109,27 +109,27 @@ class Input(ABC):
         - the x,y position of the cursor when the button was pressed
 
         """
-        pg.event.get()
-        btn = pg.mouse.get_pressed()
-        t = pg.time.get_ticks()
+        pygame.event.get()
+        btn = pygame.mouse.get_pressed()
+        t = pygame.time.get_ticks()
 
         if btn[0] and (t - self.lastmbtn > thr * 1000):
             pressed = True
             button = "leftbutton"
-            pos = pg.mouse.get_pos()
-            self.lastmbtn = pg.time.get_ticks()
+            pos = pygame.mouse.get_pos()
+            self.lastmbtn = pygame.time.get_ticks()
 
         elif btn[1] and (t - self.lastmbtn > thr * 1000):
             pressed = True
             button = "middlebutton"
-            pos = pg.mouse.get_pos()
-            self.lastmbtn = pg.time.get_ticks()
+            pos = pygame.mouse.get_pos()
+            self.lastmbtn = pygame.time.get_ticks()
 
         elif btn[2] and (t - self.lastmbtn > thr * 1000):
             pressed = True
             button = "rightbutton"
-            pos = pg.mouse.get_pos()
-            self.lastmbtn = pg.time.get_ticks()
+            pos = pygame.mouse.get_pos()
+            self.lastmbtn = pygame.time.get_ticks()
 
         else:
             pressed = False

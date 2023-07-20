@@ -5,7 +5,7 @@ import os
 import platform
 
 import numpy as np
-import pygame as pg
+import pygame
 
 ### HRL Class ###
 
@@ -263,7 +263,7 @@ class HRL:
             self._rfl.close()
         if self._dfl != None:
             self._dfl.close()
-        pg.quit()
+        pygame.quit()
 
     @property
     def height(self):

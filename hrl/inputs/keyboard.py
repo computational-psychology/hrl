@@ -1,4 +1,4 @@
-import pygame as pg
+import pygame
 
 from .inputs import Input
 
@@ -13,19 +13,19 @@ class Keyboard(Input):
     """
 
     def readButton(self, btns=None, to=0):
-        t0 = pg.time.get_ticks()
+        t0 = pygame.time.get_ticks()
         btn = None
-        while (to == 0) or (pg.time.get_ticks() - t0 < to):
+        while (to == 0) or (pygame.time.get_ticks() - t0 < to):
             if debug:
                 print("waiting for key press")
-            event = pg.event.wait(1)  # waits for only 1 ms
-            if event.type == pg.KEYDOWN:
+            event = pygame.event.wait(1)  # waits for only 1 ms
+            if event.type == pygame.KEYDOWN:
                 if debug:
                     print("key pressed")
                 btn = checkKey(event.key, btns)
                 if btn != None:
                     break
-        t = pg.time.get_ticks()
+        t = pygame.time.get_ticks()
         return (btn, (t - t0) / 1000.0)
 
 
@@ -41,17 +41,17 @@ def checkKey(ky, btns):
 
 
 def keyMap(ky):
-    if ky == pg.K_UP:
+    if ky == pygame.K_UP:
         return "Up"
-    elif ky == pg.K_RIGHT:
+    elif ky == pygame.K_RIGHT:
         return "Right"
-    elif ky == pg.K_DOWN:
+    elif ky == pygame.K_DOWN:
         return "Down"
-    elif ky == pg.K_LEFT:
+    elif ky == pygame.K_LEFT:
         return "Left"
-    elif ky == pg.K_SPACE:
+    elif ky == pygame.K_SPACE:
         return "Space"
-    elif ky == pg.K_ESCAPE:
+    elif ky == pygame.K_ESCAPE:
         return "Escape"
     else:
         return None

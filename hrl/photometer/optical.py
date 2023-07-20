@@ -1,6 +1,6 @@
 from .photometer import Photometer
 import pyoptical as pop
-import pygame as pg
+import pygame
 import numpy as np
 
 
@@ -12,7 +12,7 @@ class OptiCAL(Photometer):
     def readLuminance(self, n, slp):
         for i in range(n):
             try:
-                pg.time.delay(slp)
+                pygame.time.delay(slp)
                 lm = self.phtm.read_luminance()
                 return lm
             except:
