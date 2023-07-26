@@ -128,7 +128,8 @@ prsr.add_argument(
     dest="graphics",
     type=str,
     default="datapixx",
-    help="Whether using the GPU (gpu) or the DataPixx interface (datapixx). Default: datapixx",
+    help="Whether using the GPU ('gpu'), the DataPixx interface ('datapixx')" +
+          " or the ViewPixx3D ('viewpixx'). Default: datapixx",
 )
 
 prsr.add_argument("-sc", dest="scrn", type=str, default="1", help="Screen number. Default: 1")
@@ -138,7 +139,7 @@ prsr.add_argument(
     dest="wdth_offset",
     type=int,
     default=0,
-    help="Horizontal offset for window. Useful for setups with a single Xscreen but multiple monitors (Xinerame). Default: 0",
+    help="Horizontal offset for window. Useful for configurations with a single Xscreen and multiple monitors. Default: 0",
 )
 
 

@@ -56,10 +56,11 @@ class HRL:
         Parameters
         ----------
 
-        graphics : The graphics device to use. Available: 'gpu','datapixx',
-            None. Default: 'gpu'
-        inputs : The input device to use. Available: 'keyboard', 'responsepixx',
-            None. Default: 'keyboard'
+        graphics : The graphics device to use. Available: 'gpu','datapixx'
+            (to be used with DataPixx 1) or 'viewpixx' (for ViewPixx 3D).
+            Default: 'gpu'
+        inputs : The input device to use. Available: 'keyboard', 'responsepixx'.
+            Default: 'keyboard'
         photometer : The graphics device to use. Available: 'optical', 'minolta', None.
             Default: None
         wdth : The desired width of the screen. Default: 1024
