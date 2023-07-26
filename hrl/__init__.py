@@ -22,6 +22,6 @@ pydoc hrl.photometer.minolta - Help for using a Minolta device
 pydoc hrl.photometer.optical - Help for using an OptiCAL device
 """
 
-__version__ = "3.0.3"
+__version__ = "3.1.0"
 
 from .hrl import HRL

@@ -19,7 +19,8 @@ Clock logic.
 @author: Jon
 """
 from __future__ import absolute_import, division, print_function
-#from builtins import object
+
+# from builtins import object
 import time
 import sys
 from pkg_resources import parse_version
@@ -31,7 +32,8 @@ except ImportError:
     pass  # pyglet is not installed
 
 from constants import STARTED, NOT_STARTED, FINISHED, PY3
-#import psychopy.logging  # Absolute import to work around circularity
+
+# import psychopy.logging  # Absolute import to work around circularity
 
 
 # set the default timing mechanism
@@ -59,33 +61,40 @@ getTime = None
 #        function is used.
 try:
     import psychtoolbox
+
     havePTB = True
 except ImportError:
     havePTB = False
 
 if havePTB:
     # def getTime():
-        # secs, wallTime, error = psychtoolbox.GetSecs('allclocks')
-        # return wallTime
+    # secs, wallTime, error = psychtoolbox.GetSecs('allclocks')
+    # return wallTime
     getTime = psychtoolbox.GetSecs
-elif sys.platform == 'win32':
+elif sys.platform == "win32":
     from ctypes import byref, c_int64, windll
+
     _fcounter = c_int64()
     _qpfreq = c_int64()
     windll.Kernel32.QueryPerformanceFrequency(byref(_qpfreq))
     _qpfreq = float(_qpfreq.value)
     _winQPC = windll.Kernel32.QueryPerformanceCounter
+
     def getTime():
         _winQPC(byref(_fcounter))
         return _fcounter.value / _qpfreq
+
 elif sys.platform == "darwin":
     # Monotonic getTime with absolute origin. Suggested by @aforren1, and
-    # copied from github.com/aforren1/toon/blob/master/toon/input/mac_clock.py 
+    # copied from github.com/aforren1/toon/blob/master/toon/input/mac_clock.py
     import ctypes
-    _libc = ctypes.CDLL('/usr/lib/libc.dylib', use_errno=True)
+
+    _libc = ctypes.CDLL("/usr/lib/libc.dylib", use_errno=True)
+
     # create helper class to store data
     class mach_timebase_info_data_t(ctypes.Structure):
-        _fields_ = (('numer', ctypes.c_uint32), ('denom', ctypes.c_uint32))
+        _fields_ = (("numer", ctypes.c_uint32), ("denom", ctypes.c_uint32))
+
     # get function and set response type
     _mach_absolute_time = _libc.mach_absolute_time
     _mach_absolute_time.restype = ctypes.c_uint64
@@ -93,11 +102,14 @@ elif sys.platform == "darwin":
     _timebase = mach_timebase_info_data_t()
     _libc.mach_timebase_info(ctypes.byref(_timebase))
     _ticks_per_second = _timebase.numer / _timebase.denom * 1.0e9
-    #then define getTime func
+
+    # then define getTime func
     def getTime():
         return _mach_absolute_time() / _ticks_per_second
+
 else:
     import timeit
+
     getTime = timeit.default_timer
 
 
@@ -126,8 +138,7 @@ class MonotonicClock(object):
             self._timeAtLastReset = start_time
 
     def getTime(self):
-        """Returns the current time on this clock in secs (sub-ms precision)
-        """
+        """Returns the current time on this clock in secs (sub-ms precision)"""
         return getTime() - self._timeAtLastReset
 
     def getLastResetTime(self):
@@ -136,6 +147,7 @@ class MonotonicClock(object):
         timebase used by Clock.
         """
         return self._timeAtLastReset
+
 
 monotonicClock = MonotonicClock()
 
@@ -225,7 +237,8 @@ class StaticPeriod(object):
         # was called
 
     """
-    def __init__(self, screenHz=None, win=None, name='StaticPeriod'):
+
+    def __init__(self, screenHz=None, win=None, name="StaticPeriod"):
         """
         :param screenHz: the frame rate of the monitor (leave as None if you
             don't want this accounted for)
@@ -267,8 +280,10 @@ class StaticPeriod(object):
         if self.win:
             self.win.recordFrameIntervals = self._winWasRecordingIntervals
         if timeRemaining < 0:
-            msg = ('We overshot the intended duration of %s by %.4fs. The '
-                   'intervening code took too long to execute.')
+            msg = (
+                "We overshot the intended duration of %s by %.4fs. The "
+                "intervening code took too long to execute."
+            )
             vals = self.name, abs(timeRemaining)
             psychopy.logging.warn(msg % vals)
             return 0
@@ -316,7 +331,7 @@ def wait(secs, hogCPUperiod=0.2):
         # let's see if pyglet collected any event in meantime
         try:
             # this takes focus away from command line terminal window:
-            if parse_version(pyglet.version) < parse_version('1.2'):
+            if parse_version(pyglet.version) < parse_version("1.2"):
                 # events for sounds/video should run independently of wait()
                 pyglet.media.dispatch_events()
         except AttributeError:
@@ -327,8 +342,7 @@ def wait(secs, hogCPUperiod=0.2):
             pass
         for winWeakRef in core.openWindows:
             win = winWeakRef()
-            if (win.winType == "pyglet" and
-                    hasattr(win.winHandle, "dispatch_events")):
+            if win.winType == "pyglet" and hasattr(win.winHandle, "dispatch_events"):
                 win.winHandle.dispatch_events()  # pump events
 
 

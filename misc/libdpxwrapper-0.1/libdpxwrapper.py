@@ -1,11 +1,12 @@
 import platform
 from ctypes import *
-if platform.system() == 'Windows':
+
+if platform.system() == "Windows":
     lib_handle = windll.LoadLibrary("libdpx.dll")
-elif platform.system() == 'Linux':
+elif platform.system() == "Linux":
     lib_handle = cdll.LoadLibrary("libdpx.so")
 else:
-    raise Exception, "your operating system is currently not supported"
+    raise Exception("your operating system is currently not supported")
 
 DPxOpen = lib_handle.DPxOpen
 DPxOpen.restype = None
@@ -930,7 +931,12 @@ DPxSetVidHorizOverlayBounds.restype = None
 DPxSetVidHorizOverlayBounds.argtypes = [c_int, c_int, c_int, c_int]
 DPxGetVidHorizOverlayBounds = lib_handle.DPxGetVidHorizOverlayBounds
 DPxGetVidHorizOverlayBounds.restype = None
-DPxGetVidHorizOverlayBounds.argtypes = [POINTER(c_int), POINTER(c_int), POINTER(c_int), POINTER(c_int)]
+DPxGetVidHorizOverlayBounds.argtypes = [
+    POINTER(c_int),
+    POINTER(c_int),
+    POINTER(c_int),
+    POINTER(c_int),
+]
 DPxSetVidHorizOverlayAlpha = lib_handle.DPxSetVidHorizOverlayAlpha
 DPxSetVidHorizOverlayAlpha.restype = None
 DPxSetVidHorizOverlayAlpha.argtypes = [POINTER(c_uint16)]
@@ -1219,4 +1225,3 @@ DPXREG_VID_CTRL_MODE_C24 = 0x0000
 DPXREG_VID_CTRL_MODE_L48 = 0x0001
 DPXREG_VID_CTRL_MODE_M16 = 0x0002
 DPXREG_VID_CTRL_MODE_C48 = 0x0003
-

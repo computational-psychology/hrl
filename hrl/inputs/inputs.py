@@ -5,16 +5,12 @@ base class, which defines common functions required for reading input and
 measuring time.
 """
 
-# PyGame
-import pygame as pg
+from abc import ABC, abstractmethod
 
-# Unqualified Imports
-import abc
+import pygame
 
 
-### Classes ###
-
-class Input(object):
+class Input(ABC):
     """
     The Input abstract base class. New hardware inputs must instantiate
     this class. The core abstract method is 'readButton', which returns
@@ -25,11 +21,9 @@ class Input(object):
     values are specific to the subclasses. Subclasses should come with a
     a clear explanation of the keymap if it deviates from this typical set.
     """
-    __metaclass__ = abc.ABCMeta
 
-    # Abstract Methods #
-
-    def readButton(self,btns,to):
+    @abstractmethod
+    def readButton(self, btns, to):
         """
         Reads a value from the input device, returning a (button,time) pair,
         where button is the name of the botton pressed, and time is the delay
@@ -60,17 +54,14 @@ class Input(object):
             the amount of time in seconds it took from the initial call to the
             press.
         """
-        return
-
-    # Concrete Methods #
+        ...
 
     def __init__(self):
         """
         The Input constructor.
         """
-        pg.init()
-        self.lastmbtn = pg.time.get_ticks()
-
+        pygame.init()
+        self.lastmbtn = pygame.time.get_ticks()
 
     def checkEscape(self):
         """
@@ -86,65 +77,63 @@ class Input(object):
         A boolean indicating whether escape has been pressed since the last
         call.
         """
-        eventlist = pg.event.get()
+        eventlist = pygame.event.get()
         for event in eventlist:
-            if event.type == pg.QUIT \
-               or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return True
         return False
-        
+
     def check_mouse_press(self, thr=0):
         """
         Queries if a mouse button has been pressed since the last call,
         returning also the cursor position in case it has been pressed.
-         
-        Like checkEscape(), this function can be used within the core 
+
+        Like checkEscape(), this function can be used within the core
         loop of a program to allow the user to trigger an event.
-        
-        
+
+
         Arguments
         ----------
-        
-        thr: 'threshold' in seconds. Any button press happening in less than 
+
+        thr: 'threshold' in seconds. Any button press happening in less than
               thr seconds gets ignored. This argument is necessary
               as pygame reports many times the same single button press.
-              Default = 0 (all events are reported)    
+              Default = 0 (all events are reported)
 
         Returns
         -------
         A tuple containing
-        - a boolean indicating whether a button has been pressed or not 
+        - a boolean indicating whether a button has been pressed or not
         since the last call
         - the name of the button (leftbutton, middlebutton, rightbutton)
         - the x,y position of the cursor when the button was pressed
-        
+
         """
-        pg.event.get()
-        btn = pg.mouse.get_pressed()
-        t = pg.time.get_ticks()
-                                
-        if btn[0] and (t-self.lastmbtn > thr*1000):
-            pressed=True
-            button = 'leftbutton'
-            pos = pg.mouse.get_pos()
-            self.lastmbtn = pg.time.get_ticks()
-            
-        elif btn[1] and (t-self.lastmbtn > thr*1000):
-            pressed=True
-            button = 'middlebutton'
-            pos = pg.mouse.get_pos()
-            self.lastmbtn = pg.time.get_ticks()
-            
-        elif btn[2] and (t-self.lastmbtn > thr*1000):
-            pressed=True
-            button = 'rightbutton'
-            pos = pg.mouse.get_pos()
-            self.lastmbtn = pg.time.get_ticks()
-            
+        pygame.event.get()
+        btn = pygame.mouse.get_pressed()
+        t = pygame.time.get_ticks()
+
+        if btn[0] and (t - self.lastmbtn > thr * 1000):
+            pressed = True
+            button = "leftbutton"
+            pos = pygame.mouse.get_pos()
+            self.lastmbtn = pygame.time.get_ticks()
+
+        elif btn[1] and (t - self.lastmbtn > thr * 1000):
+            pressed = True
+            button = "middlebutton"
+            pos = pygame.mouse.get_pos()
+            self.lastmbtn = pygame.time.get_ticks()
+
+        elif btn[2] and (t - self.lastmbtn > thr * 1000):
+            pressed = True
+            button = "rightbutton"
+            pos = pygame.mouse.get_pos()
+            self.lastmbtn = pygame.time.get_ticks()
+
         else:
-            pressed=False
+            pressed = False
             button = None
             pos = (None, None)
 
         return (pressed, button, pos)
-
