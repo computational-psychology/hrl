@@ -4,6 +4,7 @@ implement the Photometer abstract base class, which simply defines a common
 function for reading luminance.
 """
 
+import abc
 from abc import ABC
 
 
@@ -17,8 +18,6 @@ class Photometer(ABC):
     this class. The only method is 'readLuminance', which returns a luminance
     reading from the device.
     """
-
-    __metaclass__ = abc.ABCMeta
 
     # Abstract Methods #
 
