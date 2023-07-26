@@ -77,15 +77,9 @@ class Texture:
     # JV: Why are we not using this automatic __del__ method?
     # GA: Python's garbage collection was not working properly somehow,
     # that's why I explicitly called the functions to delete textures.
-
-    #   def __del__(self):
-    #       if self._txid != None:
-    #           deleteTexture(self._txid)
-    #           self._txid = None
-    #       if self._dlid != None:
-    #           deleteTextureDL(self._dlid)
-    #           self._dlid = None
-
+    def __del__(self):
+        self.delete()
+        
     def delete(self):
         """Remove this texture from the OpenGL texture memory"""
         if self._txid != None:
