@@ -154,9 +154,10 @@ def main():
     
     tex_white = hrl.graphics.newTexture(white)
     tex_black = hrl.graphics.newTexture(black)
-        
-    Nframes = int(10 * rate)
-    for i in range(1000):
+    
+    Nframes = int(30 * rate)
+
+    for i in range(Nframes):
         
         
         if i % 2 == 0 :
