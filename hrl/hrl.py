@@ -207,11 +207,10 @@ class HRL:
 
         if photometer == "optical":
             from .photometer.optical import OptiCAL
-
-            self.photometer = OptiCAL("/dev/ttyUSB0")
-        if photometer == "minolta":
+            self.photometer = OptiCAL("/dev/ttyUSB0", timeout=10)
+            
+        elif photometer == "minolta":
             from .photometer.minolta import Minolta
-
             self.photometer = Minolta("/dev/ttyUSB0")
 
         else:
