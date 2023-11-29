@@ -69,7 +69,7 @@ def main():
     photometer = None
 
     # background value
-    bg = 0.3
+    bg = 0.0
 
     # Pass this to HRL if we want to use gamma correction.
     lut = "lut.csv"
