@@ -18,3 +18,6 @@ for btn in btns:
     print("Please press " + btn)
     (foo, t) = kbd.readButton(btns=[btn])
     print("Time taken: " + str(t))
+    
+txt.delete()
+

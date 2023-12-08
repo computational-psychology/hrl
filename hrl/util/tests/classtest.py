@@ -11,3 +11,5 @@ for btn in ["Left", "Right", "Up", "Down", "Space"]:
     print("Please press " + btn)
     (foo, t) = hrl.inputs.readButton(btns=[btn])
     print("Time taken: " + str(t))
+
+txt.delete()

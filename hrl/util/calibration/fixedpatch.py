@@ -121,8 +121,15 @@ prsr.add_argument(
     help="Shall we round the sin wave into a square wave? Default: False",
 )
 
-# Settings (these can all be changed with system arguments)
+prsr.add_argument(
+    "-p",
+    dest="photometer",
+    type=str,
+    default="optical",
+    help="The photometer to use. Default: optical",
+)
 
+# Settings (these can all be changed with system arguments)
 
 def main():
     wdth = 1024
@@ -132,20 +139,23 @@ def main():
     flnm = "results/" + args.flnm
 
     hrl = HRL(
-        wdth,
-        hght,
-        0,
-        coords=(0, 1, 0, 1),
-        flipcoords=False,
-        dpx=True,
-        ocal=True,
+        graphics = "gpu",  # 'datapixx' is another option
+        inputs = "keyboard",  # 'responsepixx' is another option
+        scrn = 0,
+        wdth = wdth,
+        hght = hght,
+        #coords=(0, 1, 0, 1),
+        #flipcoords=False,
+        #dpx=True,
+        #photometer=None,
+        photometer=args.photometer,
         rfl=flnm,
         rhds=flds,
         fs=True,
     )
     # Initializations
 
-    ptch = hrl.newTexture(np.array([[args.lm]]))
+    ptch = hrl.graphics.newTexture(np.array([[args.lm]]))
     pwdth, phght = wdth * args.sz, hght * args.sz
     ppos = ((wdth - pwdth) / 2, (hght - phght) / 2)
 
@@ -160,20 +170,21 @@ def main():
         for x in np.linspace(0, 1, nitss)
     ]
     tsts = [n % (nitss / args.sfrq) == 0 for n in range(nitss)]
-    cycl = zip(itss, tsts)
+    cycl = list(zip(itss, tsts))
     slptm = int(1000.0 / args.tmprs)
 
     def opticalRead(its):
         print(f"Current Intensity: {its}")
-        lm = hrl.readLuminance(1, 0)
-        hrl.rmtx["Intensity"] = its
-        hrl.rmtx["Luminance"] = lm
+        #lm = hrl.photometer.readLuminance(1, 0)
+        lm = 0.0
+        hrl.results["Intensity"] = its
+        hrl.results["Luminance"] = lm
         hrl.writeResultLine()
 
     for its, tst in cycl * args.ncyc:
-        hrl.changeBackground(its)
+        hrl.graphics.changeBackground(its)
         ptch.draw(ppos, (pwdth, phght))
-        hrl.flip()
+        hrl.graphics.flip()
 
         pg.time.wait(slptm)
 
@@ -181,11 +192,11 @@ def main():
             prcs = Process(target=opticalRead, args=(its,))
             prcs.start()
 
-        if hrl.checkEscape():
+        if hrl.inputs.checkEscape():
             break
 
     # Experiment is over!
-    hrl.close
+    hrl.close()
 
 
 if __name__ == "__main__":
