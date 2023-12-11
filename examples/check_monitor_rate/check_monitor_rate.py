@@ -95,7 +95,7 @@ def main():
     elif in_lab_jvc_mss300:
         graphics = "gpu"
         inputs = "keyboard"
-        scrn = 0
+        scrn = 1
         fs = True  # fullscreen
         wdth = 2048  # Screen size
         hght = 1536
