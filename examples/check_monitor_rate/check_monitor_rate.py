@@ -30,6 +30,7 @@ from socket import gethostname
 
 inlab_siemens = True if "vlab" in gethostname() else False
 inlab_viewpixx = True if "viewpixx" in gethostname() else False
+in_lab_jvc_mss300 = True if "setup3" in gethostname() else False
 
 import clock
 
@@ -78,8 +79,10 @@ def main():
         inputs = "responsepixx"
         scrn = 1
         fs = True  # fullscreen
-        wdth = 1024  # Screen size
-        hght = 768
+        #wdth = 1024  # Siemens screen size
+        #hght = 768
+        wdth = 1280   # JVC ME screensize
+        hght = 1024
 
     elif inlab_viewpixx:
         graphics = "viewpixx"
@@ -89,6 +92,14 @@ def main():
         wdth = 1920  # Screen size
         hght = 1080
 
+    elif in_lab_jvc_mss300:
+        graphics = "gpu"
+        inputs = "keyboard"
+        scrn = 0
+        fs = True  # fullscreen
+        wdth = 2048  # Screen size
+        hght = 1536
+                
     else:
         graphics = "gpu"  # 'datapixx' is another option
         inputs = "keyboard"  # 'responsepixx' is another option
