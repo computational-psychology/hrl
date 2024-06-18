@@ -12,7 +12,7 @@ import pygame
 
 class HRL:
     """
-    HRL (High Resoultion Luminance) is a class which interfaces with a set of
+    HRL (High Resolution Luminance) is a class which interfaces with a set of
     devices for assembling a psychophysics experiment. The sorts of devices are
     graphics devices for driving display, inputs for reading input from a
     subject, and photometers for calibration. For more information about these
@@ -43,7 +43,7 @@ class HRL:
         fs=False,
         wdth_offset=0,
         db=True,
-        scrn=0,
+        scrn=None,
         dfl=None,
         rfl=None,
         rhds=None,
@@ -70,7 +70,9 @@ class HRL:
         wdth_offset: The desired horizontal offset of the window. Useful for setups
               with multiple monitors but a single Xscreen session. Default: 0
         db : Whether or not to use double buffering. Default: True
-        scrn: Which monitor to use. Numbered 0,1... Default: 0
+        scrn: Which monitor to use, given as an integer (e.g. 0, 1), or as a string containing the 
+              X11 screen specification string (e.g. ":0.1" or ":1"). 
+              Default: None (uses the default settings) 
         dfl : The read location of the design matrix. Default: None
         rfl : The write location of the result matrix. Default: None
         rhds : A list of the string names of the headers for the Result
@@ -86,41 +88,31 @@ class HRL:
         experiment.
         """
 
-        ### Load Config ###
-        # data_files=[(os.path.expanduser('~/.config'), ['misc/hrlrc'])]
-        # cfg = cp.RawConfigParser()
-        # cfg.read([os.path.expanduser('~/.config/hrlrc')])
-
-        # os.environ['DISPLAY'] = ':0.' + str(scrn)
-
-        #######
-        # 30.Aug 2020: this command is commented as it doesnt work in newer versions of linux
-        # in newer versions, default screen numbering is ':1'
-        # in older versions (including lab computer), it is  ':0.1'
-
-        # Update April 2022. I changed the way to recognize the formating. In older systems
-        # or systems with separate Xscreens, the naming is still :0.0 or :0.1.
-        # For systems with only one screen, it is :1. So we change the if-else conditional
-
+        ####### Setting up on which monitor to use
+        # In older systems or systems with separate Xscreens, the naming is still :0.0 or :0.1.
+        # For systems with only one screen, it is :1.
         if platform.system() == "Linux":
-            print("OS display number (default): %s" % os.environ["DISPLAY"])
+            print("default screen number used by the OS: %s" % os.environ["DISPLAY"])
 
-            if (
-                os.environ["DISPLAY"] == ":0"
-            ):  # legacy option for older configs or separate Xscreens
-                os.environ["DISPLAY"] = ":0." + str(scrn)
-            else:
-                os.environ["DISPLAY"] = ":" + str(scrn)
+            if scrn!=None:
+                # legacy option for older configs or separate Xscreens  
+                if (os.environ["DISPLAY"] == ":0"): 
+                    os.environ["DISPLAY"] = ":0." + str(scrn)
+                else:
+                    if isinstance(scrn, str):
+                        os.environ["DISPLAY"] = scrn
+                    elif isinstance(scrn, int):
+                        os.environ["DISPLAY"] = ":" + str(scrn)
 
-            print("OS display number (now used): %s" % os.environ["DISPLAY"])
+                print("display number changed to: %s" % os.environ["DISPLAY"])
 
             ## 11. Aug 2021
             # we add a wdth_offset to be able to run HRL in setups with a
             # single Xscreen but multiple monitors (a config with Xinerama enabled)
             os.environ["SDL_VIDEO_WINDOW_POS"] = "%d,0" % wdth_offset
 
-        #######
 
+		#######
         ## Load Datapixx ##
 
         if (graphics == "datapixx") or (inputs == "responsepixx") or (graphics == "viewpixx"):
