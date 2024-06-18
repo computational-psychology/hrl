@@ -38,7 +38,6 @@ else:
         wdth=WIDTH,
         hght=HEIGHT,
         bg=0.5,
-        scrn=1,
         db=True,
         fs=False,
         mouse=True,
