@@ -139,6 +139,7 @@ class Graphics(ABC):
         self._gammainv = lambda x: x
         if lut != None:
             print("..using look-up table: %s" % lut)
+            # TODO: if color, then lut will need to contain data for *each channel*
             self._lut = np.genfromtxt(lut, skip_header=1)
             self._gammainv = lambda x: np.interp(x, self._lut[:, 0], self._lut[:, 1])
 
@@ -170,10 +171,18 @@ class Graphics(ABC):
         -------
         Texture object
         """
+        # TODO: check that this occurs also for color arrays
         grys = np.flipud(grys0)  # flipping up-down necessary
+        
+        # TODO: if color mode, then do gamma correct on each channel
         grys = self.gamma_correct(grys)
-
+        
+        # TODO: if 16bit resolution mode:
         byts = channelsToInt(self.greyToChannels(grys[::-1,])).tobytes()
+        
+        # TODO: else:   pass though of array x 3 as ints, to bytes
+        # byts = channelstoInt(grys[::-1,]).tobytes()
+        
         wdth = len(grys[0])
         hght = len(grys[:, 0])
 
