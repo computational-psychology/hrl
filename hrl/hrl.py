@@ -49,6 +49,7 @@ class HRL:
         rhds=None,
         lut=None,
         mouse=False,
+        mode='gray16',
     ):
         """
         Initialize an HRL object.
@@ -121,8 +122,7 @@ class HRL:
 
         #######
 
-        ## Load Datapixx ##
-
+        ## Load Vpixx specific library ##
         if (graphics == "datapixx") or (inputs == "responsepixx") or (graphics == "viewpixx"):
             if graphics == "datapixx":
                 from pypixxlib.datapixx import DATAPixx as DPixx
@@ -170,6 +170,7 @@ class HRL:
                 double_buffer=db,
                 lut=lut,
                 mouse=mouse,
+                mode=mode,
             )
 
         elif graphics == "datapixx" or graphics == "viewpixx":
@@ -183,6 +184,7 @@ class HRL:
                 double_buffer=db,
                 lut=lut,
                 mouse=mouse,
+                mode=mode,
             )
 
         else:

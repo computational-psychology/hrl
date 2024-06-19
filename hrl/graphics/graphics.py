@@ -78,6 +78,7 @@ class Graphics(ABC):
         double_buffer=True,
         lut=None,
         mouse=False,
+        mode='gray16',
     ):
         """
         The Graphics constructor predefines the basic OpenGL initializations
@@ -109,6 +110,7 @@ class Graphics(ABC):
         self.screen = pygame.display.set_mode((width, height), dbit, vsync=1)
         self.width = width
         self.height = height
+        self.mode = mode
 
         # Hide mouse cursor
         if not mouse:
@@ -139,9 +141,14 @@ class Graphics(ABC):
         self._gammainv = lambda x: x
         if lut != None:
             print("..using look-up table: %s" % lut)
-            # TODO: if color, then lut will need to contain data for *each channel*
-            self._lut = np.genfromtxt(lut, skip_header=1)
-            self._gammainv = lambda x: np.interp(x, self._lut[:, 0], self._lut[:, 1])
+            
+            if self.mode == 'gray16':
+                self._lut = np.genfromtxt(lut, skip_header=1)
+                self._gammainv = lambda x: np.interp(x, self._lut[:, 0], self._lut[:, 1])
+            elif self.mode=='color24':
+                # TODO: if color, then lut will need to contain data for *each channel*
+                pass
+                
 
         # Here we change the default color
         self.changeBackground(background)
@@ -150,7 +157,7 @@ class Graphics(ABC):
     def gamma_correct(self, img):
         return self._gammainv(img)
 
-    def newTexture(self, grys0, shape="square"):
+    def newTexture(self, arr0, shape="square"):
         """
         Given a numpy array of values between 0 and 1, returns a new
         Texture object. The texture object comes equipped with the draw
@@ -162,7 +169,7 @@ class Graphics(ABC):
 
         Parameters
         ----------
-        grys : The greyscale numpy array
+        arr0  : The (greyscale or color) numpy array
         shape : The shape to 'cut out' of the given greyscale array. A square
             will render the entire array. Available: 'square', 'circle'
             Default: 'square'
@@ -171,21 +178,19 @@ class Graphics(ABC):
         -------
         Texture object
         """
-        # TODO: check that this occurs also for color arrays
-        grys = np.flipud(grys0)  # flipping up-down necessary
+        arr = self.gamma_correct(arr0)
         
-        # TODO: if color mode, then do gamma correct on each channel
-        grys = self.gamma_correct(grys)
+        wdth = len(arr[0])
+        hght = len(arr[:, 0])
         
-        # TODO: if 16bit resolution mode:
-        byts = channelsToInt(self.greyToChannels(grys[::-1,])).tobytes()
-        
-        # TODO: else:   pass though of array x 3 as ints, to bytes
-        # byts = channelstoInt(grys[::-1,]).tobytes()
-        
-        wdth = len(grys[0])
-        hght = len(grys[:, 0])
-
+        if self.mode=='gray16':
+            byts = channelsToInt(self.greyToChannels(arr)).tobytes()
+            
+        elif self.mode=='color24':
+            assert(arr.ndim==3)
+            arr = np.uint32(arr * (2**8 - 1))
+            byts = channelsToInt((arr[:,:,0], arr[:,:,1], arr[:,:,2], 255)).tobytes()
+            
         return Texture(byts, wdth, hght, shape)
 
     def flip(self, clr=True):
