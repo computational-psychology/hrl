@@ -1,7 +1,5 @@
 name: Build Docs HTML and deploy to gh-pages
 on:
-  schedule:
-    - cron: '0 0 * * *'
   push:
     branches:
       - master
@@ -24,9 +22,9 @@ jobs:
           miniconda-version: 'latest'
           python-version: 3.11
           environment-file: docs/docs-environment.yml
-          activate-environment: mybook
+          activate-environment: hrl-docs
 
-      - name: Build My Book
+      - name: Build HRL documentation
         shell: bash -l {0}
         run: jb build docs/
 
