@@ -1,4 +1,4 @@
-# Welcome to the HRL documentation
+# Welcome
 
 This is the documentation of the package HRL. 
 HRL is a library for running high resolution luminance experiments for 
@@ -20,7 +20,6 @@ It also reviews the theoretical basis of monitor calibration
 (and why it is senseful to do it) and how this is implemented in HRL.
 
 
-**Table of contents**
 
 ```{tableofcontents}
 ```

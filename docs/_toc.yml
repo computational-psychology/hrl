@@ -7,19 +7,23 @@ parts:
     chapters:
     - file: getting_started/installation
     - file: getting_started/minimal-usage-example 
-    - file: getting_started/deploying-code-in-lab
-
+    - file: getting_started/deploying-in-lab
+  
+  - caption: Useful extra utils
+    chapters:
+    - file: useful-utils/useful-utils-intro
+    - file: useful-utils/show-stimuli
+    - file: useful-utils/text-displays
+    - file: useful-utils/managing-data
+    
   - caption: Experiment templates
     chapters:
-    - file: templates/managing-data
+    - file: templates/templates-intro
     - file: templates/asymmetric-matching
     - file: templates/mutual-matching
-    - file: templates/likert-responses
-    - file: templates/MLCM
-    - file: templates/MLDS
-    - file: templates/2-IFC
-    - file: templates/2-AFC
-    
+    - file: templates/MLDS-MLCM
+    - file: templates/2-AFC-2-IFC
+    - file: templates/likert-responses  
     
   - caption: Monitor calibration 
     chapters:
