@@ -1,15 +1,30 @@
 # Installation
 
-```{note}
+The first step is to install `HRL` in your machine.
+ 
 It is recommended that you install HRL in a *python environment*. 
-Using your favorite env manager (venv, pyenv, conda, etc), run the `pip` command 
-when *inside* the environment.
-```
+Using your favorite environment manager (*venv*, *pyenv*, *conda*, etc), 
+run the following commands when *inside* the environment.
+Make sure your enviroment runs **python 3**
 
-## End-users
+
+## HRL for end-users
 
 The easiest way to install HRL is using pip.
-It is not (yet) on PyPI, so first clone the repository via
+
+```bash
+pip install https://github.com/computational-psychology/hrl/archive/master.zip
+```
+
+This will also install the required dependencies:
+- [PyOpenGL](https://pyopengl.sourceforge.net/) (`pyopengl`)
+- [PyGame](https://www.pygame.org/) (`pygame`)
+- [NumPy](https://numpy.org/) (`numpy`)
+
+
+## HRL for developers
+
+First clone the repository 
 
 ```
 git clone https://github.com/computational-psychology/hrl
@@ -18,35 +33,39 @@ git clone https://github.com/computational-psychology/hrl
 Then go to the root of the repository and run
 
 ```
-pip install .
-```
-
-
-## Developers
-
-If you want edit the source code and try changes in HRL, it is better that you do an 
-editable installation. This will avoid that you have to re-install the library
-after every change you do in the source code.
-
-For this, append a `-e` to the pip command, in this way:
-
-```
 pip install -e .
 ```
+
+This will make an editable installation, which reflects immediately your
+changes in the source code and thus avoiding that you have to re-install the library
+after every change you make.
 
 
 ## In the Lab
 
-In addition to `HRL`, in the experimental setup you need to install
-the propetary library `vpixxlib` provided by Vpixx. 
+In addition to `HRL`, you need to install additional packages in the 
+machine where you run your experiments in the lab.
+
+### `pypixxlib` 
+
+This propetary library is provided by Vpixx and it makes possible
+to communicate with all Vpixx devices (Datapixx, ViewPixx, etc)
 
 
-- instructions
+- Download the library from [Vpixx website](https://docs.vpixx.com/python/introduction-to-vpixx-python-documentation). 
+
+- Install with
+
+```
+pip install PATH_TO_FILE/pypixxlib.tar.gz
+```
 
 
-Also you need to install `pyserial`, which is used to talk to the 
-Minolta LS-100 photometer.
 
+### `pyserial`
+
+Needed when using the [Minolta LS-100 photometer](https://www.konicaminolta.com/instruments/download/instruction_manual/light/pdf/ls-100-110_instruction_eng.pdf) for calibration. 
+Install with
 
 ```
 pip install pyserial

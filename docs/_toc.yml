@@ -3,7 +3,7 @@
 format: jb-book
 root: intro
 parts:
-  - caption: Getting started with hrl
+  - caption: Getting started with HRL
     chapters:
     - file: getting_started/installation
     - file: getting_started/minimal-usage-example 
