@@ -1,0 +1,7 @@
+# Others
+
+## Temporal response
+
+
+## Homogeneity
+

@@ -1,0 +1,736 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Minimal example &#8212; HRL documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started/minimal-usage-example';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Deploying your code in tha lab setup" href="deploying-code-in-lab.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">HRL documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome to the HRL documentation
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started with HRL</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Minimal example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deploying-code-in-lab.html">Deploying your code in tha lab setup</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Experiment templates</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../templates/managing-data.html">Managing data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/asymmetric-matching.html">Asymmetric matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/mutual-matching.html">Mutual matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/likert-responses.html">Likert scale</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/MLCM.html">MLCM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/MLDS.html">MLDS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/2-IFC.html">2-IFC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/2-AFC.html">2-AFC</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Monitor calibration</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../calibration/how-high-resolution-lum-is-achieved.html">How does high resolution is achieved?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/gamma-correction-linearization.html">Gamma correction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/refresh-rate.html">Refresh rate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/minimal-lum-step.html">Minimal luminace step</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/others.html">Others</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../reference/api.html"><code class="docutils literal notranslate"><span class="pre">hrl</span></code> API</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/computational-psychology/hrl" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/getting_started/minimal-usage-example.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Minimal example</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-by-step">Step-by-step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up">Set-up</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-stimulus">Define a stimulus</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#display-the-stimulus">Display the stimulus</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collect-a-response">Collect a response</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#process-the-response">Process the response</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up">Clean-up</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-example">Full example</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="minimal-example">
+<h1>Minimal example<a class="headerlink" href="#minimal-example" title="Link to this heading">#</a></h1>
+<p>Here we show a basic example of how to show a stimulus
+and collect responses.
+First we go step by step explaning on how to use HRL,
+at the bottom you can find the code for the full working example.</p>
+<section id="step-by-step">
+<h2>Step-by-step<a class="headerlink" href="#step-by-step" title="Link to this heading">#</a></h2>
+<section id="set-up">
+<h3>Set-up<a class="headerlink" href="#set-up" title="Link to this heading">#</a></h3>
+<p>The first step is to import and initialize <code class="docutils literal notranslate"><span class="pre">HRL</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
+
+<span class="c1"># Define window parameters</span>
+<span class="n">SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>  <span class="c1"># Desired shape of the drawing window (height, width)</span>
+
+<span class="c1"># Create HRL interface object</span>
+<span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
+    <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>     <span class="c1"># Use the default GPU as graphics device driver</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+    <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>      <span class="c1"># Height of the window, in pixels</span>
+    <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>      <span class="c1"># Width of the window, in pixels</span>
+    <span class="n">scrn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>             <span class="c1"># Which screen (monitor) to use</span>
+    <span class="n">fs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>           <span class="c1"># Fullscreen or not</span>
+    <span class="n">bg</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>             <span class="c1"># background intensity (black=0.0; white=1.0)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ihrl</span></code> is an <code class="docutils literal notranslate"><span class="pre">HRL</span></code> instance which is our main point of interaction with
+the library.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">HRL</span></code> is designed with the idea that you can develop your code in your own
+local machine, and by just a change in the arguments you can deploy it in
+the lab. For now we kept the default parameters as above.</p>
+<p>In the next section we will change the initialization parameters, which
+will allow us to run the exact same code but in the lab.</p>
+</div>
+</section>
+<section id="define-a-stimulus">
+<h3>Define a stimulus<a class="headerlink" href="#define-a-stimulus" title="Link to this heading">#</a></h3>
+<p>In order to display a stimulus,
+we first have to define/load/create a stimulus.
+There are many ways to do so, e.g., load an image from a file.
+Here, create an image-matrix (np.ndarray) with 256x256 random values</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="n">stim_image</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="display-the-stimulus">
+<h3>Display the stimulus<a class="headerlink" href="#display-the-stimulus" title="Link to this heading">#</a></h3>
+<p>To display on the screen <code class="docutils literal notranslate"><span class="pre">HRL</span></code>  we first create a texture containing
+the image information using the method <code class="docutils literal notranslate"><span class="pre">hrl.graphics.newTexture</span></code>.
+The input is a input array with values between 0 and 1.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert the stimulus image(matrix) to an OpenGL texture</span>
+<span class="n">stim_texture</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">newTexture</span><span class="p">(</span><span class="n">stim_image</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We then draw this texture on the buffer with the method <code class="docutils literal notranslate"><span class="pre">draw</span></code> of a
+texture object.
+Here we decide also where to draw it (its position).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Determine position: we want the stimulus in the center of the frame</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">CENTER</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">CENTER</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create a display: draw texture on the frame buffer</span>
+<span class="n">stim_texture</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">sz</span><span class="o">=</span><span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span><span class="p">,</span> <span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Finally, we need to <em>flip</em> the buffers. At this point is where
+what you have drawn before becomes visible.
+More on what are the buffers in
+<a class="reference internal" href="../calibration/refresh-rate.html"><span class="doc std std-doc">our documentation on measuring the refresh-rate</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display: flip the frame buffer</span>
+<span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">clr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># also clr=True means that the screen will be cleared before showing</span>
+</pre></div>
+</div>
+<p>The stimulus display will then stay on the screen
+until either another <code class="docutils literal notranslate"><span class="pre">.flip()</span></code> is called (with <code class="docutils literal notranslate"><span class="pre">clr=True</span></code>),
+or the hrl instance is closed.</p>
+</section>
+<section id="collect-a-response">
+<h3>Collect a response<a class="headerlink" href="#collect-a-response" title="Link to this heading">#</a></h3>
+<p>After displaying some stimulus, we often want some response from the participant.
+This generally requires two steps:</p>
+<ul class="simple">
+<li><p>capturing the response via some input hardware (e.g., keyboard, button box)</p></li>
+<li><p>processing the response,  i.e., deciding what to do with it
+(record to disk directly, determine next stimulus, etc.)</p></li>
+</ul>
+<p>HRL also provides functionality to interact with input hardware.
+The high-level interface is <code class="docutils literal notranslate"><span class="pre">&lt;hrl_object&gt;.inputs.readButton()</span></code> and
+it waits for a (single) button press.</p>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">readButton</span></code> waits until one of the following buttons is pressed:
+“Up”, “Down”, “Right”, “Left”, “Space”, “Escape”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Participant pressed a button&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can also ask <code class="docutils literal notranslate"><span class="pre">readButton</span></code>to wait for only some buttons
+and ignore all others:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Participant pressed a button&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The method <code class="docutils literal notranslate"><span class="pre">readButton</span></code> also returns the time passed
+since it was called.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">button</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="process-the-response">
+<h3>Process the response<a class="headerlink" href="#process-the-response" title="Link to this heading">#</a></h3>
+<p>Having captured a response, we need to process it.
+This can include all kinds of steps, for instance
+deciding if the response is “correct” or not (in tasks where this is possible);
+storing the response (and additional information) as results data;
+deciding what the next trial and stimulus will be.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign responses to correct/incorreect</span>
+<span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+<span class="k">if</span> <span class="n">response_correct</span><span class="p">[</span><span class="n">button</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is correct&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is incorrect&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>How exactly the response is mapped to some action
+depends heavily on the experiment and task.
+For example, in most forced choice experiment,
+the response is converted to correct/incorrect,
+recorded as a result, and a new trial is presented.</p>
+<p>In an adjustment task the response leads to increasing
+or decreasing some stimulus parameter.
+In these experiments, a button press will lead to a new <em>stimulus</em>,
+but not immediately to recording a new result.
+Only when some other button is pressed to <em>accept</em> a match,
+then the result is recorded and a new trial is started.</p>
+<p>You can find templates for these and many other tasks in
+this documentation, section <a class="reference internal" href="../intro.html"><span class="doc std std-doc">templates</span></a></p>
+</section>
+<section id="clean-up">
+<h3>Clean-up<a class="headerlink" href="#clean-up" title="Link to this heading">#</a></h3>
+<p>After the whole experiment is done
+(or if the participant/experimenter wants to terminate earlier),
+some cleanup is required:
+the connection to display and input hardware should be closed.
+This is done using the <code class="docutils literal notranslate"><span class="pre">.close()</span></code> method of the HRL-object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="full-example">
+<h2>Full example<a class="headerlink" href="#full-example" title="Link to this heading">#</a></h2>
+<p>This example opens a window, shows a randomly generated texture
+and waits for any allowed key press. It then closes the window.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
+
+<span class="c1"># 0. SET-UP  </span>
+<span class="c1"># Define window parameters</span>
+<span class="n">SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>  <span class="c1"># Desired shape of the drawing window (height, width)</span>
+<span class="n">CENTER</span> <span class="o">=</span> <span class="p">(</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Center of the drawing window</span>
+
+<span class="c1"># Create HRL interface object</span>
+<span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
+    <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+    <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Height of the window, in pixels</span>
+    <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># Width of the window, in pixels</span>
+    <span class="n">scrn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>   <span class="c1"># Which screen (monitor) to use</span>
+    <span class="n">fs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Fullscreen or not</span>
+    <span class="n">bg</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># background intensity (black=0.0; white=1.0)</span>
+<span class="p">)</span>
+
+
+<span class="c1"># 1. DEFINE STIMULUS </span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="n">stim_image</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">standard_normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+
+
+<span class="c1"># 2. DISPLAY THE STIMULUS</span>
+<span class="c1"># Convert the stimulus image(matrix) to an OpenGL texture</span>
+<span class="n">stim_texture</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">newTexture</span><span class="p">(</span><span class="n">stim_image</span><span class="p">)</span>
+
+<span class="c1"># Determine position: we want the stimulus in the center of the frame</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">CENTER</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">CENTER</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create a display: draw texture on the frame buffer</span>
+<span class="n">stim_texture</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">sz</span><span class="o">=</span><span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span><span class="p">,</span> <span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span><span class="p">))</span>
+
+<span class="c1"># Display: flip the frame buffer</span>
+<span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">clr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># also `clear` the frame buffer</span>
+
+
+<span class="c1"># 3. COLLECT A  RESPONSE  </span>
+<span class="n">button</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># 4. &quot;PROCESS&quot; RESPONSE</span>
+<span class="c1"># Assign responses to correct/incorrect</span>
+<span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+<span class="k">if</span> <span class="n">response_correct</span><span class="p">[</span><span class="n">button</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is correct&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is incorrect&quot;</span><span class="p">)</span>
+
+<span class="c1"># CLEANUP </span>
+<span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./getting_started"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="deploying-code-in-lab.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Deploying your code in tha lab setup</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-by-step">Step-by-step</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up">Set-up</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#define-a-stimulus">Define a stimulus</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#display-the-stimulus">Display the stimulus</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#collect-a-response">Collect a response</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#process-the-response">Process the response</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up">Clean-up</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-example">Full example</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Guillermo Aguilar, Joris Vincent, Torsten Betz, Sacha Sokoloski
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024. Licence: GPLv2.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
