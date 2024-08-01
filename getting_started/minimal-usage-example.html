@@ -60,7 +60,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started/minimal-usage-example';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Deploying your code in tha lab setup" href="deploying-code-in-lab.html" />
+    <link rel="next" title="Deploying your code in the lab" href="deploying-in-lab.html" />
     <link rel="prev" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -169,7 +169,7 @@
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="../intro.html">
-                    Welcome to the HRL documentation
+                    Welcome
                 </a>
             </li>
         </ul>
@@ -177,22 +177,27 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Minimal example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="deploying-code-in-lab.html">Deploying your code in tha lab setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deploying-in-lab.html">Deploying your code in the lab</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Useful extra utils</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/useful-utils-intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/show-stimuli.html">Show stimuli</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/text-displays.html">Text displays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/managing-data.html">Managing data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Experiment templates</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../templates/managing-data.html">Managing data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/templates-intro.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../templates/asymmetric-matching.html">Asymmetric matching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../templates/mutual-matching.html">Mutual matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/MLDS-MLCM.html">MLDS/MLCM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/2-AFC-2-IFC.html">2-AFC/2-IFC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../templates/likert-responses.html">Likert scale</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/MLCM.html">MLCM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/MLDS.html">MLDS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/2-IFC.html">2-IFC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/2-AFC.html">2-AFC</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Monitor calibration</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../calibration/how-high-resolution-lum-is-achieved.html">How does high resolution is achieved?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/how-high-resolution-lum-is-achieved.html">How is high resolution achieved?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/gamma-correction-linearization.html">Gamma correction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/refresh-rate.html">Refresh rate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/minimal-lum-step.html">Minimal luminace step</a></li>
@@ -419,9 +424,8 @@ the library.</p>
 <p class="admonition-title">Note</p>
 <p><code class="docutils literal notranslate"><span class="pre">HRL</span></code> is designed with the idea that you can develop your code in your own
 local machine, and by just a change in the arguments you can deploy it in
-the lab. For now we kept the default parameters as above.</p>
-<p>In the next section we will change the initialization parameters, which
-will allow us to run the exact same code but in the lab.</p>
+the lab. For now we keep the default parameters, in the next section
+we will show how to deploy it in the lab.</p>
 </div>
 </section>
 <section id="define-a-stimulus">
@@ -429,7 +433,7 @@ will allow us to run the exact same code but in the lab.</p>
 <p>In order to display a stimulus,
 we first have to define/load/create a stimulus.
 There are many ways to do so, e.g., load an image from a file.
-Here, create an image-matrix (np.ndarray) with 256x256 random values</p>
+Here, create an image-matrix (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>) with 256x256 random values</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
@@ -458,7 +462,7 @@ Here we decide also where to draw it (its position).</p>
 </div>
 <p>Finally, we need to <em>flip</em> the buffers. At this point is where
 what you have drawn before becomes visible.
-More on what are the buffers in
+More on what the buffers are in
 <a class="reference internal" href="../calibration/refresh-rate.html"><span class="doc std std-doc">our documentation on measuring the refresh-rate</span></a></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Display: flip the frame buffer</span>
 <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">clr</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># also clr=True means that the screen will be cleared before showing</span>
@@ -527,7 +531,7 @@ but not immediately to recording a new result.
 Only when some other button is pressed to <em>accept</em> a match,
 then the result is recorded and a new trial is started.</p>
 <p>You can find templates for these and many other tasks in
-this documentation, section <a class="reference internal" href="../intro.html"><span class="doc std std-doc">templates</span></a></p>
+section <a class="reference internal" href="../intro.html"><span class="doc std std-doc">experiment templates</span></a></p>
 </section>
 <section id="clean-up">
 <h3>Clean-up<a class="headerlink" href="#clean-up" title="Link to this heading">#</a></h3>
@@ -543,8 +547,9 @@ This is done using the <code class="docutils literal notranslate"><span class="p
 </section>
 <section id="full-example">
 <h2>Full example<a class="headerlink" href="#full-example" title="Link to this heading">#</a></h2>
-<p>This example opens a window, shows a randomly generated texture
-and waits for any allowed key press. It then closes the window.</p>
+<p>This is the same code as above but put together in a single script.
+In this example HRL opens a window, shows a randomly generated texture
+and waits for any allowed key press. Finally it closes the window.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
 
@@ -589,7 +594,7 @@ and waits for any allowed key press. It then closes the window.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
 
-<span class="c1"># 4. &quot;PROCESS&quot; RESPONSE</span>
+<span class="c1"># 4. PROCESS RESPONSE</span>
 <span class="c1"># Assign responses to correct/incorrect</span>
 <span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
@@ -645,11 +650,11 @@ and waits for any allowed key press. It then closes the window.</p>
       </div>
     </a>
     <a class="right-next"
-       href="deploying-code-in-lab.html"
+       href="deploying-in-lab.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Deploying your code in tha lab setup</p>
+        <p class="prev-next-title">Deploying your code in the lab</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

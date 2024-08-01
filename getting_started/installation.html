@@ -61,7 +61,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Minimal example" href="minimal-usage-example.html" />
-    <link rel="prev" title="Welcome to the HRL documentation" href="../intro.html" />
+    <link rel="prev" title="Welcome" href="../intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -169,7 +169,7 @@
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="../intro.html">
-                    Welcome to the HRL documentation
+                    Welcome
                 </a>
             </li>
         </ul>
@@ -177,22 +177,27 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="minimal-usage-example.html">Minimal example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="deploying-code-in-lab.html">Deploying your code in tha lab setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deploying-in-lab.html">Deploying your code in the lab</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Useful extra utils</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/useful-utils-intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/show-stimuli.html">Show stimuli</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/text-displays.html">Text displays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../useful-utils/managing-data.html">Managing data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Experiment templates</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../templates/managing-data.html">Managing data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/templates-intro.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../templates/asymmetric-matching.html">Asymmetric matching</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../templates/mutual-matching.html">Mutual matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/MLDS-MLCM.html">MLDS/MLCM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/2-AFC-2-IFC.html">2-AFC/2-IFC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../templates/likert-responses.html">Likert scale</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/MLCM.html">MLCM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/MLDS.html">MLDS</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/2-IFC.html">2-IFC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../templates/2-AFC.html">2-AFC</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Monitor calibration</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../calibration/how-high-resolution-lum-is-achieved.html">How does high resolution is achieved?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/how-high-resolution-lum-is-achieved.html">How is high resolution achieved?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/gamma-correction-linearization.html">Gamma correction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/refresh-rate.html">Refresh rate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/minimal-lum-step.html">Minimal luminace step</a></li>
@@ -417,13 +422,19 @@ changes in the source code and thus avoiding that you have to re-install the lib
 after every change you make.</p>
 </section>
 <section id="in-the-lab">
-<h2>In the Lab<a class="headerlink" href="#in-the-lab" title="Link to this heading">#</a></h2>
+<span id="install-inlab"></span><h2>In the Lab<a class="headerlink" href="#in-the-lab" title="Link to this heading">#</a></h2>
 <p>In addition to <code class="docutils literal notranslate"><span class="pre">HRL</span></code>, you need to install additional packages in the
 machine where you run your experiments in the lab.</p>
 <section id="pypixxlib">
 <h3><code class="docutils literal notranslate"><span class="pre">pypixxlib</span></code><a class="headerlink" href="#pypixxlib" title="Link to this heading">#</a></h3>
 <p>This propetary library is provided by Vpixx and it makes possible
 to communicate with all Vpixx devices (Datapixx, ViewPixx, etc)</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>In Linux Debian systems Vpixx provides an installable .deb package.
+When installed, the <code class="docutils literal notranslate"><span class="pre">pypixxlib.tar.gz</span></code> file can be found in
+<code class="docutils literal notranslate"><span class="pre">/usr/share/VPixx</span> <span class="pre">Software</span> <span class="pre">Tools/Software</span> <span class="pre">Tools/pypixxlib/</span></code></p>
+</aside>
 <ul class="simple">
 <li><p>Download the library from <a class="reference external" href="https://docs.vpixx.com/python/introduction-to-vpixx-python-documentation">Vpixx website</a>.</p></li>
 <li><p>Install with</p></li>
@@ -479,7 +490,7 @@ Install with</p>
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Welcome to the HRL documentation</p>
+        <p class="prev-next-title">Welcome</p>
       </div>
     </a>
     <a class="right-next"

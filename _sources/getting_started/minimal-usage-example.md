@@ -36,10 +36,8 @@ the library.
 ```{note}
  `HRL` is designed with the idea that you can develop your code in your own
 local machine, and by just a change in the arguments you can deploy it in
-the lab. For now we kept the default parameters as above. 
-
-In the next section we will change the initialization parameters, which 
-will allow us to run the exact same code but in the lab.
+the lab. For now we keep the default parameters, in the next section
+we will show how to deploy it in the lab.
 ```
 
 
@@ -48,7 +46,7 @@ will allow us to run the exact same code but in the lab.
 In order to display a stimulus,
 we first have to define/load/create a stimulus.
 There are many ways to do so, e.g., load an image from a file.
-Here, create an image-matrix (np.ndarray) with 256x256 random values
+Here, create an image-matrix ({py:class}`numpy.ndarray`) with 256x256 random values
 
 
 ```{code-block} python
@@ -85,7 +83,7 @@ stim_texture.draw(pos=pos, sz=(stim_texture.wdth, stim_texture.hght))
 
 Finally, we need to *flip* the buffers. At this point is where 
 what you have drawn before becomes visible. 
-More on what are the buffers in 
+More on what the buffers are in 
 [our documentation on measuring the refresh-rate](../calibration/refresh-rate) 
 
 
@@ -170,7 +168,7 @@ Only when some other button is pressed to *accept* a match,
 then the result is recorded and a new trial is started.
 
 You can find templates for these and many other tasks in 
-this documentation, section [templates](../intro)
+section [experiment templates](../intro)
 
 
 ### Clean-up
@@ -189,8 +187,10 @@ ihrl.close()
 
 ## Full example
 
-This example opens a window, shows a randomly generated texture
-and waits for any allowed key press. It then closes the window.
+This is the same code as above but put together in a single script.
+In this example HRL opens a window, shows a randomly generated texture
+and waits for any allowed key press. Finally it closes the window.
+
 
 ```{code-block} python
 import numpy as np
@@ -237,7 +237,7 @@ button, t = ihrl.inputs.readButton()
 print(f"Participant pressed {button} after {t}s")
 
 
-# 4. "PROCESS" RESPONSE
+# 4. PROCESS RESPONSE
 # Assign responses to correct/incorrect
 response_correct = {"Right": True, "Left": False, "Escape": False}
 
