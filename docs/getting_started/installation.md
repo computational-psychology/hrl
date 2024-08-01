@@ -40,7 +40,7 @@ This will make an editable installation, which reflects immediately your
 changes in the source code and thus avoiding that you have to re-install the library
 after every change you make.
 
-
+(install-inlab)=
 ## In the Lab
 
 In addition to `HRL`, you need to install additional packages in the 
@@ -51,6 +51,11 @@ machine where you run your experiments in the lab.
 This propetary library is provided by Vpixx and it makes possible
 to communicate with all Vpixx devices (Datapixx, ViewPixx, etc)
 
+```{margin}
+In Linux Debian systems Vpixx provides an installable .deb package.
+When installed, the `pypixxlib.tar.gz` file can be found in
+`/usr/share/VPixx Software Tools/Software Tools/pypixxlib/`
+```
 
 - Download the library from [Vpixx website](https://docs.vpixx.com/python/introduction-to-vpixx-python-documentation). 
 

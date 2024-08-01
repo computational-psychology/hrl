@@ -1,4 +1,4 @@
-# How does high resolution is achieved?
+# How is high resolution achieved?
 
 explanation concatenation of R and G channels
 allowed by some hardware: vpixx
