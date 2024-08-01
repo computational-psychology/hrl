@@ -2,5 +2,34 @@
 
 format: jb-book
 root: intro
-chapters:
-- file: installation
+parts:
+  - caption: Getting started with HRL
+    chapters:
+    - file: getting_started/installation
+    - file: getting_started/minimal-usage-example 
+    - file: getting_started/deploying-code-in-lab
+
+  - caption: Experiment templates
+    chapters:
+    - file: templates/managing-data
+    - file: templates/asymmetric-matching
+    - file: templates/mutual-matching
+    - file: templates/likert-responses
+    - file: templates/MLCM
+    - file: templates/MLDS
+    - file: templates/2-IFC
+    - file: templates/2-AFC
+    
+    
+  - caption: Monitor calibration 
+    chapters:
+    - file: calibration/how-high-resolution-lum-is-achieved
+    - file: calibration/gamma-correction-linearization
+    - file: calibration/refresh-rate
+    - file: calibration/minimal-lum-step
+    - file: calibration/others
+    
+  - caption: Reference
+    chapters:
+    - file: reference/api.md
+    
