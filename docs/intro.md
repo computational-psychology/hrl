@@ -6,12 +6,23 @@ psychophysics in Python. It is primarily a wrapper for a number of
 python libraries (e.g. OpenGL, pygame) and hardware drivers, and serves to 
 coordinate them in a purpose built, user friendly way.
 
+High resolution luminance is achieved with specific hardware from 
+[Vpixx technologies](https://vpixx.com/). Monitors from this company can produce a high resolution
+grayscale image by concatenating the red and green channels in a specific way. 
+Doing this gives a maximal, nominal resolution of 16-bit (as opposed to regular 8-bits).
+HRL provides a clean interface that wraps around the hardware library from Vpixx,
+and does all the necessary computations to display a high resolution image to
+the monitor. 
+Still, HRL can be used *without* this specific hardware but in a normal monitor. 
+In this case HRL will produce regular grayscale resolution of 8 bit.
+
+
 As opposed to other python libraries in psychophysics, HRL is designed 
 to be *light-weight*, *minimalistic*, and *modular*. 
 Because its dependencies are minimal and low-level, with HRL it is less likely that 
 your code breaks in the future (supporting future reproducibility).
 
-Importantly, HRL requires that you, the experimenter, create your 
+HRL requires that you, the experimenter, create your 
 stimuli yourself (as 2-D numpy arrays) and process the data
 you acquire. It's up to you how you do that; however, we do provide
 several utilities and templates that we have developed 
