@@ -18,6 +18,7 @@ the window size.
 ```{code-block} python
 from hrl import HRL
 import numpy as np
+import sys
 
 # Define window parameters
 SHAPE = (600, 800)  # Desired shape of the drawing window (height, width)
@@ -180,7 +181,7 @@ def display_stim(ihrl, stim_image):
     stim_texture.draw(pos=pos, sz=(stim_texture.wdth, stim_texture.hght))
 
     # Display: flip the frame buffer
-    ihrl.graphics.flip(clr=True)  # also `clear` the frame buffer
+    ihrl.graphics.flip()
 
     return
 ```
@@ -260,6 +261,7 @@ button you can switch which texture to show.
 ```
 from hrl import HRL
 import numpy as np
+import sys
 
 # Define window parameters
 SHAPE = (600, 800)  # Desired shape of the drawing window (height, width)
@@ -294,7 +296,7 @@ def display_stim(ihrl, stim_image):
     stim_texture.draw(pos=pos, sz=(stim_texture.wdth, stim_texture.hght))
 
     # Display: flip the frame buffer
-    ihrl.graphics.flip(clr=True)  # also `clear` the frame buffer
+    ihrl.graphics.flip()
 
     return
 
@@ -390,9 +392,11 @@ if __name__ == "__main__":
     
 ```
 
-Screenshot at mid contrast
+### Screenshots
+
+At mid contrast
 ![screenshot texture mid contrast](show_stimuli_mid.png)
 
-Screenshot at high contrast
+At high contrast
 ![screenshot texture high contrast](show_stimuli_high.png)
 

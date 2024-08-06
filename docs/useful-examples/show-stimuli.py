@@ -35,7 +35,7 @@ def display_stim(ihrl, stim_image):
     stim_texture.draw(pos=pos, sz=(stim_texture.wdth, stim_texture.hght))
 
     # Display: flip the frame buffer
-    ihrl.graphics.flip(clr=True)  # also `clear` the frame buffer
+    ihrl.graphics.flip()  # also `clear` the frame buffer
 
     return
 
