@@ -116,6 +116,8 @@ By default, `readButton` waits until one of the following buttons is pressed:
 ihrl.inputs.readButton()
 print("Participant pressed a button")
 ```
+"Up", "Down", "Left" and "Right" refers to the arrows in the keyboard,
+
 
 You can also ask `readButton`to wait for only some buttons
 and ignore all others:
