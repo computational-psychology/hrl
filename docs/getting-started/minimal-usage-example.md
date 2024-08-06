@@ -52,8 +52,7 @@ Here, create an image-matrix ({py:class}`numpy.ndarray`) with 256x256 random val
 ```{code-block} python
 import numpy as np
 
-rng = np.random.default_rng()
-stim_image = rng.standard_normal(size=(256, 256))
+stim_image = np.random.uniform(low=0.0, high=1.0, size=(256, 256))
 ```
 
 
