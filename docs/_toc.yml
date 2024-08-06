@@ -5,16 +5,16 @@ root: intro
 parts:
   - caption: Getting started with HRL
     chapters:
-    - file: getting_started/installation
-    - file: getting_started/minimal-usage-example 
-    - file: getting_started/deploying-in-lab
+    - file: getting-started/installation
+    - file: getting-started/minimal-usage-example 
+    - file: getting-started/deploying-in-lab
   
-  - caption: Useful extra utils
+  - caption: Useful examples
     chapters:
-    - file: useful-utils/useful-utils-intro
-    - file: useful-utils/show-stimuli
-    - file: useful-utils/text-displays
-    - file: useful-utils/managing-data
+    - file: useful-examples/useful-examples-intro
+    - file: useful-examples/show-stimuli
+    - file: useful-examples/text-displays
+    - file: useful-examples/managing-data
     
   - caption: Experiment templates
     chapters:
@@ -33,7 +33,7 @@ parts:
     - file: calibration/minimal-lum-step
     - file: calibration/others
     
-  - caption: Reference
-    chapters:
-    - file: reference/api.md
+#  - caption: Reference
+#    chapters:
+#    - file: reference/api.md
     
