@@ -1,8 +1,9 @@
 # Text displays
 
 In this example we show text to the observer, asking him to 
-press a button. When pressed, the observer gets feedback.
-Which button to press is determind randomly.
+press a button. 
+When pressed, the observer gets feedback.
+Which button to press is determined randomly (like the game 'Simon says')
 
 In the code we have separated the functions related to displaying 
 text into a module called `text_displays.py`. 
