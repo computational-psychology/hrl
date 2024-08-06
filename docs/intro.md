@@ -25,12 +25,12 @@ create a simple psychophysical experiment. This section covers the
 core functionality of HRL and from here you can (if you wish) 
 develop you own python code for your experiment.
 
-- **Useful examples** show various utilities: how to 
+- **Useful examples** shows various utilities: how to 
  show stimuli for inspection (before an experiment), how to show text 
  (for instructions) and how to manage experimental design files and 
  acquired data
  
-- **Experiment templates** showcase experimental paradigms
+- **Experiment templates** showcases experimental paradigms
 frequently used in psychophysics. You can use these templates as a starting
 point in building your own experiment.
 
