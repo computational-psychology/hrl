@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Managing data &#8212; HRL documentation</title>
+    <title>Overview &#8212; HRL documentation</title>
   
   
   
@@ -34,7 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
@@ -57,11 +57,11 @@
     <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'useful-utils/managing-data';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'useful-examples/useful-examples-intro';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Overview" href="../templates/templates-intro.html" />
-    <link rel="prev" title="Text displays" href="text-displays.html" />
+    <link rel="next" title="Show stimuli" href="show-stimuli.html" />
+    <link rel="prev" title="Deploying your code in the lab" href="../getting-started/deploying-in-lab.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -175,16 +175,16 @@
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started with HRL</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../getting_started/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_started/minimal-usage-example.html">Minimal example</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../getting_started/deploying-in-lab.html">Deploying your code in the lab</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/minimal-usage-example.html">Minimal example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/deploying-in-lab.html">Deploying your code in the lab</a></li>
 </ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Useful extra utils</span></p>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Useful examples</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="useful-utils-intro.html">Overview</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="show-stimuli.html">Show stimuli</a></li>
 <li class="toctree-l1"><a class="reference internal" href="text-displays.html">Text displays</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Managing data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing-data.html">Managing data</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Experiment templates</span></p>
 <ul class="nav bd-sidenav">
@@ -202,10 +202,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../calibration/refresh-rate.html">Refresh rate</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/minimal-lum-step.html">Minimal luminace step</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../calibration/others.html">Others</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../reference/api.html"><code class="docutils literal notranslate"><span class="pre">hrl</span></code> API</a></li>
 </ul>
 
     </div>
@@ -275,7 +271,7 @@
       
       
       
-      <li><a href="../_sources/useful-utils/managing-data.md" target="_blank"
+      <li><a href="../_sources/useful-examples/useful-examples-intro.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -357,7 +353,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Managing data</h1>
+    <h1>Overview</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -371,8 +367,28 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="managing-data">
-<h1>Managing data<a class="headerlink" href="#managing-data" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h1>
+<p>The previous pages (<a class="reference internal" href="../getting-started/minimal-usage-example.html"><span class="doc std std-doc">minimal example</span></a>
+and <a class="reference internal" href="../getting-started/deploying-in-lab.html"><span class="doc std std-doc">deploying your code in the lab</span></a>)
+shows you all the <strong>core functionality of HRL</strong>.
+Starting from there you can (if you wish) develop you own python code to create
+your stimuli, save your data, etc.</p>
+<p>However, over the years we have developed various useful utilities
+around HRL. For example, scripts to show stimuli for inspection, before
+running the experiment. Or a clean way of reading experimental designs
+and record the data.</p>
+<p>This section shows these <em>useful</em> examples, which you can take and
+adapt as needed. These are:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="show-stimuli.html"><span class="doc std std-doc">show stimuli</span></a>: how to show a set of stimuli for inspection,
+before the experiment. This can be used to control for how stimuli look like,
+its size, etc.</p></li>
+<li><p><a class="reference internal" href="text-displays.html"><span class="doc std std-doc">text displays</span></a>: how to show text, for example for
+giving instructions to the participant</p></li>
+<li><p><a class="reference internal" href="managing-data.html"><span class="doc std std-doc">managing data</span></a>: how to set up and read experimental
+design files, and how to save your acquired data, all in a neat format.</p></li>
+</ul>
 </section>
 
     <script type="text/x-thebe-config">
@@ -388,7 +404,7 @@ document.write(`
         },
         kernelOptions: {
             name: "python3",
-            path: "./useful-utils"
+            path: "./useful-examples"
         },
         predefinedOutput: true
     }
@@ -406,20 +422,20 @@ document.write(`
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="text-displays.html"
+       href="../getting-started/deploying-in-lab.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Text displays</p>
+        <p class="prev-next-title">Deploying your code in the lab</p>
       </div>
     </a>
     <a class="right-next"
-       href="../templates/templates-intro.html"
+       href="show-stimuli.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Overview</p>
+        <p class="prev-next-title">Show stimuli</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

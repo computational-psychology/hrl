@@ -1,0 +1,899 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Show stimuli &#8212; HRL documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'useful-examples/show-stimuli';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Text displays" href="text-displays.html" />
+    <link rel="prev" title="Overview" href="useful-examples-intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">HRL documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting started with HRL</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/minimal-usage-example.html">Minimal example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/deploying-in-lab.html">Deploying your code in the lab</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Useful examples</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="useful-examples-intro.html">Overview</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Show stimuli</a></li>
+<li class="toctree-l1"><a class="reference internal" href="text-displays.html">Text displays</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managing-data.html">Managing data</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Experiment templates</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../templates/templates-intro.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/asymmetric-matching.html">Asymmetric matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/mutual-matching.html">Mutual matching</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/MLDS-MLCM.html">MLDS/MLCM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/2-AFC-2-IFC.html">2-AFC/2-IFC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../templates/likert-responses.html">Likert scale</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Monitor calibration</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../calibration/how-high-resolution-lum-is-achieved.html">How is high resolution achieved?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/gamma-correction-linearization.html">Gamma correction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/refresh-rate.html">Refresh rate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/minimal-lum-step.html">Minimal luminace step</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../calibration/others.html">Others</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/computational-psychology/hrl" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/useful-examples/show-stimuli.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Show stimuli</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up">Set-up</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modularizing-the-code">Modularizing the code</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-main">Function <code class="docutils literal notranslate"><span class="pre">main</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-stimuli">Function <code class="docutils literal notranslate"><span class="pre">stimuli</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-display-stim">Function <code class="docutils literal notranslate"><span class="pre">display_stim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-select">Function <code class="docutils literal notranslate"><span class="pre">select</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-example">Full example</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#screenshots">Screenshots</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="show-stimuli">
+<h1>Show stimuli<a class="headerlink" href="#show-stimuli" title="Link to this heading">#</a></h1>
+<p>This page show how an example of how to display stimuli one by one from a list.
+The script initializes HRL, generates three random textures of different contrast, and presents one
+at the time in the center of the screen. By pressing the left and right
+button you can switch which texture to show.</p>
+<p>It demonstrates also modularity: stimuli generation, display, and processing of button
+responses are separated in functions.
+This makes our code clearer and easy to read and reuse later.</p>
+<section id="set-up">
+<h2>Set-up<a class="headerlink" href="#set-up" title="Link to this heading">#</a></h2>
+<p>We start by importing <code class="docutils literal notranslate"><span class="pre">HRL</span></code>, and setting some global variables for
+the window size.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c1"># Define window parameters</span>
+<span class="n">SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>  <span class="c1"># Desired shape of the drawing window (height, width)</span>
+<span class="n">CENTER</span> <span class="o">=</span> <span class="p">(</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Center of the drawing window</span>
+</pre></div>
+</div>
+</section>
+<section id="modularizing-the-code">
+<h2>Modularizing the code<a class="headerlink" href="#modularizing-the-code" title="Link to this heading">#</a></h2>
+<p>In the <a class="reference internal" href="../getting-started/minimal-usage-example.html"><span class="doc std std-doc">minimal example</span></a>
+we coded all steps in a linear fashion, in order to explain better <code class="docutils literal notranslate"><span class="pre">HRL</span></code>
+usage.</p>
+<p>In practice, it is better to modularize your code. This means, to define
+functions that do one and only one job, and are called multiple times during
+the experiment execution.</p>
+<p>Here we write the following functions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">stimuli</span></code>: a function that defines and computes all stimuli to be shown</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">display_stim</span></code>: function that displays the stimulus using <code class="docutils literal notranslate"><span class="pre">HRL</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">select</span></code>: a function that depending on button presses, it
+selects which stimulus to show, from a given list.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">main</span></code> function, which is the top of the hierarchy and coordinates
+everything</p></li>
+</ul>
+<p>After modularizing our code, the final structure will be like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="c1"># (...) other imports</span>
+
+
+<span class="c1"># SET-UP</span>
+<span class="c1"># (global variables)</span>
+
+
+<span class="c1"># Function definitions</span>
+<span class="k">def</span> <span class="nf">stimuli</span><span class="p">():</span>    <span class="c1"># (define all stimuli as numpy arrays)</span>
+   <span class="o">...</span>
+   
+<span class="k">def</span> <span class="nf">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+   <span class="o">...</span>
+   
+<span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+   <span class="o">...</span>
+     
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
+   <span class="o">...</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Create HRL interface object</span>
+    <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
+        <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+        <span class="c1"># graphics=&#39;datapixx&#39;,    # In the lab, we use the datapixx device driver</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+        <span class="c1"># inputs=&quot;responsepixx&quot;,  # In the lab, we use the responsepixx input device</span>
+        <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">scrn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Which screen (monitor) to use</span>
+        <span class="n">fs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Fullscreen?</span>
+        <span class="n">bg</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># background intensity (black=0.0; white=1.0)</span>
+    <span class="p">)</span>
+    <span class="n">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">)</span>
+    <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>    
+</pre></div>
+</div>
+<p>The last part of the code, which starts with <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">__name__</span> <span class="pre">==</span> <span class="pre">&quot;__main__&quot;</span></code>,
+is the python-way to ensure that that enclosed code (our experiment)
+is executed only when the code is run as a script, from the command-line.
+This is good practice in python, as all python files are also
+importable. This bit ensures that the experiment code is not
+executed if imported.</p>
+<p>Inside this section we initialize <code class="docutils literal notranslate"><span class="pre">HRL</span></code> and call the <code class="docutils literal notranslate"><span class="pre">main</span></code> function,
+which is the one coordinating the rest. When the <code class="docutils literal notranslate"><span class="pre">main</span></code> function finishes,
+it closes <code class="docutils literal notranslate"><span class="pre">HRL</span></code>.</p>
+<section id="function-main">
+<h3>Function <code class="docutils literal notranslate"><span class="pre">main</span></code><a class="headerlink" href="#function-main" title="Link to this heading">#</a></h3>
+<p>The main function first generate all stimuli by calling
+the function <code class="docutils literal notranslate"><span class="pre">stimuli</span></code>.
+Then, in an infinite loop, it shows the current stimulus
+(indexed in variable <code class="docutils literal notranslate"><span class="pre">stim_idx</span></code>) by calling
+<code class="docutils literal notranslate"><span class="pre">display_stim</span></code>, and then calls the function <code class="docutils literal notranslate"><span class="pre">select</span></code> which waits for a
+button press. The function <code class="docutils literal notranslate"><span class="pre">select</span></code> returns a new stimulus index which
+will be shown. The loop is broken by pressing <code class="docutils literal notranslate"><span class="pre">Escape</span></code>, which triggers
+a system exit call (see <code class="docutils literal notranslate"><span class="pre">select</span></code> definition below).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
+    <span class="n">stims</span> <span class="o">=</span> <span class="n">stimuli</span><span class="p">()</span>
+    <span class="n">stim_names</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">stims</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stimuli available: </span><span class="si">{</span><span class="n">stim_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">stim_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Main loop</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Display stimulus</span>
+            <span class="n">stim_name</span> <span class="o">=</span> <span class="n">stim_names</span><span class="p">[</span><span class="n">stim_idx</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Showing </span><span class="si">{</span><span class="n">stim_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="n">stim_image</span> <span class="o">=</span> <span class="n">stims</span><span class="p">[</span><span class="n">stim_name</span><span class="p">]</span>
+            <span class="n">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">)</span>
+
+            <span class="c1"># Select next stim</span>
+            <span class="n">stim_idx</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">stim_idx</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">stim_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            
+        <span class="k">except</span> <span class="ne">SystemExit</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Cleanup</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting...&quot;</span><span class="p">)</span>
+            <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">e</span>
+            
+</pre></div>
+</div>
+</section>
+<section id="function-stimuli">
+<h3>Function <code class="docutils literal notranslate"><span class="pre">stimuli</span></code><a class="headerlink" href="#function-stimuli" title="Link to this heading">#</a></h3>
+<p>Defines all stimuli, returning a dictionary with its name as key,
+and the stimulus itself as a numpy array as value</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">stimuli</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Defines three random textures with low, mid and high contrast&quot;&quot;&quot;</span>
+    
+    <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span> 
+    <span class="n">mid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+    <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+        
+    <span class="n">stims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;low contrast &#39;</span><span class="p">:</span> <span class="n">low</span><span class="p">,</span>
+             <span class="s1">&#39;mid contrast &#39;</span><span class="p">:</span> <span class="n">mid</span><span class="p">,</span>
+             <span class="s1">&#39;high contrast &#39;</span><span class="p">:</span> <span class="n">high</span><span class="p">}</span>
+             
+    <span class="k">return</span> <span class="n">stims</span> 
+</pre></div>
+</div>
+</section>
+<section id="function-display-stim">
+<h3>Function <code class="docutils literal notranslate"><span class="pre">display_stim</span></code><a class="headerlink" href="#function-display-stim" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In this &quot;experiment&quot;, we just display a collection of stimuli, one at a time.</span>
+<span class="sd">    Here we define a function to display a single stimulus image centrally on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the stimulus image(matrix) to an OpenGL texture</span>
+    <span class="n">stim_texture</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">newTexture</span><span class="p">(</span><span class="n">stim_image</span><span class="p">)</span>
+
+    <span class="c1"># Determine position: we want the stimulus in the center of the frame</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">CENTER</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">CENTER</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># Create a display: draw texture on the frame buffer</span>
+    <span class="n">stim_texture</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">sz</span><span class="o">=</span><span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span><span class="p">,</span> <span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span><span class="p">))</span>
+
+    <span class="c1"># Display: flip the frame buffer</span>
+    <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+    <span class="k">return</span>
+</pre></div>
+</div>
+</section>
+<section id="function-select">
+<h3>Function <code class="docutils literal notranslate"><span class="pre">select</span></code><a class="headerlink" href="#function-select" title="Link to this heading">#</a></h3>
+<p>We’ll use the Left/Right keys to go through the list of stimuli,
+and the Escape/Space keys to terminate.</p>
+<p>Here we define a function that captures and processes responses.
+On Escape, it raises a <em>SystemExit</em> exception to terminate.
+On Left/Right, it decreases/increases the index
+into the list of stimuli by 1.
+To prevent <em>IndexErrors</em>, make sure that the index cannot be &lt;0 or &gt;max</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow participant to select a value from a range of options</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ihrl : hrl-object</span>
+<span class="sd">        HRL-interface object to use for display</span>
+<span class="sd">    value : int</span>
+<span class="sd">        currently selected option</span>
+<span class="sd">    rng : (int, int)</span>
+<span class="sd">        min and max values to select. If one value is given, assume min=0</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        currently selected option</span>
+<span class="sd">    bool</span>
+<span class="sd">        whether this option was confirmed</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    SystemExit</span>
+<span class="sd">        if participant/experimenter terminated by pressing Escape</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+
+    <span class="n">accept</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span>
+        <span class="c1"># Raise SystemExit Exception</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Participant terminated experiment.&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Right&quot;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Space&quot;</span><span class="p">:</span>
+        <span class="n">accept</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">value</span><span class="p">,</span> <span class="n">accept</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="full-example">
+<h2>Full example<a class="headerlink" href="#full-example" title="Link to this heading">#</a></h2>
+<p>Putting everything together, we have an script that initializes HRL,
+generates three random textures of different contrast, and presents one
+at the time in the center of the screen. By pressing the left and right
+button you can switch which texture to show.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c1"># Define window parameters</span>
+<span class="n">SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>  <span class="c1"># Desired shape of the drawing window (height, width)</span>
+<span class="n">CENTER</span> <span class="o">=</span> <span class="p">(</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Center of the drawing window</span>
+
+<span class="k">def</span> <span class="nf">stimuli</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Defines three random textures with low, mid and high contrast&quot;&quot;&quot;</span>
+    
+    <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span> 
+    <span class="n">mid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+    <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
+        
+    <span class="n">stims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;low contrast &#39;</span><span class="p">:</span> <span class="n">low</span><span class="p">,</span>
+             <span class="s1">&#39;mid contrast &#39;</span><span class="p">:</span> <span class="n">mid</span><span class="p">,</span>
+             <span class="s1">&#39;high contrast &#39;</span><span class="p">:</span> <span class="n">high</span><span class="p">}</span>
+             
+    <span class="k">return</span> <span class="n">stims</span> 
+
+<span class="k">def</span> <span class="nf">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In this &quot;experiment&quot;, we just display a collection of stimuli, one at a time.</span>
+<span class="sd">    Here we define a function to display a single stimulus image centrally on the screen.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Convert the stimulus image(matrix) to an OpenGL texture</span>
+    <span class="n">stim_texture</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">newTexture</span><span class="p">(</span><span class="n">stim_image</span><span class="p">)</span>
+
+    <span class="c1"># Determine position: we want the stimulus in the center of the frame</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">CENTER</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span> <span class="n">CENTER</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># Create a display: draw texture on the frame buffer</span>
+    <span class="n">stim_texture</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">sz</span><span class="o">=</span><span class="p">(</span><span class="n">stim_texture</span><span class="o">.</span><span class="n">wdth</span><span class="p">,</span> <span class="n">stim_texture</span><span class="o">.</span><span class="n">hght</span><span class="p">))</span>
+
+    <span class="c1"># Display: flip the frame buffer</span>
+    <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">flip</span><span class="p">()</span>
+
+    <span class="k">return</span>
+
+<span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow participant to select a value from a range of options</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ihrl : hrl-object</span>
+<span class="sd">        HRL-interface object to use for display</span>
+<span class="sd">    value : int</span>
+<span class="sd">        currently selected option</span>
+<span class="sd">    rng : (int, int)</span>
+<span class="sd">        min and max values to select. If one value is given, assume min=0</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">        currently selected option</span>
+<span class="sd">    bool</span>
+<span class="sd">        whether this option was confirmed</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    SystemExit</span>
+<span class="sd">        if participant/experimenter terminated by pressing Escape</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span>
+
+    <span class="n">accept</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span>
+        <span class="c1"># Raise SystemExit Exception</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Participant terminated experiment.&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Right&quot;</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Space&quot;</span><span class="p">:</span>
+        <span class="n">accept</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">value</span><span class="p">,</span> <span class="n">accept</span>
+    
+ 
+<span class="k">def</span> <span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
+    <span class="n">stims</span> <span class="o">=</span> <span class="n">stimuli</span><span class="p">()</span>
+    <span class="n">stim_names</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">stims</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stimuli available: </span><span class="si">{</span><span class="n">stim_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">stim_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="c1"># Main loop</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Display stimulus</span>
+            <span class="n">stim_name</span> <span class="o">=</span> <span class="n">stim_names</span><span class="p">[</span><span class="n">stim_idx</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Showing </span><span class="si">{</span><span class="n">stim_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="n">stim_image</span> <span class="o">=</span> <span class="n">stims</span><span class="p">[</span><span class="n">stim_name</span><span class="p">]</span>
+            <span class="n">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">)</span>
+
+            <span class="c1"># Select next stim</span>
+            <span class="n">stim_idx</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">stim_idx</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">stim_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            
+        <span class="k">except</span> <span class="ne">SystemExit</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Cleanup</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting...&quot;</span><span class="p">)</span>
+            <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">e</span>    
+    
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c1"># Create HRL interface object</span>
+    <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
+        <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+        <span class="c1"># graphics=&#39;datapixx&#39;,    # In the lab, we use the datapixx device driver</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+        <span class="c1"># inputs=&quot;responsepixx&quot;,  # In the lab, we use the responsepixx input device</span>
+        <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">scrn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Which screen (monitor) to use</span>
+        <span class="n">fs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Fullscreen?</span>
+        <span class="n">bg</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># background intensity (black=0.0; white=1.0)</span>
+    <span class="p">)</span>
+    <span class="n">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">)</span>
+    <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   
+    
+</pre></div>
+</div>
+<section id="screenshots">
+<h3>Screenshots<a class="headerlink" href="#screenshots" title="Link to this heading">#</a></h3>
+<p>At mid contrast
+<img alt="screenshot texture mid contrast" src="../_images/show_stimuli_mid.png" /></p>
+<p>At high contrast
+<img alt="screenshot texture high contrast" src="../_images/show_stimuli_high.png" /></p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./useful-examples"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="useful-examples-intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Overview</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="text-displays.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Text displays</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up">Set-up</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modularizing-the-code">Modularizing the code</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-main">Function <code class="docutils literal notranslate"><span class="pre">main</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-stimuli">Function <code class="docutils literal notranslate"><span class="pre">stimuli</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-display-stim">Function <code class="docutils literal notranslate"><span class="pre">display_stim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#function-select">Function <code class="docutils literal notranslate"><span class="pre">select</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-example">Full example</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#screenshots">Screenshots</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Guillermo Aguilar, Joris Vincent, Torsten Betz, Sacha Sokoloski
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024. Licence: GPLv2.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
