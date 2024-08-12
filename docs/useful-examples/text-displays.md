@@ -8,7 +8,8 @@ Which button to press is determined randomly (like the game 'Simon says')
 In the code we have separated the functions related to displaying 
 text into a module called `text_displays.py`. 
 The function `display_text` is imported from this module.
-In later examples and templates this module will be included as well.
+In later examples this module will be included as well.
+The
 
 
 ## Install requirements
@@ -21,6 +22,18 @@ pip install Pillow
 ```
 
 ## Main script
+
+The main script has the function `experiment_main` which is the entry
+point of execution. First, this function picks one direction at random 
+(up, down, left or right), then displays a text asking the
+observer to press that button by calling function `show_instructions`,
+and then waits for a keyboard response by calling function `process_response`.
+If the button was correctly pressed, it show again some text saying so
+by calling function `show_correct`. 
+All these steps occur in a infinite loop until "Escape" is pressed.
+
+Notice that we have further modularized the code into several functions.
+
 
 ```{code-block} python
 import sys
@@ -164,6 +177,7 @@ if __name__ == "__main__":
     experiment_main(ihrl)
     ihrl.close()
 ```
+
 
 ## Module `text-displays.py`
 

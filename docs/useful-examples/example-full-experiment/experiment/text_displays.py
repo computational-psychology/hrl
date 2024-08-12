@@ -131,3 +131,66 @@ def display_text(
     ihrl.graphics.flip()
 
     return
+
+
+def block_break(ihrl, trial, total_trials, **kwargs):
+    """Display a (mid-block) break message to participant.
+
+    List how many trials out of total (in this block) have been completed.
+    Participant needs to press button to continue.
+
+    Parameters
+    ----------
+    ihrl : hrl
+        HRL-interface object to use for display and input
+    trial : int
+        current trial
+    total_trials : int
+        total number of trials (in this block)
+    """
+    
+    lines = ["You can take a break now.",
+            " ",
+            f"You have completed {trial} out of {total_trials} trials.",
+            " ",
+            "When you are ready, press the middle button."]
+
+    display_text(ihrl, text=lines, **kwargs)
+    btn, _ = ihrl.inputs.readButton(btns=("Escape", "Space"))
+
+    if btn in ("Escape", "Left"):
+        sys.exit("Participant terminated experiment")
+    elif btn in ("Space", "Right"):
+        return
+
+
+def block_end(ihrl, block, total_blocks, **kwargs):
+    """Display a (mid-session) break message to participant.
+
+    List how many blocks out of total (in this session) have been completed.
+    Participant needs to press button to continue.
+
+    Parameters
+    ----------
+    ihrl : hrl
+        HRL-interface object to use for display and input
+    block : int
+        current block
+    total_blocks : int
+        total number of blocks (in this session)
+    """
+
+    lines = ["You can take a break now.",
+            " ",
+            f"You have completed {block} out of {total_blocks} blocks.",
+            " ",
+            "To continue, press the right or middle button,",
+            "to finish, press the left button."]
+
+    display_text(ihrl, text=lines, **kwargs)
+    btn, _ = ihrl.inputs.readButton(btns=("Escape", "Space", "Left", "Right"))
+
+    if btn in ("Escape", "Left"):
+        sys.exit("Participant terminated experiment")
+    elif btn in ("Space", "Right"):
+        return

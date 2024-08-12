@@ -31,10 +31,9 @@ over the years in our lab. These you can use as a starting point.
 
 This documentation is organized as follows:
 
-- **Getting started with HRL** covers how to install HRL in your system and how to 
-create a simple psychophysical experiment. This section covers the 
-core functionality of HRL and from here you can (if you wish) 
-develop you own python code for your experiment.
+- **Getting started with HRL** covers how to install HRL in your system and 
+shows a minimal usage example. This section covers the core functionality 
+of HRL and from here you can (if you wish) develop you own python code for your experiment.
 
 - **Useful examples** shows various utilities: how to 
  show stimuli for inspection (before an experiment), how to show text 
