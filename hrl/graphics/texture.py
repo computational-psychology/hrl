@@ -74,16 +74,18 @@ class Texture:
 
         opengl.glCallList(self._dlid)
 
-    # JV: Why are we not using this automatic __del__ method?
-    # GA: Python's garbage collection was not working properly somehow,
-    # that's why I explicitly called the functions to delete textures.
-    def __del__(self):
-        self.delete()
+    #def __del__(self):
+    #    self.delete()
+    
+    # We do not implement the __del__ function, because
+    # it gives problems upon garbage collection at closing of python
+    # Instead, we give to the user the posibility to delete textures,
+    # particularly necessary for experiments with lots of stimuli
         
     def delete(self):
         """Remove this texture from the OpenGL texture memory"""
         if self._txid != None:
-            opengl.glDeleteTextures(self._txid)
+            opengl.glDeleteTextures(1, [self._txid])
             self._txid = None
         if self._dlid != None:
             opengl.glDeleteLists(self._dlid, 1)
