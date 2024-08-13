@@ -9,8 +9,6 @@ experiment_main()
 @authors: Guillermo Aguilar, Joris Vincent
 """
 
-from socket import gethostname
-
 import pandas as pd
 from hrl import HRL
 
@@ -19,17 +17,30 @@ import design
 import experiment_logic
 import text_displays
 
-SETUP = {
-    "graphics": "gpu",
-    "inputs": "keyboard",
-    "scrn": 1,
-    "lut": None,
-    "fs": False,
-    "wdth": 800,
-    "hght": 600,
-    "bg": 0.5
-    }
+inlab = True
 
+if inlab:
+    SETUP = {
+        "graphics": "viewpixx",   # 'datapixx' for using the old DataPixx 1 device
+        "inputs": "responsepixx",
+        "scrn": 1,
+        "lut": "lut_viewpixx.csv", # 'lut_jvc.csv' for the JVC monitor
+        "fs": True,
+        "wdth": 1920,
+        "hght": 1080,
+        "bg": 0.27,  
+    }
+else:
+    SETUP = {
+        "graphics": "gpu",
+        "inputs": "keyboard",
+        "scrn": 0,
+        "lut": None,
+        "fs": False,
+        "wdth": 1920,
+        "hght": 1080,
+        "bg": 0.3,
+    }
 
 
 def run_block(ihrl, block, block_id):
