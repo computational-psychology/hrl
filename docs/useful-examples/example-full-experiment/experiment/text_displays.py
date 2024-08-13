@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
@@ -127,9 +128,17 @@ def display_text(
         # Draw the line
         textline.draw(pos=text_pos)
 
+        # Accumulate
+        textures.append(textline)
+        
     # Display
     ihrl.graphics.flip()
 
+    # Cleanup: delete texture
+    for texture in textures:
+		# deleting texture
+        texture.delete()
+        
     return
 
 

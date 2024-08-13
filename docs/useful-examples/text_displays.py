@@ -126,8 +126,16 @@ def display_text(
 
         # Draw the line
         textline.draw(pos=text_pos)
+        
+        # Accumulate
+        textures.append(textline)
 
     # Display
     ihrl.graphics.flip()
+        
+    # Cleanup: delete texture
+    for texture in textures:
+        texture.delete()
+        
 
     return
