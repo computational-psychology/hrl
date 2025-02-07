@@ -204,7 +204,10 @@ class HRL:
         elif photometer == "minolta":
             from .photometer.minolta import Minolta
             self.photometer = Minolta("/dev/ttyUSB0")
-
+            
+        elif photometer == "colorcal":
+            from .photometer.colorcal import ColorCal
+            self.photometer = ColorCal("/dev/ttyACM0")
         else:
             self.photometer = None
 
