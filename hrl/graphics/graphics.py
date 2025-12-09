@@ -179,6 +179,8 @@ class Graphics(ABC):
 
         return Texture(byts, wdth, hght, shape)
 
+        return Texture(byts, width, height, shape)
+
     def flip(self, clr=True):
         """
         Flips in the image backbuffer. In general, one will want to draw
@@ -198,12 +200,12 @@ class Graphics(ABC):
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
     def changeBackground(self, intensity_background):
-        """
-        Changes the current background grey value.
+        """Change current background grey value.
 
         Parameters
         ----------
-        bg : The new gray value (between 0 and 1)
+        intensity_background : float
+            new grey value for background, between 0.0 and 1.0
         """
         maximum = float(2**8 - 1)
         (r, g, b, a) = self.greyToChannels(self._gammainv(intensity_background))
