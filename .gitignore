@@ -2,3 +2,5 @@
 build/
 hrl.egg-info/
 docs/_build/
+
+uv.lock
