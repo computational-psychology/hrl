@@ -27,11 +27,9 @@ def show_stim(igraphics):
 
 
 def instantiate_hrl():
-    inlab_viewpixx = "viewpixx" in gethostname()
-
-    if inlab_viewpixx:
-        hrl = HRL(
-            graphics="viewpixx",
+    if "viewpixx" in gethostname():
+        ihrl = HRL(
+            graphics="viewpixx_RGB",
             inputs="responsepixx",
             photometer=None,
             wdth=1920,
@@ -42,10 +40,12 @@ def instantiate_hrl():
             db=True,
             fs=True,
         )
+    elif "vlab" in gethostname():
+        raise RuntimeError("Cannot run RGB on Datapixx setup")
 
     else:
-        hrl = HRL(
-            graphics="gpu",
+        ihrl = HRL(
+            graphics="gpu_RGB",
             inputs="keyboard",
             photometer=None,
             wdth=1024,
@@ -55,7 +55,6 @@ def instantiate_hrl():
             lut=None,
             db=True,
             fs=False,
-            mode='color24',
         )
 
     return ihrl

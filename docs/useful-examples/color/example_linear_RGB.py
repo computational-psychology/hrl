@@ -31,7 +31,7 @@ def instantiate_hrl():
 
     if "viewpixx" in gethostname():
         ihrl = HRL(
-            graphics="viewpixx",
+            graphics="viewpixx_RGB",
             inputs="responsepixx",
             wdth=1920,
             hght=1080,
@@ -40,14 +40,13 @@ def instantiate_hrl():
             lut=lut,  # Use example CLUT for gamma correction
             db=True,
             fs=True,
-            mode="color24",
         )
     elif "vlab" in gethostname():
         raise RuntimeError("Cannot run RGB on Datapixx setup")
 
     else:
         ihrl = HRL(
-            graphics="gpu",
+            graphics="gpu_RGB",
             inputs="keyboard",
             wdth=1024,
             hght=768,
@@ -56,7 +55,6 @@ def instantiate_hrl():
             lut=lut,  # Use example CLUT for gamma correction
             db=True,
             fs=False,
-            mode="color24",
         )
 
     return ihrl
