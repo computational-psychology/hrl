@@ -1,6 +1,7 @@
+import numpy as np
 import pytest
 
-from hrl.luts import create_lut
+from hrl.luts import create_clut, create_lut
 
 # Standard gamma exponent for all gamma-related fixtures and tests
 DEFAULT_GAMMA = 2.2
@@ -49,3 +50,54 @@ def nonlinear_lut():
         First row is zero-intensity with dark luminance = 1.0.
     """
     return create_lut(gamma=DEFAULT_GAMMA, k=150.0, dark=1.0)
+
+
+@pytest.fixture
+def no_clut():
+    """Simple pass-through CLUT with no gamma correction and no dark chromaticity.
+
+    Returns
+    -------
+    Array
+        with 13 columns [IntensityIn, R, G, B, 9 matrix values].
+        R = G = B = IntensityIn^(1/1.0) = IntensityIn.
+        Dark chromaticity: zeros. Color matrix: identity.
+    """
+    return create_clut(gamma=1.0, dark_chromaticity=np.zeros(3), color_matrix=np.eye(3))
+
+
+@pytest.fixture
+def linear_clut():
+    """Linear CLUT with no gamma correction, with dark chromaticity and identity color matrix.
+
+    Returns
+    -------
+    Array
+        with 13 columns [IntensityIn, R, G, B, 9 matrix values].
+        R = G = B = IntensityIn^(1/1.0) = IntensityIn.
+        Dark chromaticity: small nonzero values. Color matrix: identity.
+    """
+    dark = np.array([0.01, 0.012, 0.015])
+    return create_clut(gamma=1.0, dark_chromaticity=dark, color_matrix=np.eye(3))
+
+
+@pytest.fixture
+def nonlinear_clut():
+    """Nonlinear CLUT with gamma correction, dark chromaticity and channel crosstalk.
+
+    Returns
+    -------
+    Array
+        with 13 columns [IntensityIn, R, G, B, 9 matrix values].
+        R = G = B = IntensityIn^(1/2.2).
+        Dark chromaticity: small nonzero values. Color matrix: simulates channel crosstalk.
+    """
+    dark = np.array([0.01, 0.012, 0.015])
+    color_matrix = np.array(
+        [
+            [0.85, 0.05, 0.01],
+            [0.03, 0.87, 0.04],
+            [0.02, 0.06, 0.84],
+        ]
+    )
+    return create_clut(gamma=DEFAULT_GAMMA, dark_chromaticity=dark, color_matrix=color_matrix)
