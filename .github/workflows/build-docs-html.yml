@@ -1,35 +1,28 @@
 name: Build Docs HTML
+
 on:
   push:
     branches-ignore:
       - master
-      
+
 permissions:
   contents: write
-  
+
 jobs:
-  build:
+  build-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: false
+        # Checkout the HRL repository
+      - uses: actions/checkout@v6
 
-      - name: Setup Miniconda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          auto-activate-base: false
-          miniconda-version: 'latest'
-          python-version: 3.11
-          environment-file: docs/docs-environment.yml
-          activate-environment: hrl-docs
+        # Install uv with python version
+      - name: Install the latest version of uv and set the python version
+        uses: astral-sh/setup-uv@v7
 
-      - name: Install jupyter_book
-        shell: bash -l {0}
-        run: pip install git+https://github.com/ExecutableBookProject/jupyter-book.git@master
+        # Install dependencies for docs
+      - name: Install dependencies for docs
+        run: uv sync --group docs
 
-      - name: Build My Book
-        shell: bash -l {0}
-        run: jb build docs/
+        # Build the docs using JupyterBook
+      - name: Build docs
+        run: uv run jb build docs/
