@@ -17,7 +17,15 @@ dependencies = ["numpy", "pygame", "pyopengl"]
 
 [dependency-groups]
 test = ["pytest>=8.3.5"]
-docs = ["ipykernel>=6.29.5", "matplotlib>=3.7.5", "pillow>=10.4.0"]
+docs = [
+    "jupyter-book<2",
+    "jupytext>=1.13.3",
+    "jupyterlab_myst",
+    "sphinxcontrib-mermaid",
+    "ipykernel>=6.29.5",
+    "matplotlib>=3.7.5",
+    "pillow>=10.4.0",
+]
 dev = ["ruff>=0.14.7", { include-group = "test" }, { include-group = "docs" }]
 
 [project.scripts]
