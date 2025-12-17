@@ -83,3 +83,74 @@ def test_gamma_correct_grey_nonlinear_lut(
     # Check expected luminance
     actual_luminance = np.interp(input_intensity, nonlinear_lut[:, 0], nonlinear_lut[:, 2])
     assert np.allclose(actual_luminance, expected_luminance, rtol=1e-4)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [(5, 5), (10, 8), (1, 1), (50, 50)],
+    ids=["small_square", "rectangular", "single_pixel", "large_square"],
+)
+def test_gamma_correct_grey_img_no_lut(shape, no_lut):
+    """Test gamma correction on 2D greyscale image arrays with no_lut (gamma=1.0, k=1.0, dark=0.0)."""
+    # Generate a test greyscale image array with deterministic seed
+    seed = hash(shape) % (2**32)
+    rng = np.random.default_rng(seed)
+    grey_img = rng.uniform(0, 1, size=shape)
+
+    # Linearize grey image array using LUT
+    linearized_img = gamma_correct_grey(grey_img, no_lut)
+
+    # Test output shape
+    assert linearized_img.shape == shape
+
+    # Expected value with gamma=1.0 (identity)
+    expected_img = grey_img ** (1 / 1.0)
+    assert np.allclose(linearized_img, expected_img)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [(5, 5), (10, 8), (1, 1), (50, 50)],
+    ids=["small_square", "rectangular", "single_pixel", "large_square"],
+)
+def test_gamma_correct_grey_img_linear_lut(shape, linear_lut):
+    """Test gamma correction on 2D greyscale image arrays with linear_lut (gamma=1.0, k=150.0, dark=2.0)."""
+    # Generate a test greyscale image array with deterministic seed
+    seed = hash(shape) % (2**32)
+    rng = np.random.default_rng(seed)
+    grey_img = rng.uniform(0, 1, size=shape)
+
+    # Linearize grey image array using LUT
+    linearized_img = gamma_correct_grey(grey_img, linear_lut)
+
+    # Test output shape
+    assert linearized_img.shape == shape
+
+    # Expected value with gamma=1.0 (identity)
+    expected_img = grey_img ** (1 / 1.0)
+    assert np.allclose(linearized_img, expected_img)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [(5, 5), (10, 8), (1, 1), (50, 50)],
+    ids=["small_square", "rectangular", "single_pixel", "large_square"],
+)
+def test_gamma_correct_grey_img_nonlinear_lut(shape, nonlinear_lut):
+    """Test gamma correction on 2D greyscale image arrays with nonlinear_lut (gamma=2.2, k=150.0, dark=1.0)."""
+    # Generate a test greyscale image array with deterministic seed
+    seed = hash(shape) % (2**32)
+    rng = np.random.default_rng(seed)
+    grey_img = rng.uniform(0, 1, size=shape)
+
+    # Linearize grey image array using LUT
+    linearized_img = gamma_correct_grey(grey_img, nonlinear_lut)
+
+    # Test output shape
+    assert linearized_img.shape == shape
+    # Expected value with gamma=2.2
+    expected_img = grey_img ** (1 / 2.2)
+
+    # Use relaxed tolerance to account for interpolation error with 256-entry LUT
+    # Relative tolerance accounts for larger values, absolute tolerance for smaller values
+    assert np.allclose(linearized_img, expected_img, atol=3e-2)
