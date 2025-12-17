@@ -81,3 +81,89 @@ def test_gamma_correct_RGB_triplet_nonlinear_clut(input_RGB, nonlinear_clut):
     # Check expected output RGB
     expected_RGB = np.array(input_RGB) ** (1 / DEFAULT_GAMMA)
     assert np.allclose(linearized_RGB.flatten(), expected_RGB, rtol=1e-4)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [
+        (5, 5),
+        (10, 8),
+        (1, 1),
+        (50, 50),
+    ],
+    ids=["small_square", "rectangular", "single_pixel", "large_square"],
+)
+def test_gamma_correct_RGB_img_no_clut(shape, no_clut):
+    """Test gamma correction on 3D RGB image arrays with no_clut (gamma=1.0)."""
+    # Generate a test RGB image array with deterministic seed
+    seed = hash(shape) % (2**32)
+    rng = np.random.default_rng(seed)
+    rgb_img = rng.uniform(0, 1, size=(*shape, 3))
+
+    # Linearize RGB image array using CLUT
+    linearized_img = gamma_correct_RGB(rgb_img, no_clut)
+
+    # Test output shape
+    assert linearized_img.shape == (*shape, 3)
+
+    # Expected value with gamma=1.0 (identity)
+    expected_img = rgb_img ** (1 / 1.0)
+    assert np.allclose(linearized_img, expected_img)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [
+        (5, 5),
+        (10, 8),
+        (1, 1),
+        (50, 50),
+    ],
+    ids=["small_square", "rectangular", "single_pixel", "large_square"],
+)
+def test_gamma_correct_RGB_img_linear_clut(shape, linear_clut):
+    """Test gamma correction on 3D RGB image arrays with linear_clut (gamma=1.0)."""
+    # Generate a test RGB image array with deterministic seed
+    seed = hash(shape) % (2**32)
+    rng = np.random.default_rng(seed)
+    rgb_img = rng.uniform(0, 1, size=(*shape, 3))
+
+    # Linearize RGB image array using CLUT
+    linearized_img = gamma_correct_RGB(rgb_img, linear_clut)
+
+    # Test output shape
+    assert linearized_img.shape == (*shape, 3)
+
+    # Expected value with gamma=1.0 (identity)
+    expected_img = rgb_img ** (1 / 1.0)
+    assert np.allclose(linearized_img, expected_img)
+
+
+@pytest.mark.parametrize(
+    "shape",
+    [
+        (5, 5),
+        (10, 8),
+        (1, 1),
+        (50, 50),
+    ],
+    ids=["small_square", "rectangular", "single_pixel", "large_square"],
+)
+def test_gamma_correct_RGB_img_nonlinear_clut(shape, nonlinear_clut):
+    """Test gamma correction on 3D RGB image arrays with nonlinear_clut (gamma=2.2)."""
+    # Generate a test RGB image array with deterministic seed
+    seed = hash(shape) % (2**32)
+    rng = np.random.default_rng(seed)
+    rgb_img = rng.uniform(0, 1, size=(*shape, 3))
+
+    # Linearize RGB image array using CLUT
+    linearized_img = gamma_correct_RGB(rgb_img, nonlinear_clut)
+
+    # Test output shape
+    assert linearized_img.shape == (*shape, 3)
+
+    # Expected value with gamma=2.2
+    expected_img = rgb_img ** (1 / DEFAULT_GAMMA)
+
+    # Use relaxed tolerance to account for interpolation error with 256-entry LUT
+    assert np.allclose(linearized_img, expected_img, atol=3e-2)
