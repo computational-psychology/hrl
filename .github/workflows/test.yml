@@ -1,0 +1,34 @@
+name: Test
+
+on: 
+  push:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: ${{ matrix.os}} / py${{ matrix.python_version }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu] # [ubuntu, windows, macos]
+        python_version: ['3.10', '3.11', '3.12', '3.13'] # pygame doesn't build on 3.14 yet...
+    steps:
+        # Checkout the HRL repository
+      - uses: actions/checkout@v6
+
+        # Install uv with python version
+      - name: Install the latest version of uv and set the python version
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python_version }}
+
+      - name: Install dependencies for py==${{ matrix.python_version }}
+        run: uv sync --group test
+
+        # Run testing through pytest for the current version
+        # uv automatically install all required dependencies from pyproject.toml
+      - name: Test, for py==${{ matrix.python_version }}
+        run: uv run pytest tests/

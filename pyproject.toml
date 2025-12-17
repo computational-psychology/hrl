@@ -16,8 +16,9 @@ requires-python = ">=3.8"
 dependencies = ["numpy", "pygame", "pyopengl"]
 
 [dependency-groups]
+test = ["pytest>=8.3.5"]
 docs = ["ipykernel>=6.29.5", "matplotlib>=3.7.5", "pillow>=10.4.0"]
-dev = ["pytest>=8.3.5", "ruff>=0.14.7", { include-group = "docs" }]
+dev = ["ruff>=0.14.7", { include-group = "test" }, { include-group = "docs" }]
 
 [project.scripts]
 hrl-util = "hrl.util:main"
