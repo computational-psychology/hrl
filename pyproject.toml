@@ -48,3 +48,10 @@ namespaces = false # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.setuptools.dynamic]
 version = { attr = "hrl.__version__" }
+
+[tool.pytest]
+markers = [
+    "graphics: mark test as requiring graphics.",
+    "inputs: mark test as requiring input.",
+    "interactive: mark test as interactive.",
+]

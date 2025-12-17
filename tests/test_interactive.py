@@ -1,11 +1,7 @@
-import os
-
 import numpy as np
 import pytest
 
-IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
-if IN_GITHUB_ACTIONS:
-    pytest.skip("Interactive tests, don't work in CI", allow_module_level=True)
+pytestmark = [pytest.mark.graphics, pytest.mark.inputs, pytest.mark.interactive]
 
 
 def test_keyboard():

@@ -1,10 +1,12 @@
 import numpy as np
+import pytest
 
 
 def test_import():
     import hrl
 
 
+@pytest.mark.graphics
 def test_gpu_init():
     from hrl.graphics.gpu import GPU
 
@@ -20,6 +22,7 @@ def test_gpu_init():
     igraphics.flip()
 
 
+@pytest.mark.graphics
 def test_gpu_texture():
     from hrl.graphics.gpu import GPU
 
@@ -39,6 +42,7 @@ def test_gpu_texture():
     igraphics.flip()
 
 
+@pytest.mark.inputs
 def test_keyboard():
     from hrl.inputs.keyboard import Keyboard
 
@@ -47,6 +51,8 @@ def test_keyboard():
     assert btns is None
 
 
+@pytest.mark.graphics
+@pytest.mark.inputs
 def test_hrl_class():
     from hrl import HRL
 
