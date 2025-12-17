@@ -16,8 +16,17 @@ requires-python = ">=3.8"
 dependencies = ["numpy", "pygame", "pyopengl"]
 
 [dependency-groups]
-docs = ["ipykernel>=6.29.5", "matplotlib>=3.7.5", "pillow>=10.4.0"]
-dev = ["pytest>=8.3.5", "ruff>=0.14.7", { include-group = "docs" }]
+test = ["pytest>=8.3.5"]
+docs = [
+    "jupyter-book<2",
+    "jupytext>=1.13.3",
+    "jupyterlab_myst",
+    "sphinxcontrib-mermaid",
+    "ipykernel>=6.29.5",
+    "matplotlib>=3.7.5",
+    "pillow>=10.4.0",
+]
+dev = ["ruff>=0.14.7", { include-group = "test" }, { include-group = "docs" }]
 
 [project.scripts]
 hrl-util = "hrl.util:main"
@@ -39,3 +48,10 @@ namespaces = false # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.setuptools.dynamic]
 version = { attr = "hrl.__version__" }
+
+[tool.pytest]
+markers = [
+    "graphics: mark test as requiring graphics.",
+    "inputs: mark test as requiring input.",
+    "interactive: mark test as interactive.",
+]

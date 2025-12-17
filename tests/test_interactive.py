@@ -1,4 +1,7 @@
 import numpy as np
+import pytest
+
+pytestmark = [pytest.mark.graphics, pytest.mark.inputs, pytest.mark.interactive]
 
 
 def test_keyboard():
