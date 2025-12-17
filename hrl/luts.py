@@ -51,6 +51,40 @@ def gamma_correct_grey(img, LUT):
     return np.interp(img, LUT[:, 0], LUT[:, 1])
 
 
+def gamma_correct_RGB(img, CLUT):
+    """Apply gamma correction to an RGB array using a provided color LUT.
+
+    Parameters
+    ----------
+    img : Array[float]
+        input RGB array with values between [0.0, 1.0].
+        Can be a single RGB triplet (shape: (1, 1, 3)) or an RGB image (shape: (H, W, 3)).
+    CLUT : Array[float]
+        color lookup table with at least shape (N, 4), where the first column is
+        input intensities and the next three columns are the corrected R, G, B values.
+        Can have more columns, which will be ignored.
+
+    Returns
+    -------
+    Array[float]
+        gamma-corrected RGB array with the same shape as input.
+    """
+    # Apply interpolation per channel
+    linearized_RGB = np.array(
+        [
+            np.interp(img[..., channel], CLUT[:, 0], CLUT[:, channel + 1])
+            for channel in range(img.shape[-1])
+        ]
+    )
+
+    # Move channel axis from first to last position
+    # For (1, 1, 3) input: (3, 1, 1) -> (1, 1, 3)
+    # For (H, W, 3) input: (3, H, W) -> (H, W, 3)
+    linearized_RGB = np.moveaxis(linearized_RGB, 0, -1)
+
+    return linearized_RGB
+
+
 def create_lut(
     n=256,
     gamma=1.0,
