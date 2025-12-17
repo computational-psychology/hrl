@@ -85,6 +85,7 @@ def gamma_correct_RGB(img, CLUT):
     return linearized_RGB
 
 
+### (C)LUT Factories ###
 def create_lut(
     n=256,
     gamma=1.0,
@@ -119,3 +120,53 @@ def create_lut(
     lum[0] = dark  # enforce zero row
 
     return np.column_stack([x, out, lum])
+
+
+def create_clut(
+    n=256,
+    gamma=[1.0, 1.0, 1.0],
+    color_matrix=None,
+    dark_chromaticity=None,
+):
+    """Create a parametric CLUT with gamma correction and color conversion.
+
+    Parameters
+    ----------
+    n : int, optional
+        number of entries in the CLUT, by default 256.
+    gamma : [float, float, float], or float, optional
+        gamma exponents for correction, by default [1.0, 1.0, 1.0].
+    color_matrix : Array, optional
+        3x3 color transformation matrix, by default identity (XYZ=RGB).
+    dark_chromaticity : Array, optional
+        3-element vector for dark state chromaticity (XYZ at black), by default zeros (no dark light).
+
+    Returns
+    -------
+    Array
+        with 13 columns [IntensityIn, R, G, B, 9 matrix values]:
+            R=G=B = IntensityIn^(1/gamma)
+            First row's 3x3 matrix represents dark_chromaticity as the black point
+            Last row's 3x3 matrix is color_matrix
+            Intermediate rows linearly interpolate between dark and full color
+    """
+    if dark_chromaticity is None:
+        dark_chromaticity = np.zeros(3)
+    if color_matrix is None:
+        color_matrix = np.eye(3)
+    if isinstance(gamma, (int, float)):
+        gamma = [gamma, gamma, gamma]
+
+    x = np.linspace(0.0, 1.0, n)
+    corrected = [x ** (1 / g) for g in gamma]
+    rgb = np.column_stack(corrected)
+
+    # RGB->XYZ matrices per entry: linearly interpolate from dark to full color
+    # At x=0: dark chromaticity as diagonal (simplified representation)
+    # At x=1: full color_matrix
+    dark_matrix = np.diag(dark_chromaticity)
+    matrices = x[:, None, None] * (color_matrix - dark_matrix) + dark_matrix
+    matrices_flat = matrices.reshape(n, -1)
+
+    # Combine all columns
+    return np.column_stack([x, rgb, matrices_flat])
