@@ -28,11 +28,11 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
   
@@ -399,10 +399,10 @@ You need to install this library in your python environment, for example with <c
 </section>
 <section id="main-script">
 <h2>Main script<a class="headerlink" href="#main-script" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">hrl</span> <span class="kn">import</span> <span class="n">HRL</span>
-<span class="kn">from</span> <span class="nn">text_displays</span> <span class="kn">import</span> <span class="n">display_text</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hrl</span><span class="w"> </span><span class="kn">import</span> <span class="n">HRL</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">text_displays</span><span class="w"> </span><span class="kn">import</span> <span class="n">display_text</span>
 
 <span class="c1"># Define window parameters</span>
 <span class="n">SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>  <span class="c1"># Desired shape of the drawing window (height, width)</span>
@@ -414,7 +414,7 @@ You need to install this library in your python environment, for example with <c
 <span class="c1"># random generator</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
 
-<span class="k">def</span> <span class="nf">show_instructions</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_instructions</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Display instructions to the participant</span>
 
 <span class="sd">    Parameters</span>
@@ -438,7 +438,7 @@ You need to install this library in your python environment, for example with <c
     <span class="k">return</span>
 
 
-<span class="k">def</span> <span class="nf">show_correct</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_correct</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Display message that participant pressed the correct button</span>
 
 <span class="sd">    Parameters</span>
@@ -454,7 +454,7 @@ You need to install this library in your python environment, for example with <c
     <span class="n">display_text</span><span class="p">(</span><span class="n">ihrl</span><span class="o">=</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">lines</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">process_response</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_response</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Process participant&#39;s keypress</span>
 
 <span class="sd">    Parameters</span>
@@ -485,7 +485,7 @@ You need to install this library in your python environment, for example with <c
         <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run adjustment experiment on specified display</span>
 
 <span class="sd">    Parameters</span>
@@ -544,10 +544,10 @@ You need to install this library in your python environment, for example with <c
 </section>
 <section id="module-text-displays-py">
 <h2>Module <code class="docutils literal notranslate"><span class="pre">text-displays.py</span></code><a class="headerlink" href="#module-text-displays-py" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span><span class="p">,</span> <span class="n">ImageFont</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageDraw</span><span class="p">,</span> <span class="n">ImageFont</span>
 
-<span class="k">def</span> <span class="nf">create_text_texture</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">create_text_texture</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> 
                         <span class="n">intensity_text</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                         <span class="n">intensity_background</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                         <span class="n">fontsize</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span>
@@ -617,7 +617,7 @@ You need to install this library in your python environment, for example with <c
     <span class="k">return</span> <span class="n">img</span>
     
     
-<span class="k">def</span> <span class="nf">display_text</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">display_text</span><span class="p">(</span>
     <span class="n">ihrl</span><span class="p">,</span>
     <span class="n">text</span><span class="p">,</span>
     <span class="n">fontsize</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span>
