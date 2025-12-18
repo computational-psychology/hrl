@@ -46,12 +46,12 @@ def test_modes():
     device = VIEWPixx3D()
     try:
         original_mode = device.getVideoMode()
-        if original_mode is 'C24':
+        if original_mode == 'C24':
             device.setVideoMode('M16')
-            assert device.getVideoMode() is 'M16'
+            assert device.getVideoMode() == 'M16'
         else:
             device.setVideoMode('C24')
-            assert device.getVideoMode() is 'C24'
+            assert device.getVideoMode() == 'C24'
     finally:
         device.close()
 
@@ -81,6 +81,7 @@ def test_graphics_init():
         device.close()
 
 
+@pytest.mark.inputs
 def test_keyboard():
     from pypixxlib.viewpixx import VIEWPixx3D
     from hrl.graphics.datapixx import DATAPixx as VIEWPixx
@@ -107,6 +108,7 @@ def test_keyboard():
         device.close()
 
 
+@pytest.mark.inputs
 def test_responsepixx():
     from pypixxlib.viewpixx import VIEWPixx3D
     from hrl.graphics.datapixx import DATAPixx as VIEWPixx
@@ -133,6 +135,7 @@ def test_responsepixx():
         device.close()
 
 
+@pytest.mark.inputs
 def test_hrl():
     from hrl import HRL
 
