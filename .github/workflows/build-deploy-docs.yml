@@ -38,6 +38,9 @@ jobs:
     needs: build-docs
     if: github.ref == 'refs/heads/master'
     steps:
+        # Checkout the HRL repository
+      - uses: actions/checkout@v6
+
         # Download built docs from build job
       - name: Download built docs
         uses: actions/download-artifact@v4
