@@ -1,0 +1,55 @@
+name: Build and Deploy Docs
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    steps:
+        # Checkout the HRL repository
+      - uses: actions/checkout@v6
+
+        # Install uv with python version
+      - name: Install the latest version of uv and set the python version
+        uses: astral-sh/setup-uv@v7
+
+        # Install dependencies for docs
+      - name: Install dependencies for docs
+        run: uv sync --group docs
+
+        # Build the docs using JupyterBook
+      - name: Build docs
+        run: uv run jb build docs/
+
+        # Upload built docs as artifact
+      - name: Upload built docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-html
+          path: docs/_build/html/
+          retention-days: 1
+
+  deploy-docs:
+    runs-on: ubuntu-latest
+    needs: build-docs
+    if: github.ref == 'refs/heads/master'
+    steps:
+        # Download built docs from build job
+      - name: Download built docs
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-html
+          path: docs/_build/html/
+
+        # Deploy only on master branch
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: docs/_build/html
+          clean: true
