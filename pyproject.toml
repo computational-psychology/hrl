@@ -54,4 +54,5 @@ markers = [
     "graphics: mark test as requiring graphics.",
     "inputs: mark test as requiring input.",
     "interactive: mark test as interactive.",
+    "pixx: mark test as requiring DataPixx or ViewPixx hardware.",
 ]

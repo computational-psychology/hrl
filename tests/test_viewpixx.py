@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-pytestmark = [pytest.mark.graphics]
+pytestmark = [pytest.mark.graphics, pytest.mark.pixx]
 
 
 SETUP = {
