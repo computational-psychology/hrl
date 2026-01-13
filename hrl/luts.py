@@ -1,18 +1,27 @@
 """Lookup table (LUT) utilities for gamma correction and luminance mapping.
 
-HRL uses LUTs to perform gamma correction on greyscale images
-and map intensities to luminance values.
+HRL uses LUTs to perform gamma correction on greyscale images,
+mapping input intensities to linearized output intensities.
 This module provides functions to create and apply these LUTs.
 
-The LUTs are structured as 2D NumPy arrays with three columns:
+The grayscale LUTs are structured as 2D NumPy arrays with three columns:
 0: `intensity_in`: Input intensities (ranging between [0.0, 1.0])
 1: `intensity_out`: Gamma-corrected output intensities
 2: `luminance`: Corresponding luminance values
 
-Generally, these LUTs are created through measurement of a display
+For color displays, color LUTs (CLUTs) are used,
+which map input R, G, B intensities to linearized RGB values
+and provide a color transformation matrix for each intensity level.
+These CLUTs are structured as 2D NumPy arrays with thirteen columns:
+0: `intensity_in`: Input intensities (ranging between [0.0, 1.0])
+1-3: `R_out`, `G_out`, `B_out`: Gamma-corrected output RGB values
+4-12: 3x3 color transformation (RGB -> XYZ) matrix values, flattened row-wise:
+    [X_R, X_G, X_B, Y_R, Y_G, Y_B, Z_R, Z_G, Z_B]
+
+Generally, these (C)LUTs are created through measurement of a display
 and linearization of the resulting measurements.
 This can be done using the `hrl-util`, documented elsewhere.
-Here, we do provide a function to create parametric LUTs
+Here, we do provide a function to create parametric (C)LUTs
 based on standard gamma correction formulas
 -- this is useful for testing and simulation, but should not be used
 for real display characterization!
@@ -22,8 +31,12 @@ Functions
 ---------
 gamma_correct_grey(img, LUT)
     Apply gamma correction to a greyscale array using a provided LUT.
+gamma_correct_RGB(img, CLUT)
+    Apply gamma correction to an RGB array using a provided color LUT.
 create_lut(n=256, gamma=1.0, k=1.0, dark=0.0)
     Create a parametric LUT with gamma correction and luminance scaling.
+create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=None)
+    Create a parametric CLUT with gamma correction and color conversion.
 
 """
 
