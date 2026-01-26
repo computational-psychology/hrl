@@ -4,7 +4,7 @@ HRL uses LUTs to perform gamma correction on greyscale images,
 mapping input intensities to linearized output intensities.
 This module provides functions to create and apply these LUTs.
 
-The grayscale LUTs are structured as 2D NumPy arrays with three columns:
+The greyscale LUTs are structured as 2D NumPy arrays with three columns:
 0: `intensity_in`: Input intensities (ranging between [0.0, 1.0])
 1: `intensity_out`: Gamma-corrected output intensities
 2: `luminance`: Corresponding luminance values
@@ -52,7 +52,7 @@ def gamma_correct_grey(img, LUT):
         input greyscale array with values between [0.0, 1.0].
         Can be a scalar, 1D array, or 2D array.
     LUT : Array[float]
-        lookup table with at least shape (N, 2), where the first column is
+        LookUp Table with at least shape (N, 2), where the first column is
         input intensities and the second column is the corrected values.
         Can have more columns, which will be ignored.
 
@@ -73,7 +73,7 @@ def gamma_correct_RGB(img, CLUT):
         input RGB array with values between [0.0, 1.0].
         Can be a single RGB triplet (shape: (1, 1, 3)) or an RGB image (shape: (H, W, 3)).
     CLUT : Array[float]
-        color lookup table with at least shape (N, 4), where the first column is
+        Color LookUp Table with at least shape (N, 4), where the first column is
         input intensities and the next three columns are the corrected R, G, B values.
         Can have more columns, which will be ignored.
 
@@ -121,9 +121,9 @@ def create_lut(
     Returns
     -------
     Array
-        with 3 columns [intensity_in, intensity_in, luminance]:
-            intensity_in = intensity_in^(1/gamma)
-            luminance = k * intensity_in + dark
+        With 3 columns [intensity_in, intensity_out, luminance]:
+            intensity_out = intensity_in^(1/gamma)
+            luminance = k * intensity_in^gamma + dark
     """
     x = np.linspace(0.0, 1.0, n)
 
@@ -147,8 +147,8 @@ def create_clut(
     ----------
     n : int, optional
         number of entries in the CLUT, by default 256.
-    gamma : [float, float, float], or float, optional
-        gamma exponents for correction, by default [1.0, 1.0, 1.0].
+    gamma : [float, float, float] or float, optional
+        gamma exponents for R, G, B correction, by default [1.0, 1.0, 1.0].
     color_matrix : Array, optional
         3x3 color transformation matrix, by default identity (XYZ=RGB).
     dark_chromaticity : Array, optional
@@ -157,8 +157,8 @@ def create_clut(
     Returns
     -------
     Array
-        with 13 columns [IntensityIn, R, G, B, 9 matrix values]:
-            R=G=B = IntensityIn^(1/gamma)
+        with 13 columns [intensity_in, R_out, G_out, B_out, 9 matrix values]:
+            R_out, G_out, B_out = intensity_in^(1/gamma[i]) for each channel
             First row's 3x3 matrix represents dark_chromaticity as the black point
             Last row's 3x3 matrix is color_matrix
             Intermediate rows linearly interpolate between dark and full color
