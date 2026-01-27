@@ -151,13 +151,25 @@ class HRL:
         fs = False
 
         ## Load Graphics Device ##
-        if graphics == "gpu":
-            from .graphics.gpu import GPU
+        if graphics in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
+            from .graphics.gpu import GPU_grey
 
-            self.graphics = GPU(
+            self.graphics = GPU_grey(
                 width=wdth,
                 height=hght,
                 background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
+        elif graphics in ("viewpixx_RGB", "gpu_RGB", "RGB"):
+            from .graphics.gpu import GPU_RGB
+
+            self.graphics = GPU_RGB(
+                width=wdth,
+                height=hght,
+                background=[bg, bg, bg],
                 fullscreen=fs,
                 double_buffer=db,
                 lut=lut,

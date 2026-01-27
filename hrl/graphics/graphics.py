@@ -54,7 +54,7 @@ class Graphics(ABC):
     """
 
     @abstractmethod
-    def greyToChannels(self, gry):
+    def channels_from_img(self, gry):
         """
         Converts a single greyscale value into a 4 colour channel representation
         specific to self (the graphics backend).
@@ -134,23 +134,42 @@ class Graphics(ABC):
         # combined, and is therefore largely irrelevant.
         opengl.glBlendFunc(opengl.GL_SRC_ALPHA, opengl.GL_ONE_MINUS_SRC_ALPHA)
 
-        # Gamma Function Correction
-        self._lut = None
-        self._gammainv = lambda x: x
-        if lut != None:
-            print("..using look-up table: %s" % lut)
-            # TODO: if color, then lut will need to contain data for *each channel*
+        # Enable gamma correction
+        if lut is not None:
+            # Load specified LUT
+            print(f"..using look-up table: {lut}")
             self._lut = np.genfromtxt(lut, skip_header=1)
-            self._gammainv = lambda x: np.interp(x, self._lut[:, 0], self._lut[:, 1])
+        else:  # No LUT provided
+            self._lut = None
+            self._gamma_correct = lambda x: x  # By default, no gamma correction: identity function
 
-        # Here we change the default color
-        self.changeBackground(background)
-        self.flip()
+    def bytestring_from_channels(self, R, G, B, Alpha):
+        """Convert 4-channel, 8-bit integer representation to single-channel 32-bit bytestring
+
+        Parameters
+        ----------
+        R, G, B, Alpha : Array[uint8]
+            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
+
+        Returns
+        -------
+        bytes
+            Single-channel 32-bit bytestring representation
+        """
+        # Define bit shifts for each channel
+        r = 2**0
+        g = 2 ** (self.bitdepth)
+        b = 2 ** (self.bitdepth * 2)
+        alpha = 2 ** (self.bitdepth * 3)
+
+        # Combine channels into single 32-bit integer representation
+        bitint = (R * r) + (G * g) + (B * b) + (Alpha * alpha)
+        return bitint.tobytes()
 
     def gamma_correct(self, img):
-        return self._gammainv(img)
+        return img
 
-    def newTexture(self, grys0, shape="square"):
+    def newTexture(self, arr0, shape="square"):
         """
         Given a numpy array of values between 0 and 1, returns a new
         Texture object. The texture object comes equipped with the draw
@@ -162,7 +181,7 @@ class Graphics(ABC):
 
         Parameters
         ----------
-        grys : The greyscale numpy array
+        arr0  : The (greyscale or color) numpy array
         shape : The shape to 'cut out' of the given greyscale array. A square
             will render the entire array. Available: 'square', 'circle'
             Default: 'square'
@@ -171,24 +190,11 @@ class Graphics(ABC):
         -------
         Texture object
         """
-        # TODO: check that this occurs also for color arrays
-        grys = np.flipud(grys0)  # flipping up-down necessary
-        
-        # TODO: if color mode, then do gamma correct on each channel
-        grys = self.gamma_correct(grys)
-        
-        # TODO: if 16bit resolution mode:
-        byts = channelsToInt(self.greyToChannels(grys[::-1,])).tobytes()
-        
-        # TODO: else:   pass though of array x 3 as ints, to bytes
-        # byts = channelstoInt(grys[::-1,]).tobytes()
-        
-        wdth = len(grys[0])
-        hght = len(grys[:, 0])
+        arr = self.gamma_correct(arr0)
 
-        return Texture(byts, wdth, hght, shape)
+        byts = self.bytestring_from_channels(*self.channels_from_img(arr))
 
-        return Texture(byts, width, height, shape)
+        return Texture(byts, arr0.shape[1], arr0.shape[0], shape)
 
     def flip(self, clr=True):
         """
@@ -208,7 +214,7 @@ class Graphics(ABC):
         if clr:
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
-    def changeBackground(self, intensity_background):
+    def changeBackground(self, background):
         """Change current background grey value.
 
         Parameters
@@ -216,12 +222,19 @@ class Graphics(ABC):
         intensity_background : float
             new grey value for background, between 0.0 and 1.0
         """
-        maximum = float(2**8 - 1)
-        (r, g, b, a) = self.greyToChannels(self._gammainv(intensity_background))
+        maximum = float(2**self.bitdepth - 1)
+
+        # Gamma correct input value(s)
+        bg = self.gamma_correct(background)
+
+        # Convert to channel representation
+        (r, g, b, a) = self.channels_from_img(bg)
+
+        # Set as OpenGL background
         opengl.glClearColor(r / maximum, g / maximum, b / maximum, a / maximum)
         opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
-        self.background = intensity_background
+        self.background = background
 
 
 def channelsToInt(t):
