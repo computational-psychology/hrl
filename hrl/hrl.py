@@ -163,7 +163,7 @@ class HRL:
                 lut=lut,
                 mouse=mouse,
             )
-        elif graphics in ("viewpixx_RGB", "gpu_RGB", "RGB"):
+        elif graphics in ("gpu_RGB", "RGB"):
             from .graphics.gpu import GPU_RGB
 
             self.graphics = GPU_RGB(
@@ -176,13 +176,38 @@ class HRL:
                 mouse=mouse,
             )
 
-        elif graphics == "datapixx" or graphics == "viewpixx":
+        elif graphics == "datapixx":
             from .graphics.datapixx import DATAPixx
 
             self.graphics = DATAPixx(
                 width=wdth,
                 height=hght,
                 background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
+        elif graphics in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
+            from .graphics.viewpixx import VIEWPixx_grey
+
+            self.graphics = VIEWPixx_grey(
+                width=wdth,
+                height=hght,
+                background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
+
+        elif graphics in ("viewpixx_RGB", "viewpixx_color", "viewpixx_colour"):
+            from .graphics.viewpixx import VIEWPixx_RGB
+
+            self.graphics = VIEWPixx_RGB(
+                width=wdth,
+                height=hght,
+                background=[bg, bg, bg],
                 fullscreen=fs,
                 double_buffer=db,
                 lut=lut,
