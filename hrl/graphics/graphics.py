@@ -82,6 +82,9 @@ class Graphics(ABC):
         current background value(s)
     bitdepth : int
         bit depth per physical channel (set by subclasses)
+    device : object or None
+        hardware device connection (e.g., pypixxlib instance) for devices
+        requiring external hardware communication. None for standard GPUs.
 
     Notes
     -----
@@ -156,6 +159,10 @@ class Graphics(ABC):
         self.screen = pygame.display.set_mode((width, height), dbit, vsync=1)
         self.width = width
         self.height = height
+
+        # Hardware device connection (None for GPU, set by *Pixx subclasses)
+        if not hasattr(self, "device"):
+            self.device = None
 
         # Hide mouse cursor
         if not mouse:
