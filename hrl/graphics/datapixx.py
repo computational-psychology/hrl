@@ -10,11 +10,29 @@ from .graphics import Graphics
 
 
 class DATAPixx(Graphics):
-    """Graphics interface for 6-bit high-resolution greyscale for DataPixx/ViewPixx DACs"""
+    """Graphics interface for 6-bit high-resolution greyscale for DataPixx devices"""
 
     bitdepth = 8  # bit depth per physical channel
+    device = None
 
     def __init__(self, *args, **kwargs):
+        # Open hardware connection
+        from pypixxlib.datapixx import DATAPixx as device
+
+        self.device = device()
+
+        # Set video mode to M16: concatente R & G channels for 16-bit greyscale
+        mode = self.device.getVideoMode()
+        print(f"Current video mode: {mode}")
+
+        if mode != "M16":
+            print("Setting video mode to M16...")
+            self.device.setVideoMode("M16")
+            self.device.updateRegisterCache()
+            mode = self.device.getVideoMode()
+            print(f"Video mode now: {mode}")
+
+        # Call parent initializer
         super().__init__(*args, **kwargs)
 
         # Enable gamma correction
@@ -25,6 +43,10 @@ class DATAPixx(Graphics):
         # Here we change the default color
         self.changeBackground(np.array(kwargs.get("background", 0.5)))
         self.flip()
+
+    def close(self):
+        """Close connection to DataPixx device"""
+        self.device.close()
 
     def channels_from_img(self, img):
         """Convert greyscale image in [0.0, 1.0] to 4-channel, 8-bit integer representation

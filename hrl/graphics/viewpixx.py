@@ -13,8 +13,26 @@ class VIEWPixx_grey(Graphics):
     """Graphics interface for 6-bit high-resolution greyscale for ViewPixx devices"""
 
     bitdepth = 8  # bit depth per physical channel
+    device = None
 
     def __init__(self, *args, **kwargs):
+        # Open hardware connection
+        from pypixxlib.viewpixx import VIEWPixx3D as device
+
+        self.device = device()
+
+        # Set video mode to M16: concatente R & G channels for 16-bit greyscale
+        mode = self.device.getVideoMode()
+        print(f"Current video mode: {mode}")
+
+        if mode != "M16":
+            print("Setting video mode to M16...")
+            self.device.setVideoMode("M16")
+            self.device.updateRegisterCache()
+            mode = self.device.getVideoMode()
+            print(f"Video mode now: {mode}")
+
+        # Call parent initializer
         super().__init__(*args, **kwargs)
 
         # Enable gamma correction
@@ -66,6 +84,23 @@ class VIEWPixx_RGB(Graphics):
     bitdepth = 8  # bit depth per physical channel
 
     def __init__(self, *args, **kwargs):
+        # Open hardware connection
+        from pypixxlib.viewpixx import VIEWPixx3D as device
+
+        self.device = device()
+
+        # Set video mode to C24: regular 8-bit per channel RGB
+        mode = self.device.getVideoMode()
+        print(f"Current video mode: {mode}")
+
+        if mode != "C24":
+            print("Setting video mode to C24...")
+            self.device.setVideoMode("C24")
+            self.device.updateRegisterCache()
+            mode = self.device.getVideoMode()
+            print(f"Video mode now: {mode}")
+
+        # Call parent initializer
         super().__init__(*args, **kwargs)
 
         # Enable gamma correction
