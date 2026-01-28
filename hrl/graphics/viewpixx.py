@@ -1,15 +1,9 @@
-from functools import partial
-
 import numpy as np
 
-from hrl.luts import gamma_correct_grey, gamma_correct_RGB
-
-from .graphics import Graphics
-
-## Class ##
+from .graphics import Graphics_grey, Graphics_RGB
 
 
-class VIEWPixx_grey(Graphics):
+class VIEWPixx_grey(Graphics_grey):
     """VPixx ViewPixx 3D in M16 mode for 16-bit greyscale resolution.
 
     Uses M16 video mode which concatenates the R and G channels to achieve
@@ -55,15 +49,6 @@ class VIEWPixx_grey(Graphics):
         # Call parent initializer
         super().__init__(*args, **kwargs)
 
-        # Enable gamma correction
-        if self._lut is not None:
-            # TODO: validate LUT shape
-            self.gamma_correct = partial(gamma_correct_grey, LUT=self._lut)
-
-        # Here we change the default color
-        self.changeBackground(np.array(kwargs.get("background", 0.5)))
-        self.flip()
-
     def channels_from_img(self, img):
         """Convert greyscale image to 16-bit R-G concatenated representation.
 
@@ -85,7 +70,6 @@ class VIEWPixx_grey(Graphics):
             - B = 0 (unused)
             - Alpha = 255
         """
-        assert img.ndim <= 2, "Input image must be single-channel HxW array"
 
         # Discretize to 16-bit integers, single channel
         arr = img * (2 ** (2 * self.bitdepth) - 1)
@@ -102,7 +86,7 @@ class VIEWPixx_grey(Graphics):
         return channels
 
 
-class VIEWPixx_RGB(Graphics):
+class VIEWPixx_RGB(Graphics_RGB):
     """VPixx ViewPixx 3D in C24 mode for RGB color display.
 
     Uses C24 video mode which provides standard 8-bit per channel RGB output
@@ -145,15 +129,6 @@ class VIEWPixx_RGB(Graphics):
         # Call parent initializer
         super().__init__(*args, **kwargs)
 
-        # Enable gamma correction
-        if self._lut is not None:
-            # TODO: validate LUT shape
-            self.gamma_correct = partial(gamma_correct_RGB, CLUT=self._lut)
-
-        # Set the background color
-        self.changeBackground(np.array(kwargs.get("background", [0.5, 0.5, 0.5])).reshape(1, 1, 3))
-        self.flip()
-
     def channels_from_img(self, img):
         """Convert RGB image to 4-channel RGBA representation.
 
@@ -171,8 +146,6 @@ class VIEWPixx_RGB(Graphics):
             4-channel representation as (R, G, B, Alpha) with separate
             8-bit arrays for each color channel and Alpha=255
         """
-
-        assert img.ndim == 3 and img.shape[2] == 3, "Input image must be 3-channel HxWx3 array"
 
         # Discretize to 8-bit integers, single channel
         arr = img * (2**self.bitdepth - 1)

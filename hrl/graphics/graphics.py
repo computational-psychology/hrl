@@ -10,6 +10,14 @@ Graphics (ABC)
     Base abstract class defining common OpenGL initialization and texture
     creation pipeline.
 
+Graphics_grey
+    Intermediate abstract class for all greyscale display devices.
+    Handles greyscale-specific gamma correction and calibration.
+
+Graphics_RGB
+    Intermediate abstract class for all RGB display devices.
+    Handles RGB-specific gamma correction and color calibration.
+
 Device Classes
 --------------
 GPU_grey, GPU_RGB
@@ -48,12 +56,14 @@ a draw() method for rendering to the display.
 """
 
 from abc import ABC, abstractmethod
+from functools import partial
 
 import numpy as np
 import OpenGL.GL as opengl
 import pygame
 
 from hrl.graphics.texture import Texture, deleteTexture, deleteTextureDL
+from hrl.luts import gamma_correct_grey, gamma_correct_RGB
 
 
 class Graphics(ABC):
@@ -306,3 +316,245 @@ class Graphics(ABC):
         opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
         self.background = background
+
+
+class Graphics_grey(Graphics):
+    """Intermediate abstract class for greyscale display devices.
+
+    Extends the base Graphics class with greyscale-specific functionality
+    including gamma correction setup, scalar background handling, and input
+    validation for 2D arrays.
+
+    This intermediate layer shares common greyscale logic across all greyscale
+    devices (GPU_grey, DATAPixx, VIEWPixx_grey), allowing device-specific
+    subclasses to focus only on channel encoding.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (set by subclasses)
+    device : object or None
+        hardware device connection (set by subclasses requiring hardware)
+
+    Notes
+    -----
+    Do not instantiate directly. Use concrete subclasses: GPU_grey, DATAPixx,
+    or VIEWPixx_grey.
+
+    Subclasses must implement:
+    - channels_from_img(img): device-specific greyscale to RGBA conversion
+
+    See Also
+    --------
+    Graphics_RGB : intermediate class for RGB devices
+    GPU_grey : standard 8-bit greyscale GPU implementation
+    DATAPixx : 16-bit greyscale DataPixx implementation
+    VIEWPixx_grey : 16-bit greyscale ViewPixx implementation
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize greyscale graphics device.
+
+        Parameters
+        ----------
+        width : int
+            window width in pixels
+        height : int
+            window height in pixels
+        background : float
+            background intensity in [0.0, 1.0]
+        fullscreen : bool, optional
+            enable fullscreen display mode, by default False
+        double_buffer : bool, optional
+            enable double buffering for smooth rendering, by default True
+        lut : str, optional
+            path to LookUp Table (LUT) file with columns:
+            [intensity_in, intensity_out, luminance (optional)],
+            by default None
+        mouse : bool, optional
+            show mouse cursor, by default False
+        """
+        # Call parent Graphics.__init__
+        super().__init__(*args, **kwargs)
+
+        # Setup gamma correction for greyscale
+        if self._lut is not None:
+            self.gamma_correct = partial(gamma_correct_grey, LUT=self._lut)
+
+        # Set initial background (scalar value)
+        bg = kwargs.get("background", 0.5)
+        self.changeBackground(bg)
+        self.flip()
+
+    def newTexture(self, arr0, shape="square"):
+        """Create texture from greyscale array.
+
+        Validates input as 2D array, then delegates to parent newTexture
+        which applies gamma correction and channel encoding.
+
+        Parameters
+        ----------
+        arr0 : ndarray
+            greyscale intensity values in [0.0, 1.0] with shape (H, W)
+        shape : {'square', 'circle'}, optional
+            shape mask to apply to texture, by default 'square'.
+            'circle' creates a circular aperture.
+
+        Returns
+        -------
+        Texture
+            texture object with draw() method for rendering
+
+        Raises
+        ------
+        ValueError
+            if input array has more than 2 dimensions
+        """
+        # Input validation
+        arr0 = np.asarray(arr0)
+        if arr0.ndim > 2:
+            raise ValueError(f"Greyscale input must be 2D or less, got shape {arr0.shape}")
+
+        # Call parent newTexture (which applies gamma correction)
+        return super().newTexture(arr0, shape)
+
+    def changeBackground(self, intensity_background):
+        """Change background intensity.
+
+        Parameters
+        ----------
+        intensity_background : float
+            background intensity in [0.0, 1.0]
+        """
+        # Convert scalar to single-channel array
+        if isinstance(intensity_background, (int, float)):
+            intensity_background = np.array([intensity_background]).reshape(1, 1)
+
+        # Call parent changeBackground
+        super().changeBackground(intensity_background)
+
+
+class Graphics_RGB(Graphics):
+    """Intermediate abstract class for RGB display devices.
+
+    Extends the base Graphics class with RGB-specific functionality including
+    gamma correction setup, RGB/scalar background handling, and input validation
+    for (H, W, 3) arrays.
+
+    This intermediate layer shares common RGB logic across all RGB devices
+    (GPU_RGB, VIEWPixx_RGB), allowing device-specific subclasses to focus only
+    on channel encoding.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (set by subclasses)
+    device : object or None
+        hardware device connection (set by subclasses requiring hardware)
+
+    Notes
+    -----
+    Do not instantiate directly. Use concrete subclasses: GPU_RGB or
+    VIEWPixx_RGB.
+
+    Subclasses must implement:
+    - channels_from_img(img): device-specific RGB to RGBA conversion
+
+    See Also
+    --------
+    Graphics_grey : intermediate class for greyscale devices
+    GPU_RGB : standard 8-bit RGB GPU implementation
+    VIEWPixx_RGB : 8-bit RGB ViewPixx implementation
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize RGB graphics device.
+
+        Parameters
+        ----------
+        width : int
+            window width in pixels
+        height : int
+            window height in pixels
+        background : float or array-like
+            background as grey value in [0.0, 1.0] or (r, g, b) tuple/array
+        fullscreen : bool, optional
+            enable fullscreen display mode, by default False
+        double_buffer : bool, optional
+            enable double buffering for smooth rendering, by default True
+        lut : str, optional
+            path to Color LookUp Table (CLUT) file with columns:
+            [intensity_in, R_out, G_out, B_out, ...],
+            by default None
+        mouse : bool, optional
+            show mouse cursor, by default False
+        """
+        # Call parent Graphics.__init__
+        super().__init__(*args, **kwargs)
+
+        # Setup gamma correction for RGB
+        if self._lut is not None:
+            self.gamma_correct = partial(gamma_correct_RGB, CLUT=self._lut)
+
+        # Set initial background (use changeBackground which handles scalar/RGB conversion)
+        background = kwargs.get("background", 0.5)
+        self.changeBackground(background)
+        self.flip()
+
+    def newTexture(self, arr0, shape="square"):
+        """Create texture from RGB array.
+
+        Validates input as (H, W, 3) array, then delegates to parent newTexture
+        which applies gamma correction and channel encoding.
+
+        Parameters
+        ----------
+        arr0 : ndarray
+            RGB values in [0.0, 1.0] with shape (H, W, 3)
+        shape : {'square', 'circle'}, optional
+            shape mask to apply to texture, by default 'square'.
+            'circle' creates a circular aperture.
+
+        Returns
+        -------
+        Texture
+            texture object with draw() method for rendering
+
+        Raises
+        ------
+        ValueError
+            if input array does not have shape (H, W, 3)
+        """
+        # Input validation
+        arr0 = np.asarray(arr0)
+        if arr0.ndim != 3 or arr0.shape[2] != 3:
+            raise ValueError(f"RGB input must be (H, W, 3), got shape {arr0.shape}")
+
+        # Call parent newTexture (which applies gamma correction)
+        return super().newTexture(arr0, shape)
+
+    def changeBackground(self, background):
+        """Change background color.
+
+        Accepts scalar (grey) or RGB values, converts to proper array format,
+        then delegates to parent changeBackground.
+
+        Parameters
+        ----------
+        background : float, tuple, or ndarray
+            background color specification:
+            - float: grey value in [0.0, 1.0] applied equally to R, G, B
+            - tuple/array: (r, g, b) values each in [0.0, 1.0]
+        """
+        # Convert scalar to RGB array
+        if isinstance(background, (int, float)):
+            background = np.array([background, background, background])
+        elif not isinstance(background, np.ndarray):
+            background = np.array(background)
+
+        # Ensure proper shape
+        if background.shape != (1, 1, 3):
+            background = background.reshape(1, 1, 3)
+
+        # Call parent changeBackground
+        super().changeBackground(background)

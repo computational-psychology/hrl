@@ -1,15 +1,9 @@
-from functools import partial
-
 import numpy as np
 
-from hrl.luts import gamma_correct_grey
-
-from .graphics import Graphics
-
-## Class ##
+from .graphics import Graphics_grey
 
 
-class DATAPixx(Graphics):
+class DATAPixx(Graphics_grey):
     """VPixx DataPixx in M16 mode for 16-bit greyscale resolution.
 
     Uses M16 video mode which concatenates the R and G channels to achieve
@@ -55,15 +49,6 @@ class DATAPixx(Graphics):
         # Call parent initializer
         super().__init__(*args, **kwargs)
 
-        # Enable gamma correction
-        if self._lut is not None:
-            # TODO: validate LUT shape
-            self.gamma_correct = partial(gamma_correct_grey, LUT=self._lut)
-
-        # Here we change the default color
-        self.changeBackground(np.array(kwargs.get("background", 0.5)))
-        self.flip()
-
     def close(self):
         """Close connection to DataPixx hardware device.
 
@@ -93,7 +78,6 @@ class DATAPixx(Graphics):
             - B = 0 (unused)
             - Alpha = 255
         """
-        assert img.ndim <= 2, "Input image must be single-channel HxW array"
 
         # Discretize to 16-bit integers, single channel
         arr = img * (2 ** (2 * self.bitdepth) - 1)
