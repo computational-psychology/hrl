@@ -10,7 +10,27 @@ from .graphics import Graphics
 
 
 class VIEWPixx_grey(Graphics):
-    """Graphics interface for 6-bit high-resolution greyscale for ViewPixx devices"""
+    """VPixx ViewPixx 3D in M16 mode for 16-bit greyscale resolution.
+
+    Uses M16 video mode which concatenates the R and G channels to achieve
+    16-bit (65536 level) greyscale resolution. This enables high-precision
+    luminance control for psychophysics experiments.
+
+    The device connection is established automatically during initialization.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (8, but combined to 16-bit)
+    device : VIEWPixx3D
+        pypixxlib device instance for hardware communication
+
+    See Also
+    --------
+    VIEWPixx_RGB : RGB mode for ViewPixx hardware
+    DATAPixx : 16-bit greyscale for DataPixx hardware
+    GPU_grey : standard 8-bit greyscale
+    """
 
     bitdepth = 8  # bit depth per physical channel
     device = None
@@ -45,21 +65,25 @@ class VIEWPixx_grey(Graphics):
         self.flip()
 
     def channels_from_img(self, img):
-        """Convert greyscale image in [0.0, 1.0] to 4-channel, 8-bit integer representation
+        """Convert greyscale image to 16-bit R-G concatenated representation.
 
-        The four channel representation concatenates two 8-bit channels (R & G)
-        to form a 16-bit resolution, single-channel image.
-        This is the format required by the DataPixx DAC for high bit-depth greyscale output.
+        Encodes greyscale values by concatenating two 8-bit channels (R and G)
+        to form a 16-bit (65536 level) resolution. This is the format required
+        by ViewPixx M16 video mode for high-precision greyscale output.
 
         Parameters
         ----------
-        img : Array[float]
-            Input greyscale image with values in [0.0, 1.0]
+        img : ndarray
+            input greyscale image with values in [0.0, 1.0] and shape (H, W)
 
         Returns
         -------
-        Tuple[Array[uint8]]
-            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
+        tuple of (ndarray, ndarray, int, int)
+            4-channel representation as (R, G, B, Alpha) where:
+            - R = high byte (bits 8-15)
+            - G = low byte (bits 0-7)
+            - B = 0 (unused)
+            - Alpha = 255
         """
         assert img.ndim <= 2, "Input image must be single-channel HxW array"
 
@@ -79,7 +103,25 @@ class VIEWPixx_grey(Graphics):
 
 
 class VIEWPixx_RGB(Graphics):
-    """Graphics interface for 8-bit per channel RGB representation on ViewPixx devices"""
+    """VPixx ViewPixx 3D in C24 mode for RGB color display.
+
+    Uses C24 video mode which provides standard 8-bit per channel RGB output
+    with 256 levels per color channel.
+
+    The device connection is established automatically during initialization.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (8)
+    device : VIEWPixx3D
+        pypixxlib device instance for hardware communication
+
+    See Also
+    --------
+    VIEWPixx_grey : greyscale mode for ViewPixx hardware
+    GPU_RGB : RGB mode for standard GPUs
+    """
 
     bitdepth = 8  # bit depth per physical channel
 
@@ -113,22 +155,21 @@ class VIEWPixx_RGB(Graphics):
         self.flip()
 
     def channels_from_img(self, img):
-        """Converts an HxWx3 RGB image in [0.0, 1.0] to 4-channel, 8-bit integer representation
+        """Convert RGB image to 4-channel RGBA representation.
 
-        The 32 bit channel representation is simply the 8-bit integer discretization
-        for each of the R, G, and B channels,
-        with the alpha channel set to the max int.
+        Encodes each R, G, B channel independently with 8-bit resolution,
+        with alpha channel at maximum.
 
         Parameters
         ----------
-        img : Array[float]
-            Input RGB image with values in [0.0, 1.0]
+        img : ndarray
+            input RGB image with values in [0.0, 1.0] and shape (H, W, 3)
 
         Returns
         -------
-        Tuple[Array[uint8]]
-            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
-
+        tuple of (ndarray, ndarray, ndarray, int)
+            4-channel representation as (R, G, B, Alpha) with separate
+            8-bit arrays for each color channel and Alpha=255
         """
 
         assert img.ndim == 3 and img.shape[2] == 3, "Input image must be 3-channel HxWx3 array"

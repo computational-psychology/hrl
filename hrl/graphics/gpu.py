@@ -10,7 +10,22 @@ from .graphics import Graphics
 
 
 class GPU_grey(Graphics):
-    """Graphics interface for 1-channel, 8-bit greyscale representation on standard GPUs"""
+    """Standard GPU in greyscale mode with 8-bit per channel resolution.
+
+    Encodes greyscale values by duplicating them across R, G, B channels,
+    providing standard 8-bit (256 level) intensity resolution.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (8)
+
+    See Also
+    --------
+    GPU_RGB : RGB mode for standard GPUs
+    DATAPixx : 16-bit greyscale for VPixx DataPixx hardware
+    VIEWPixx_grey : 16-bit greyscale for VPixx ViewPixx hardware
+    """
 
     bitdepth = 8  # bit depth per physical channel
 
@@ -27,22 +42,21 @@ class GPU_grey(Graphics):
         self.flip()
 
     def channels_from_img(self, img):
-        """Convert greyscale image in [0.0, 1.0] to 4-channel, 8-bit integer representation
+        """Convert greyscale image to 4-channel RGBA representation.
 
-        The 32 bit channel representation is simply an 8-bit integer n
-        equal across the red, green, and blue channels,
-        with the alpha channel set to the max int.
+        Encodes greyscale values by setting R = G = B = intensity, with
+        alpha channel at maximum. Provides 8-bit (256 level) resolution.
 
         Parameters
         ----------
-        img : Array[float]
-            Input greyscale image with values in [0.0, 1.0]
+        img : ndarray
+            input greyscale image with values in [0.0, 1.0] and shape (H, W)
 
         Returns
         -------
-        Tuple[Array[uint8]]
-            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
-
+        tuple of (ndarray, ndarray, ndarray, int)
+            4-channel representation as (R, G, B, Alpha) where R=G=B=intensity
+            and Alpha=255
         """
         assert img.ndim <= 2, "Input image must be single-channel HxW array"
 
@@ -62,7 +76,21 @@ class GPU_grey(Graphics):
 
 
 class GPU_RGB(Graphics):
-    """Graphics interface for standard 3-channel, 8-bit RGB representation on standard GPUs"""
+    """Standard GPU in RGB mode with 8-bit per channel resolution.
+
+    Provides standard 3-channel RGB output with 8-bit (256 level) resolution
+    per color channel.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (8)
+
+    See Also
+    --------
+    GPU_grey : greyscale mode for standard GPUs
+    VIEWPixx_RGB : RGB mode for VPixx ViewPixx hardware
+    """
 
     bitdepth = 8  # bit depth per channel
 
@@ -79,22 +107,21 @@ class GPU_RGB(Graphics):
         self.flip()
 
     def channels_from_img(self, img):
-        """Converts an HxWx3 RGB image in [0.0, 1.0] to 4-channel, 8-bit integer representation
+        """Convert RGB image to 4-channel RGBA representation.
 
-        The 32 bit channel representation is simply the 8-bit integer discretization
-        for each of the R, G, and B channels,
-        with the alpha channel set to the max int.
+        Encodes each R, G, B channel independently with 8-bit resolution,
+        with alpha channel at maximum.
 
         Parameters
         ----------
-        img : Array[float]
-            Input RGB image with values in [0.0, 1.0]
+        img : ndarray
+            input RGB image with values in [0.0, 1.0] and shape (H, W, 3)
 
         Returns
         -------
-        Tuple[Array[uint8]]
-            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
-
+        tuple of (ndarray, ndarray, ndarray, int)
+            4-channel representation as (R, G, B, Alpha) with separate
+            8-bit arrays for each color channel and Alpha=255
         """
 
         assert img.ndim == 3 and img.shape[2] == 3, "Input image must be 3-channel HxWx3 array"

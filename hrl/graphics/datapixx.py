@@ -10,7 +10,27 @@ from .graphics import Graphics
 
 
 class DATAPixx(Graphics):
-    """Graphics interface for 6-bit high-resolution greyscale for DataPixx devices"""
+    """VPixx DataPixx in M16 mode for 16-bit greyscale resolution.
+
+    Uses M16 video mode which concatenates the R and G channels to achieve
+    16-bit (65536 level) greyscale resolution. This enables high-precision
+    luminance control for psychophysics experiments.
+
+    The device connection is established automatically during initialization
+    and closed via the close() method.
+
+    Attributes
+    ----------
+    bitdepth : int
+        bit depth per physical channel (8, but combined to 16-bit)
+    device : DATAPixx
+        pypixxlib device instance for hardware communication
+
+    See Also
+    --------
+    GPU_grey : standard 8-bit greyscale
+    VIEWPixx_grey : 16-bit greyscale for VPixx ViewPixx hardware
+    """
 
     bitdepth = 8  # bit depth per physical channel
     device = None
@@ -45,25 +65,33 @@ class DATAPixx(Graphics):
         self.flip()
 
     def close(self):
-        """Close connection to DataPixx device"""
+        """Close connection to DataPixx hardware device.
+
+        Should be called when finished with the device to properly release
+        hardware resources.
+        """
         self.device.close()
 
     def channels_from_img(self, img):
-        """Convert greyscale image in [0.0, 1.0] to 4-channel, 8-bit integer representation
+        """Convert greyscale image to 16-bit R-G concatenated representation.
 
-        The four channel representation concatenates two 8-bit channels (R & G)
-        to form a 16-bit resolution, single-channel image.
-        This is the format required by the DataPixx DAC for high bit-depth greyscale output.
+        Encodes greyscale values by concatenating two 8-bit channels (R and G)
+        to form a 16-bit (65536 level) resolution. This is the format required
+        by DataPixx M16 video mode for high-precision greyscale output.
 
         Parameters
         ----------
-        img : Array[float]
-            Input greyscale image with values in [0.0, 1.0]
+        img : ndarray
+            input greyscale image with values in [0.0, 1.0] and shape (H, W)
 
         Returns
         -------
-        Tuple[Array[uint8]]
-            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
+        tuple of (ndarray, ndarray, int, int)
+            4-channel representation as (R, G, B, Alpha) where:
+            - R = high byte (bits 8-15)
+            - G = low byte (bits 0-7)
+            - B = 0 (unused)
+            - Alpha = 255
         """
         assert img.ndim <= 2, "Input image must be single-channel HxW array"
 

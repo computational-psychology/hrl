@@ -1,39 +1,50 @@
-"""
-This is the HRL submodule for handling graphics devices and OpenGL. Graphics
-devices in HRL instantiate the 'Graphics' abstract class, which defines the
-common functions required for displaying greyscale images.
+"""Graphics device interfaces for HRL psychophysics displays.
 
-Image presentation in HRL can be understood as a multi step process as follows:
+This module provides abstract and concrete classes for interfacing with various
+display hardware devices through OpenGL. The class hierarchy is organized by
+display mode (greyscale vs. RGB) and device type (GPU, DataPixx, ViewPixx).
 
-    Bitmap (The image written in an 8 bit, 4 channel format)
-    -> Greyscale Array (A numpy array of doubles between 0 and 1)
-    -> Processed Greyscale Array (A Gresycale Array remapped with a lookup table)
-    -> Display List (An index to a stored texture in graphical memory)
-    -> Texture (A python class instance which can be drawn)
+Class Hierarchy
+---------------
+Graphics (ABC)
+    Base abstract class defining common OpenGL initialization and texture
+    creation pipeline.
 
-i) The conversion of Bitmaps to Greyscale arrays is handled by functions in
-'hrl.extra' Where possible, it is recommended to bypass this step and work
-directly with numpy arrays.
+Device Classes
+--------------
+GPU_grey, GPU_RGB
+    Standard GPU displays with 8-bit per channel resolution.
 
-ii) The conversion of Greyscale Arrays to Processed Greyscale Arrays is handled by
-the base 'hrl' class, and consists primarily of gamma correction and contrast
-range selection.
+DATAPixx
+    VPixx DataPixx device in M16 mode for 16-bit greyscale (R-G concatenation).
 
-iii) Saving a Processed Greyscale Array into graphics memory and interacting
-with it as a Texture object is handled in this module.
+VIEWPixx_grey, VIEWPixx_RGB
+    VPixx ViewPixx 3D device in M16 mode (greyscale) or C24 mode (RGB).
 
-The 'Texture' class is a wrapper for certain OpenGL functions designed to
-simplify the display of individual 2d images.  The sole method of the Texture
-class is 'draw'.
+Image Processing Pipeline
+--------------------------
+The image presentation pipeline consists of:
 
-Texture objects are not meant to be created on their own, but are instead
-created via the 'newTexture' method of Graphics. Graphics.newTexture will take
-a given Processed Greyscale Array (with other optional arguments as well), and
-return it as Texture object designed to be shown on the particular Graphics
-object.
+1. Input array: numpy array with values in [0.0, 1.0]
+   - Greyscale: shape (H, W)
+   - RGB: shape (H, W, 3)
 
-The openGL code was based largely on a great tutorial by a mysterious tutor
-here: http://disruption.ca/gutil/introduction.html
+2. Gamma correction: optional LookUp Table (LUT) or Color LookUp Table (CLUT)
+   application for linearization
+
+3. Channel encoding: conversion to device-specific RGBA representation
+   - GPU: 8-bit per channel
+   - DataPixx/ViewPixx M16: 16-bit via R-G concatenation
+
+4. Texture creation: OpenGL texture object ready for display
+
+Notes
+-----
+The coordinate system follows matrix conventions: origin at top-left,
+increasing rightward and downward. This matches numpy array indexing.
+
+Texture objects are created via Graphics.newTexture() and come equipped with
+a draw() method for rendering to the display.
 """
 
 from abc import ABC, abstractmethod
@@ -46,26 +57,58 @@ from hrl.graphics.texture import Texture, deleteTexture, deleteTextureDL
 
 
 class Graphics(ABC):
-    """
-    The Graphics abstract base class. New graphics hardware must instantiate
-    this class. The key method is 'greyToChannels', which defines how to
-    represent a greyscale value between 0 and 1 as a 4-tuple (r,g,b,a), so that
-    the given grey value is correctly on the Graphics backend.
+    """Abstract base class for all graphics display devices.
+
+    Provides common OpenGL initialization, window management, and texture
+    creation pipeline. Subclasses must implement device-specific channel
+    encoding via the channels_from_img() method.
+
+    This class handles:
+    - OpenGL context and window initialization
+    - Display buffer management (flip, clear)
+    - LookUp Table (LUT) loading for gamma correction
+    - Texture object creation from numpy arrays
+    - Background color management
+
+    Attributes
+    ----------
+    screen : pygame.Surface
+        the OpenGL display surface
+    width : int
+        window width in pixels
+    height : int
+        window height in pixels
+    background : float or ndarray
+        current background value(s)
+    bitdepth : int
+        bit depth per physical channel (set by subclasses)
+
+    Notes
+    -----
+    Do not instantiate this class directly. Use concrete subclasses like
+    GPU_grey, GPU_RGB, DATAPixx, VIEWPixx_grey, or VIEWPixx_RGB.
     """
 
     @abstractmethod
-    def channels_from_img(self, gry):
-        """
-        Converts a single greyscale value into a 4 colour channel representation
-        specific to self (the graphics backend).
+    def channels_from_img(self, img):
+        """Convert image array to device-specific RGBA channel representation.
+
+        Device-specific method that encodes image values as 4-channel RGBA
+        tuples according to the hardware's requirements (e.g., 8-bit per
+        channel for GPU, 16-bit via R-G concatenation for DataPixx).
 
         Parameters
         ----------
-        gry : The grey value
+        img : ndarray
+            input image array with values in [0.0, 1.0].
+            - For greyscale devices: shape (H, W)
+            - For RGB devices: shape (H, W, 3)
 
         Returns
         -------
-        (r,g,b,a) the grey represented as a corresponding 4-tuple
+        tuple of ndarray or int
+            4-channel RGBA representation as (R, G, B, Alpha).
+            Format is device-specific (e.g., uint8 arrays, scalars).
         """
         ...
 
@@ -79,23 +122,27 @@ class Graphics(ABC):
         lut=None,
         mouse=False,
     ):
-        """
-        The Graphics constructor predefines the basic OpenGL initializations
-        that must be performed regardless of the specific backends.
+        """Initialize OpenGL context and display window.
 
         Parameters
         ----------
-        width : The width (in pixels) of the openGL window
-        height : The height (in pixels) of the openGL window
-        background : The default background grey value (between 0 and 1)
-        fullscreen : Enable fullscreen display (Boolean) Default: False
-        double_buffer : Enable double buffering (Boolean) Default: True
-        lut : filepath to lookup table to use
-        mouse: Enable mouse cursor to be visible. Default: False
-
-        Returns
-        -------
-        Graphics object
+        width : int
+            window width in pixels
+        height : int
+            window height in pixels
+        background : float or array-like
+            initial background value. Interpretation depends on subclass:
+            - Greyscale: float in [0.0, 1.0]
+            - RGB: float or (r, g, b) tuple in [0.0, 1.0]
+        fullscreen : bool, optional
+            enable fullscreen display mode, by default False
+        double_buffer : bool, optional
+            enable double buffering for smooth rendering, by default True
+        lut : str, optional
+            path to LookUp Table (LUT) or Color LookUp Table (CLUT) file
+            for gamma correction, by default None
+        mouse : bool, optional
+            show mouse cursor, by default False
         """
 
         # OpenGL options
@@ -144,17 +191,26 @@ class Graphics(ABC):
             self._gamma_correct = lambda x: x  # By default, no gamma correction: identity function
 
     def bytestring_from_channels(self, R, G, B, Alpha):
-        """Convert 4-channel, 8-bit integer representation to single-channel 32-bit bytestring
+        """Pack RGBA channels into 32-bit bytestring for OpenGL.
+
+        Combines separate R, G, B, Alpha channel arrays into a single
+        packed 32-bit integer representation suitable for OpenGL texture upload.
 
         Parameters
         ----------
-        R, G, B, Alpha : Array[uint8]
-            4-channel representation as tuple of 8-bit integer arrays (R, G, B, Alpha)
+        R : ndarray or int
+            red channel values
+        G : ndarray or int
+            green channel values
+        B : ndarray or int
+            blue channel values
+        Alpha : ndarray or int
+            alpha channel values
 
         Returns
         -------
         bytes
-            Single-channel 32-bit bytestring representation
+            packed 32-bit RGBA bytestring for OpenGL texture data
         """
         # Define bit shifts for each channel
         r = 2**0
@@ -170,25 +226,30 @@ class Graphics(ABC):
         return img
 
     def newTexture(self, arr0, shape="square"):
-        """
-        Given a numpy array of values between 0 and 1, returns a new
-        Texture object. The texture object comes equipped with the draw
-        method for obvious purposes.
+        """Create OpenGL texture from image array.
 
-        NB: Images in HRL are represented in matrix style coordinates. i.e. the
-        origin is in the upper left corner, and increases to the right and
-        downwards.
+        Applies gamma correction (if LUT provided), converts to device-specific
+        channel encoding, and creates an OpenGL texture object ready for display.
 
         Parameters
         ----------
-        arr0  : The (greyscale or color) numpy array
-        shape : The shape to 'cut out' of the given greyscale array. A square
-            will render the entire array. Available: 'square', 'circle'
-            Default: 'square'
+        arr0 : ndarray
+            input image array with values in [0.0, 1.0].
+            - For greyscale: shape (H, W)
+            - For RGB: shape (H, W, 3)
+        shape : {'square', 'circle'}, optional
+            shape mask to apply to texture, by default 'square'.
+            'circle' creates a circular aperture.
 
         Returns
         -------
-        Texture object
+        Texture
+            texture object with draw() method for rendering
+
+        Notes
+        -----
+        Images use matrix-style coordinates: origin at top-left, increasing
+        rightward (x) and downward (y). This matches numpy array indexing.
         """
         arr = self.gamma_correct(arr0)
 
@@ -197,30 +258,33 @@ class Graphics(ABC):
         return Texture(byts, arr0.shape[1], arr0.shape[0], shape)
 
     def flip(self, clr=True):
-        """
-        Flips in the image backbuffer. In general, one will want to draw
-        a set of Textures and then call flip to display them all at once.
+        """Swap display buffers to show rendered content.
 
-        Takes a clr argument which causes the back buffer to clear after
-        the flip. When off, textures will be drawn on top of the current back
-        buffer. By default the back buffer will be cleared automatically, but in
-        performance sensitive scenarios it may be worth turning this off.
+        Swaps the back buffer (where drawing occurs) with the front buffer
+        (what is displayed). This is the standard way to present stimuli
+        after drawing textures.
 
         Parameters
         ----------
-        clr : Whether to clear the back buffer after flip. Default: True
+        clr : bool, optional
+            clear the back buffer after flipping, by default True.
+            Set to False to accumulate drawings across frames (useful for
+            performance-sensitive scenarios).
         """
         pygame.display.flip()
         if clr:
             opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
     def changeBackground(self, background):
-        """Change current background grey value.
+        """Change display background color or intensity.
 
         Parameters
         ----------
-        intensity_background : float
-            new grey value for background, between 0.0 and 1.0
+        background : float or ndarray
+            new background value(s) in [0.0, 1.0].
+            Interpretation depends on subclass:
+            - Greyscale: float intensity
+            - RGB: float (grey) or shape (1, 1, 3) array (r, g, b)
         """
         maximum = float(2**self.bitdepth - 1)
 
