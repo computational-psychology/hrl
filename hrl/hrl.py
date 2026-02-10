@@ -2,7 +2,6 @@
 
 import csv
 import os
-import platform
 
 import numpy as np
 import pygame
@@ -90,36 +89,7 @@ class HRL:
         experiment.
         """
 
-        ####### Setting up on which monitor to use
-        # In older systems or systems with separate Xscreens, the naming is still :0.0 or :0.1.
-        # For systems with only one screen, it is :1.
-        if platform.system() == "Linux":
-            print("default screen number used by the OS: %s" % os.environ["DISPLAY"])
-
-            if scrn!=None:
-                # legacy option for older configs or separate Xscreens  
-                if (os.environ["DISPLAY"] == ":0"): 
-                    os.environ["DISPLAY"] = ":0." + str(scrn)
-                else:
-                    if isinstance(scrn, str):
-                        os.environ["DISPLAY"] = scrn
-                    elif isinstance(scrn, int):
-                        os.environ["DISPLAY"] = ":" + str(scrn)
-
-                print("display number changed to: %s" % os.environ["DISPLAY"])
-
-            ## 11. Aug 2021
-            # we add a wdth_offset to be able to run HRL in setups with a
-            # single Xscreen but multiple monitors (a config with Xinerama enabled)
-            os.environ["SDL_VIDEO_WINDOW_POS"] = "%d,0" % wdth_offset
-
-        # we force not fullscreen, even in experimental computer,
-        # because in later versions of pygame
-        # fullscreen on a second screen gives very weird behavior on
-        # recording of keyboard events, effectively hanging the computer.
-        fs = False
-
-        ## Load Graphics Device ##
+        ## Setup screen and graphics ##
         self.graphics = hrl.graphics.new_graphics(
             graphics_alias=graphics,
             width=wdth,
@@ -129,6 +99,8 @@ class HRL:
             double_buffer=db,
             lut=lut,
             mouse=mouse,
+            screen=scrn,
+            width_offset=wdth_offset,
         )
 
         ## Load Input Device ##
