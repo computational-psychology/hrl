@@ -111,39 +111,6 @@ class HRL:
             # single Xscreen but multiple monitors (a config with Xinerama enabled)
             os.environ["SDL_VIDEO_WINDOW_POS"] = "%d,0" % wdth_offset
 
-
-		#######
-        ## Load Datapixx ##
-
-        if (graphics == "datapixx") or (inputs == "responsepixx") or (graphics == "viewpixx"):
-            if graphics == "datapixx":
-                from pypixxlib.datapixx import DATAPixx as DPixx
-            elif graphics == "viewpixx":
-                from pypixxlib.viewpixx import VIEWPixx3D as DPixx
-
-            # Open datapixx.
-            self.device = DPixx()
-
-            # set videomode: Concatenate Red and Green into a 16 bit luminance
-            # channel.
-            mode = self.device.getVideoMode()
-            print(mode)
-
-            if mode != "M16":
-                self.device.setVideoMode("M16")
-                self.device.updateRegisterCache()
-
-            mode = self.device.getVideoMode()
-            print(mode)
-
-            # Demonstrate successful initialization.
-            # self.datapixx.blink(dpx.BWHITE | dpx.BBLUE | dpx.BGREEN
-            #            | dpx.BYELLOW | dpx.BRED)
-            # TODO BLINK with pypixxlib
-
-        else:
-            self.device = None
-
         # we force not fullscreen, even in experimental computer,
         # because in later versions of pygame
         # fullscreen on a second screen gives very weird behavior on
@@ -151,10 +118,47 @@ class HRL:
         fs = False
 
         ## Load Graphics Device ##
-        if graphics == "gpu":
-            from .graphics.gpu import GPU
+        if graphics in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
+            from .graphics.gpu import GPU_grey
 
-            self.graphics = GPU(
+            self.graphics = GPU_grey(
+                width=wdth,
+                height=hght,
+                background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
+        elif graphics in ("gpu_RGB", "RGB"):
+            from .graphics.gpu import GPU_RGB
+
+            self.graphics = GPU_RGB(
+                width=wdth,
+                height=hght,
+                background=[bg, bg, bg],
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
+
+        elif graphics == "datapixx":
+            from .graphics.datapixx import DATAPixx
+
+            self.graphics = DATAPixx(
+                width=wdth,
+                height=hght,
+                background=bg,
+                fullscreen=fs,
+                double_buffer=db,
+                lut=lut,
+                mouse=mouse,
+            )
+        elif graphics in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
+            from .graphics.viewpixx import VIEWPixx_grey
+
+            self.graphics = VIEWPixx_grey(
                 width=wdth,
                 height=hght,
                 background=bg,
@@ -164,13 +168,13 @@ class HRL:
                 mouse=mouse,
             )
 
-        elif graphics == "datapixx" or graphics == "viewpixx":
-            from .graphics.datapixx import DATAPixx
+        elif graphics in ("viewpixx_RGB", "viewpixx_color", "viewpixx_colour"):
+            from .graphics.viewpixx import VIEWPixx_RGB
 
-            self.graphics = DATAPixx(
+            self.graphics = VIEWPixx_RGB(
                 width=wdth,
                 height=hght,
-                background=bg,
+                background=[bg, bg, bg],
                 fullscreen=fs,
                 double_buffer=db,
                 lut=lut,
@@ -190,7 +194,8 @@ class HRL:
         elif inputs == "responsepixx":
             from .inputs.responsepixx import RESPONSEPixx
 
-            self.inputs = RESPONSEPixx(self.device)
+            # Assume hardware connection already established by graphics
+            self.inputs = RESPONSEPixx(self.graphics.device)
 
         else:
             self.inputs = None
@@ -249,8 +254,8 @@ class HRL:
         Closes all the devices and systems maintained by the HRL object.
         This should be called at the end of the program.
         """
-        if self.device != None:
-            self.device.close()
+        if self.graphics.device != None:
+            self.graphics.device.close()
         if self._rfl != None:
             self._rfl.close()
         if self._dfl != None:

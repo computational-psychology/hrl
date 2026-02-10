@@ -8,9 +8,9 @@ def test_import():
 
 @pytest.mark.graphics
 def test_gpu_init():
-    from hrl.graphics.gpu import GPU
+    from hrl.graphics.gpu import GPU_grey
 
-    igraphics = GPU(
+    igraphics = GPU_grey(
         width=200,
         height=200,
         background=0.5,
@@ -24,9 +24,9 @@ def test_gpu_init():
 
 @pytest.mark.graphics
 def test_gpu_texture():
-    from hrl.graphics.gpu import GPU
+    from hrl.graphics.gpu import GPU_grey
 
-    igraphics = GPU(
+    igraphics = GPU_grey(
         width=200,
         height=200,
         background=0.5,
