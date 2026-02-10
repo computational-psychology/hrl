@@ -23,31 +23,7 @@ def main():
         )
 
     else:
-        if args[0] == "tests":
-            if len(args) == 1 or args[1] == "--help":
-                print(
-                    """
-        Tests are simple scripts to ensure that HRL software and hardware
-        is working correctly.
-
-        Currently implemented commands are:
-
-            standard - Basic test for a normal computer
-            datapixx - Basic test for a computer with DATApixx
-            optical - Take a single reading from an OptiCAL
-            class - Tests the HRL class with normal hardware
-                """
-                )
-            elif args[1] == "standard":
-                import hrl.util.tests.standard
-            elif args[1] == "datapixx":
-                import hrl.util.tests.datapixx
-            elif args[1] == "optical":
-                import hrl.util.tests.optical
-            elif args[1] == "class":
-                import hrl.util.tests.classtest
-
-        elif args[0] == "lut":
+        if args[0] == "lut":
             if len(args) == 1 or args[1] == "--help":
                 print(
                     """
