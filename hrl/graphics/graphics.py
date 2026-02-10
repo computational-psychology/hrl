@@ -303,7 +303,9 @@ class Graphics(ABC):
             - Greyscale: float intensity
             - RGB: float (grey) or shape (1, 1, 3) array (r, g, b)
         """
-        maximum = float(2**self.bitdepth - 1)
+        # Convert scalar to single-channel array
+        if isinstance(background, (int, float)):
+            background = np.array([background]).reshape(1, 1)
 
         # Gamma correct input value(s)
         bg = self.gamma_correct(background)
@@ -312,7 +314,13 @@ class Graphics(ABC):
         (r, g, b, a) = self.channels_from_img(bg)
 
         # Set as OpenGL background
-        opengl.glClearColor(r / maximum, g / maximum, b / maximum, a / maximum)
+        maximum = float(2**self.bitdepth - 1)
+        opengl.glClearColor(
+            r.squeeze() / maximum,
+            g.squeeze() / maximum,
+            b.squeeze() / maximum,
+            a / maximum,
+        )
         opengl.glClear(opengl.GL_COLOR_BUFFER_BIT)
 
         self.background = background
@@ -417,21 +425,6 @@ class Graphics_grey(Graphics):
 
         # Call parent newTexture (which applies gamma correction)
         return super().newTexture(arr0, shape)
-
-    def changeBackground(self, intensity_background):
-        """Change background intensity.
-
-        Parameters
-        ----------
-        intensity_background : float
-            background intensity in [0.0, 1.0]
-        """
-        # Convert scalar to single-channel array
-        if isinstance(intensity_background, (int, float)):
-            intensity_background = np.array([intensity_background]).reshape(1, 1)
-
-        # Call parent changeBackground
-        super().changeBackground(intensity_background)
 
 
 class Graphics_RGB(Graphics):
