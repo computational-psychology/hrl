@@ -1,31 +1,9 @@
 """HRL Graphics module - display device interfaces."""
 
-from .datapixx import DATAPixx
-from .gpu import GPU_RGB, GPU_grey
-from .graphics import Graphics, Graphics_grey, Graphics_RGB
-from .texture import Texture
-from .viewpixx import VIEWPixx_grey, VIEWPixx_RGB
-
 __all__ = [
-    "Graphics",
-    "Graphics_grey",
-    "Graphics_RGB",
-    "GPU_grey",
-    "GPU_RGB",
-    "DATAPixx",
-    "VIEWPixx_grey",
-    "VIEWPixx_RGB",
+    "new_graphics",
     "Texture",
 ]
-
-
-ALIAS_MAP = {
-    "GPU_grey": ["gpu", "gpu_grey", "grey", "gray", "gray8"],
-    "GPU_RGB": ["gpu_RGB", "RGB"],
-    "VIEWPixx_grey": ["viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"],
-    "VIEWPixx_RGB": ["viewpixx_RGB", "viewpixx_color", "viewpixx_colour"],
-    "DataPixx": ["datapixx", "datapixx_grey", "datapixx_gray", "datapixx_gray8"],
-}
 
 
 def new_graphics(
@@ -46,7 +24,11 @@ def new_graphics(
     Parameters
     ----------
     graphics_alias : str
-        alias for the desired graphics device. Valid options are defined in ALIAS_MAP.
+        alias for the desired graphics device. Valid options include:
+        'gpu', 'gpu_grey', 'grey', 'gray', 'gray8', 'gpu_RGB', 'RGB',
+        'viewpixx', 'viewpixx_grey', 'viewpixx_gray', 'viewpixx_gray8',
+        'viewpixx_RGB', 'viewpixx_color', 'viewpixx_colour',
+        'datapixx', 'datapixx_grey', 'datapixx_gray', 'datapixx_gray8'.
     width : int
         width of the screen in pixels.
     height : int
@@ -80,21 +62,25 @@ def new_graphics(
     ------
     ValueError
         if the provided graphics_alias does not match any known device aliases
-        (see ALIAS_MAP for valid options)
     """
-    if graphics_alias in ALIAS_MAP["GPU_grey"]:
-        graphics_class = GPU_grey
-    elif graphics_alias in ALIAS_MAP["GPU_RGB"]:
-        graphics_class = GPU_grey
-    elif graphics_alias in ALIAS_MAP["DataPixx"]:
-        graphics_class = GPU_grey
-    elif graphics_alias in ALIAS_MAP["VIEWPixx_grey"]:
-        graphics_class = GPU_grey
-    elif graphics_alias in ALIAS_MAP["VIEWPixx_RGB"]:
-        graphics_class = GPU_grey
+    # Lazy import the graphics class based on alias
+    if graphics_alias in ["gpu", "gpu_grey", "grey", "gray", "gray8"]:
+        from .gpu import GPU_grey as graphics_class
+    elif graphics_alias in ["gpu_RGB", "RGB"]:
+        from .gpu import GPU_RGB as graphics_class
+    elif graphics_alias in ["viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"]:
+        from .viewpixx import VIEWPixx_grey as graphics_class
+    elif graphics_alias in ["viewpixx_RGB", "viewpixx_color", "viewpixx_colour"]:
+        from .viewpixx import VIEWPixx_RGB as graphics_class
+    elif graphics_alias in ["datapixx", "datapixx_grey", "datapixx_gray", "datapixx_gray8"]:
+        from .datapixx import DATAPixx as graphics_class
     else:
         raise ValueError(
-            f"Unknown graphics device '{graphics_alias}'. Valid options are: {ALIAS_MAP.items()}"
+            f"Unknown graphics device '{graphics_alias}'. Valid options are: "
+            f"'gpu', 'gpu_grey', 'grey', 'gray', 'gray8', 'gpu_RGB', 'RGB', "
+            f"'viewpixx', 'viewpixx_grey', 'viewpixx_gray', 'viewpixx_gray8', "
+            f"'viewpixx_RGB', 'viewpixx_color', 'viewpixx_colour', "
+            f"'datapixx', 'datapixx_grey', 'datapixx_gray', 'datapixx_gray8'"
         )
 
     return graphics_class(
