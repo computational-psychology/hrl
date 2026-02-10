@@ -1,4 +1,8 @@
+import pytest
+
 from hrl.photometer.optical import OptiCAL
+
+pytestmark = [pytest.mark.photometer]
 
 
 def test_initialization():
