@@ -7,6 +7,7 @@ import numpy as np
 import pygame
 
 import hrl.graphics
+import hrl.inputs
 
 ### HRL Class ###
 
@@ -103,21 +104,11 @@ class HRL:
             width_offset=wdth_offset,
         )
 
-        ## Load Input Device ##
-
-        if inputs == "keyboard":
-            from .inputs.keyboard import Keyboard
-
-            self.inputs = Keyboard()
-
-        elif inputs == "responsepixx":
-            from .inputs.responsepixx import RESPONSEPixx
-
-            # Assume hardware connection already established by graphics
-            self.inputs = RESPONSEPixx(self.graphics.device)
-
-        else:
-            self.inputs = None
+        ## Setup Input Device ##
+        self.inputs = hrl.inputs.new_input(
+            input_alias=inputs,
+            device=self.graphics.device,
+        )
 
         ## Load Photometer ##
 
