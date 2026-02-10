@@ -7,6 +7,8 @@ import platform
 import numpy as np
 import pygame
 
+import hrl.graphics
+
 ### HRL Class ###
 
 
@@ -118,71 +120,16 @@ class HRL:
         fs = False
 
         ## Load Graphics Device ##
-        if graphics in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
-            from .graphics.gpu import GPU_grey
-
-            self.graphics = GPU_grey(
-                width=wdth,
-                height=hght,
-                background=bg,
-                fullscreen=fs,
-                double_buffer=db,
-                lut=lut,
-                mouse=mouse,
-            )
-        elif graphics in ("gpu_RGB", "RGB"):
-            from .graphics.gpu import GPU_RGB
-
-            self.graphics = GPU_RGB(
-                width=wdth,
-                height=hght,
-                background=[bg, bg, bg],
-                fullscreen=fs,
-                double_buffer=db,
-                lut=lut,
-                mouse=mouse,
-            )
-
-        elif graphics == "datapixx":
-            from .graphics.datapixx import DATAPixx
-
-            self.graphics = DATAPixx(
-                width=wdth,
-                height=hght,
-                background=bg,
-                fullscreen=fs,
-                double_buffer=db,
-                lut=lut,
-                mouse=mouse,
-            )
-        elif graphics in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
-            from .graphics.viewpixx import VIEWPixx_grey
-
-            self.graphics = VIEWPixx_grey(
-                width=wdth,
-                height=hght,
-                background=bg,
-                fullscreen=fs,
-                double_buffer=db,
-                lut=lut,
-                mouse=mouse,
-            )
-
-        elif graphics in ("viewpixx_RGB", "viewpixx_color", "viewpixx_colour"):
-            from .graphics.viewpixx import VIEWPixx_RGB
-
-            self.graphics = VIEWPixx_RGB(
-                width=wdth,
-                height=hght,
-                background=[bg, bg, bg],
-                fullscreen=fs,
-                double_buffer=db,
-                lut=lut,
-                mouse=mouse,
-            )
-
-        else:
-            self.graphics = None
+        self.graphics = hrl.graphics.new_graphics(
+            graphics_alias=graphics,
+            width=wdth,
+            height=hght,
+            background=bg,
+            fullscreen=fs,
+            double_buffer=db,
+            lut=lut,
+            mouse=mouse,
+        )
 
         ## Load Input Device ##
 
