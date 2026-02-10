@@ -1,5 +1,8 @@
 """HRL Graphics module - display device interfaces."""
 
+import os
+import platform
+
 __all__ = [
     "new_graphics",
     "Texture",
@@ -15,6 +18,8 @@ def new_graphics(
     double_buffer=True,
     lut=None,
     mouse=False,
+    screen=None,
+    width_offset=0,
 ):
     """Factory function to create appropriate Graphics subclass based on configuration.
 
@@ -83,12 +88,40 @@ def new_graphics(
             f"'datapixx', 'datapixx_grey', 'datapixx_gray', 'datapixx_gray8'"
         )
 
+    # Run screen setup for multiple monitor support
+    screen_setup(screen=screen, window_width_offset=width_offset)
+
     return graphics_class(
         width=width,
         height=height,
         background=background,
-        fullscreen=fullscreen,
+        fullscreen=False,
         double_buffer=double_buffer,
         lut=lut,
         mouse=mouse,
     )
+
+
+def screen_setup(screen, window_width_offset):
+    ####### Setting up on which monitor to use
+    # In older systems or systems with separate Xscreens, the naming is still :0.0 or :0.1.
+    # For systems with only one screen, it is :1.
+    if platform.system() == "Linux":
+        print(f"Default screen number used by the OS: {os.environ['DISPLAY']}")
+
+        if screen is not None:
+            # legacy option for older configs or separate Xscreens
+            if os.environ["DISPLAY"] == ":0":
+                os.environ["DISPLAY"] = ":0." + str(screen)
+            else:
+                if isinstance(screen, str):
+                    os.environ["DISPLAY"] = screen
+                elif isinstance(screen, int):
+                    os.environ["DISPLAY"] = ":" + str(screen)
+
+            print(f"Display number changed to: {os.environ['DISPLAY']}")
+
+        ## 11. Aug 2021
+        # we add a wdth_offset to be able to run HRL in setups with a
+        # single Xscreen but multiple monitors (a config with Xinerama enabled)
+        os.environ["SDL_VIDEO_WINDOW_POS"] = f"{window_width_offset},0"
