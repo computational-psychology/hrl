@@ -8,6 +8,7 @@ import pygame
 
 import hrl.graphics
 import hrl.inputs
+import hrl.photometer
 
 ### HRL Class ###
 
@@ -110,18 +111,13 @@ class HRL:
             device=self.graphics.device,
         )
 
-        ## Load Photometer ##
-
-        if photometer == "optical":
-            from .photometer.optical import OptiCAL
-            self.photometer = OptiCAL("/dev/ttyUSB0", timeout=10)
-            
-        elif photometer == "minolta":
-            from .photometer.minolta import Minolta
-            self.photometer = Minolta("/dev/ttyUSB0")
-
-        else:
-            self.photometer = None
+        ## Setup photometer ##
+        if photometer is not None:
+            self.photometer = hrl.photometer.new_photometer(
+                photometer_alias=photometer,
+                device="/dev/ttyUSB0",
+                timeout=10,
+            )
 
         ## Results file ##
         self._rfl = None
