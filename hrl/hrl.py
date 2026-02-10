@@ -53,42 +53,56 @@ class HRL:
         lut=None,
         mouse=False,
     ):
-        """
-        Initialize an HRL object.
+        """Initialize an HRL object.
 
         Parameters
         ----------
-
-        graphics : The graphics device to use. Available: 'gpu','datapixx'
-            (to be used with DataPixx 1) or 'viewpixx' (for ViewPixx 3D).
-            Default: 'gpu'
-        inputs : The input device to use. Available: 'keyboard', 'responsepixx'.
-            Default: 'keyboard'
-        photometer : The graphics device to use. Available: 'optical', 'minolta', None.
-            Default: None
-        wdth : The desired width of the screen. Default: 1024
-        hght : The desired height of the screen. Default: 768
-        bg : The background luminance on a scale from 0 to 1. Default: 0.0
-        fs : Whether or not to run in Fullscreen. Default: False
-        wdth_offset: The desired horizontal offset of the window. Useful for setups
-              with multiple monitors but a single Xscreen session. Default: 0
-        db : Whether or not to use double buffering. Default: True
-        scrn: Which monitor to use, given as an integer (e.g. 0, 1), or as a string containing the 
-              X11 screen specification string (e.g. ":0.1" or ":1"). 
-              Default: None (uses the default settings) 
-        dfl : The read location of the design matrix. Default: None
-        rfl : The write location of the result matrix. Default: None
-        rhds : A list of the string names of the headers for the Result
-            Matrix. The string names should be without spaces, e.g.
-            'InputLuminance'. If rfl != None, rhds must be provided.
-            Default: None
-        lut : The lookup table. Default: None
-        mouse: enables or disables the mouse cursor. Default: False
+        graphics : str
+            alias for the desired graphics device, by default "gpu".
+            Valid options are defined in hrl.graphics.ALIAS_MAP.
+        inputs : str
+            alias for the desired input device, by default "keyboard".
+        photometer : str or None
+            alias for the desired photometer device, by default None.
+        wdth : int
+            width of the screen in pixels, by default 1024.
+        hght : int
+            height of the screen in pixels, by default 768.
+        bg : float or tuple, optional
+            background intensity value (0.0, 1.0), by default 0.0.
+            For grayscale devices, this is a gray level;
+            for color devices, can specify an RGB triplet.
+        fs : bool, optional
+            run in Fullscreen, currently fixed to False -- because in later versions of pygame
+            fullscreen on a second screen gives very weird behavior on recording of keyboard events,
+            effectively hanging the computer.
+        wdth_offset: int, optional
+            horizontal offset of the window, in pixels, by default 0.
+            Useful for setups with multiple monitors but a single Xscreen session.
+        db : bool, optional
+            use double buffering, by default True.
+        scrn : int or str, optional
+            which monitor to use, by default None (use the environment).
+            Given as an integer (e.g., 0, 1),
+            or as a string containing the X11 screen specification string (e.g., ":0.1" or ":1").
+        dfl : Path or str or None, optional
+            path to design file, by default None.
+        rfl : Path or str or None, optional
+            path to results file, by default None.
+        rhds : List(str) or None, optional
+            headers for the Result Matrix, by default None.
+            The string names should be without spaces, e.g. 'InputLuminance'.
+            If rfl != None, rhds must be provided.
+        lut : Path or str or None, optional
+            Path to Look-up Table, by default None.
+        mouse: bool, optional
+            enables or disables the mouse cursor, by default False.
 
         Returns
         -------
-        hrl instance. Comes with a number of methods required to run an
-        experiment.
+        HRL
+            an initialized hrl instance.
+            Comes with a number of methods required to run an experiment.
         """
 
         ## Setup screen and graphics ##
