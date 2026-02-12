@@ -1,8 +1,8 @@
 ### Imports ###
 
-import numpy as np
 import argparse as ap
-import scipy as sp
+
+import numpy as np
 
 ### Argument parser ###
 

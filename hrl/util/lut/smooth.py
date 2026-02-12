@@ -3,7 +3,6 @@
 import argparse as ap
 
 import numpy as np
-import scipy as sp
 
 ### Argument parser ###
 
@@ -83,7 +82,7 @@ def smooth(args):
 
     for i in range(args.ordr):
         smthd = np.hstack((np.ones(2) * smthd[0], smthd, np.ones(2) * smthd[-1]))
-        smthd = sp.convolve(smthd, krn, "valid")
+        smthd = np.convolve(smthd, krn, "valid")
 
     print("Saving to File...")
     tbl[:, 1] = smthd
