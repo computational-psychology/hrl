@@ -86,3 +86,20 @@ This test suite validates:
     `measurements_8bit.csv` with `order=2`
     → `smoothed_measurements_kernel.csv`
 
+
+
+## Core tests of whole pipeline (`test_integration.py`)
+
+**Full pipeline** (`test_full_pipeline`):
+Full pipeline tests that verify the complete workflow from raw measurements to final LUT.
+
+**8-bit pipeline** (256 measurement points, gamma~2.2, 1-101 cd/m²):
+```
+measurements_8bit.csv → smoothed_measurements_8bit.csv → lut_8bit.csv (8-bit resolution)
+```
+
+**16-bit pipeline** (65536 measurement points, gamma~2.2, 1-101 cd/m²):
+```
+measurements_16bit.csv → smoothed_measurements_16bit.csv → lut_10bit.csv (10-bit resolution)
+                                                          → lut_16bit.csv (16-bit resolution)
+```
