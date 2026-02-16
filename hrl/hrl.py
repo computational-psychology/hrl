@@ -274,6 +274,10 @@ class HRL:
     def background(self):
         return self.graphics.background if self.graphics else None
 
+    @property
+    def device(self):
+        return self.graphics.device if self.graphics else None
+
     ## File methods ##
 
     def writeResultLine(self, dct=None):
