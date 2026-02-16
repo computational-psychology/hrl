@@ -3,13 +3,13 @@ import pytest
 pytestmark = [pytest.mark.photometer]
 
 
-def test_initialization():
+def test_initialization(photometer_dev):
     from hrl.photometer.optical import OptiCAL
 
-    OptiCAL(dev="/dev/ttyUSB0")
+    OptiCAL(dev=photometer_dev)
 
 
-def test_read_luminance():
+def test_read_luminance(photometer_dev):
     from hrl.photometer.optical import OptiCAL
 
-    OptiCAL(dev="/dev/ttyUSB0").readLuminance(n=5, slp=5)
+    OptiCAL(dev=photometer_dev).readLuminance(n=5, slp=5)

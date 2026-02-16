@@ -3,13 +3,13 @@ import pytest
 pytestmark = [pytest.mark.photometer]
 
 
-def test_initialization():
+def test_initialization(photometer_dev):
     from hrl.photometer.minolta import Minolta
 
-    Minolta(dev="/dev/ttyUSB0")
+    Minolta(dev=photometer_dev)
 
 
-def test_read_luminance():
+def test_read_luminance(photometer_dev):
     from hrl.photometer.minolta import Minolta
 
-    Minolta(dev="/dev/ttyUSB0").readLuminance(n=5, slp=5)
+    Minolta(dev=photometer_dev).readLuminance(n=5, slp=5)
