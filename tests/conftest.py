@@ -7,6 +7,25 @@ from hrl.luts import create_clut, create_lut
 DEFAULT_GAMMA = 2.2
 
 
+def pytest_addoption(parser):
+    """Add custom command-line options for pytest."""
+    parser.addoption(
+        "--photometer-dev",
+        action="store",
+        default="/dev/ttyUSB0",
+        help="Device path for photometer (default: /dev/ttyUSB0)",
+    )
+
+
+@pytest.fixture
+def photometer_dev(request):
+    """Get the photometer device path from command-line or use default.
+
+    Can be overridden with: pytest --photometer-dev=/dev/ttyUSB1
+    """
+    return request.config.getoption("--photometer-dev")
+
+
 @pytest.fixture
 def no_lut():
     """Simple pass-through LUT with no gamma correction and no dark luminance.

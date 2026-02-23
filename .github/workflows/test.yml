@@ -31,4 +31,4 @@ jobs:
         # Run testing through pytest for the current version
         # uv automatically install all required dependencies from pyproject.toml
       - name: Test, for py==${{ matrix.python_version }}
-        run: uv run pytest tests/ -m "not graphics"
+        run: uv run pytest tests/ -m "not graphics and not photometer"

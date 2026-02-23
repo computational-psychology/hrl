@@ -1,8 +1,27 @@
+# Python cache
+__pycache__/
 *.pyc
+
+# Build artifacts
 build/
 hrl.egg-info/
+
+# Documentation build artifacts
 docs/_build/
 
+
+## Tool specifics:
+# Cached files for pytest
+.pytest_cache/
+
+# Directory for virtual environment
+.venv/
+
+# Cache files for mypy type checker
+.mypy_cache/
+
+# Lock file for uv package manager
 uv.lock
 
-.vscode/settings.json
+# Settings for VSCode editor
+.vscode/
