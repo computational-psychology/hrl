@@ -40,3 +40,22 @@ IntensityIn,Luminance
 <intensity_value>,<luminance_value>
 ...
 ```
+
+
+
+## Linearization Tests (`test_linearize.py`)
+
+The `hrl-util lut linearize` command takes measured intensity-luminance pairs from a monitor
+and creates a LUT that maps input intensities to output intensities,
+such that the resulting luminance progression is approximately linear.
+The linearization can produce LUTs of different output resolutions,
+even from the same input measurements.
+
+### Test Cases
+
+1. **Output format** (`test_linearize_output_format`): Validates CSV structure with required headers (IntensityIn, IntensityOut, Luminance), valid data ranges (0-1 for intensities)
+2. **Luminance linearity** (`test_linearize_luminance_linearity`): Verifies output produces approximately uniform luminance increments (CV < 1.5)
+3. **8-bit resolution** (`test_linearize_8bit`): Tests 8-bit measurements linearized to an 8-bit (≤256 entries) LUT. Tests against known `lut_8bit.csv`.
+4. **16-bit resolution** (`test_linearize_16bit`): Tests 16-bit measurements linearized to an 16-bit (≤65536 entries) LUT. Tests against known `lut_16bit.csv`.
+5. **10-bit resolution** (`test_linearize_10bit`): Tests 16-bit measurements linearized to a 10-bit (≤1024 entries) LUT. Tests against known `lut_10bit.csv`.
+
