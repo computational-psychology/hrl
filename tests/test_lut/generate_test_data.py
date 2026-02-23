@@ -46,6 +46,7 @@ def generate_measurement_8bit():
         TEST_DIR / "measurements_8bit.csv",
         data,
         header="intensity_in,luminance",
+        delimiter=",",
         comments="",
         fmt="%.18e",
     )
@@ -80,6 +81,7 @@ def generate_measurement_16bit():
         TEST_DIR / "measurements_16bit.csv",
         data,
         header="intensity_in,luminance",
+        delimiter=",",
         comments="",
         fmt="%.18e",
     )
@@ -120,6 +122,7 @@ def generate_measurement_duplicates():
         TEST_DIR / "measurements_duplicates.csv",
         data,
         header="intensity_in,luminance",
+        delimiter=",",
         comments="",
         fmt="%.18e",
     )
@@ -171,6 +174,7 @@ def generate_measurement_outliers():
         TEST_DIR / "measurements_outliers.csv",
         data,
         header="intensity_in,luminance",
+        delimiter=",",
         comments="",
         fmt="%.18e",
     )
@@ -204,6 +208,7 @@ def generate_measurement_lumrange():
         TEST_DIR / "measurements_lumrange.csv",
         data,
         header="intensity_in,luminance",
+        delimiter=",",
         comments="",
         fmt="%.18e",
     )

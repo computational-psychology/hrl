@@ -61,8 +61,8 @@ def test_full_pipeline(measure_integration_input):
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
 
     # Compare
-    result_lut = np.genfromtxt("lut.csv", skip_header=1)
-    expected_lut = np.genfromtxt(TEST_DIR / "lut_8bit.csv", skip_header=1)
+    result_lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    expected_lut = np.genfromtxt(TEST_DIR / "lut_8bit.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result_lut, expected_lut, decimal=10)
 
 
@@ -82,8 +82,8 @@ def test_pipeline_preserves_luminance_range(measure_lumrange_input):
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
 
     # Verify luminance range
-    result_lut = np.genfromtxt("lut.csv", skip_header=1)
-    expected_lut = np.genfromtxt(TEST_DIR / "lut_lumrange.csv", skip_header=1)
+    result_lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    expected_lut = np.genfromtxt(TEST_DIR / "lut_lumrange.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result_lut, expected_lut, decimal=10)
 
     result_lum_min = result_lut[0, 2]

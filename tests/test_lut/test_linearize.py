@@ -63,7 +63,7 @@ def test_linearize_output_format(input_16bit):
     assert "intensity_out" in header
     assert "luminance" in header
 
-    result = np.genfromtxt("lut.csv", skip_header=1)
+    result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
     assert result.shape[1] == 3
     assert not np.any(np.isnan(result))
     assert np.all(result[:, 0] >= 0) and np.all(result[:, 0] <= 1)
@@ -79,7 +79,7 @@ def test_linearize_luminance_linearity(input_16bit):
     """
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "16"], check=True)
 
-    result = np.genfromtxt("lut.csv", skip_header=1)
+    result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
     luminances = result[:, 2]
 
     assert np.all(np.diff(luminances) >= 0)  # Monotonic
@@ -101,8 +101,8 @@ def test_linearize_16bit(input_16bit):
     """
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "16"], check=True)
 
-    result = np.genfromtxt("lut.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "lut_16bit.csv", skip_header=1)
+    result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(TEST_DIR / "lut_16bit.csv", skip_header=1, delimiter=",")
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
@@ -116,8 +116,8 @@ def test_linearize_8bit(input_8bit):
     """
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
 
-    result = np.genfromtxt("lut.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "lut_8bit.csv", skip_header=1)
+    result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(TEST_DIR / "lut_8bit.csv", skip_header=1, delimiter=",")
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
@@ -133,8 +133,8 @@ def test_linearize_10bit(input_16bit):
     """
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "10"], check=True)
 
-    result = np.genfromtxt("lut.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "lut_10bit.csv", skip_header=1)
+    result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(TEST_DIR / "lut_10bit.csv", skip_header=1, delimiter=",")
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 

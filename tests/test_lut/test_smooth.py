@@ -80,7 +80,7 @@ def test_smooth_output_format(measure_simple_input):
 
     assert "intensity_in" in header and "luminance" in header
 
-    result = np.genfromtxt("smooth.csv", skip_header=1)
+    result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
     assert result.shape[1] == 2
     assert not np.any(np.isnan(result))
     assert np.all(result >= 0)
@@ -95,8 +95,8 @@ def test_smooth_basic_no_smoothing(measure_simple_input):
     """
     subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
 
-    result = np.genfromtxt("smooth.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1)
+    result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
@@ -110,8 +110,10 @@ def test_smooth_with_kernel(measure_simple_input):
     """
     subprocess.run(["hrl-util", "lut", "smooth", "-o", "2"], check=True)
 
-    result = np.genfromtxt("smooth.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "smoothed_measurements_kernel.csv", skip_header=1)
+    result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(
+        TEST_DIR / "smoothed_measurements_kernel.csv", skip_header=1, delimiter=","
+    )
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
@@ -125,8 +127,10 @@ def test_smooth_averages_duplicates(measure_duplicates_input):
     """
     subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
 
-    result = np.genfromtxt("smooth.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "smoothed_measurements_duplicates.csv", skip_header=1)
+    result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(
+        TEST_DIR / "smoothed_measurements_duplicates.csv", skip_header=1, delimiter=","
+    )
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
@@ -143,7 +147,9 @@ def test_smooth_filters_outliers(measure_outliers_input):
     """
     subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
 
-    result = np.genfromtxt("smooth.csv", skip_header=1)
-    expected = np.genfromtxt(TEST_DIR / "smoothed_measurements_outliers.csv", skip_header=1)
+    result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
+    expected = np.genfromtxt(
+        TEST_DIR / "smoothed_measurements_outliers.csv", skip_header=1, delimiter=","
+    )
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
