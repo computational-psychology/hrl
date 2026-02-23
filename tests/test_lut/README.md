@@ -110,3 +110,14 @@ to ensure that the pipeline correctly handles different input ranges
 and produces LUTs that preserve the original luminance range.
 - `measurements_lumrange.csv` (2.5-150 cd/m²) → smooth (order=1) → linearize (8-bit) → `lut_lumrange.csv`
 - Confirms final LUT min/max luminance within 10% of original range
+
+## Regenerating Test Data
+
+Run `generate_test_data.py` to regenerate all test data files:
+```bash
+cd tests/test_lut
+uv run python generate_test_data.py
+```
+
+This will create all measurement files, run the smooth and linearize commands,
+and generate all expected output files.
