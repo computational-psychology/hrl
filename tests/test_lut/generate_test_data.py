@@ -45,7 +45,7 @@ def generate_measurement_8bit():
     np.savetxt(
         TEST_DIR / "measurements_8bit.csv",
         data,
-        header="Intensity Luminance",
+        header="intensity_in,luminance",
         comments="",
         fmt="%.18e",
     )
@@ -79,7 +79,7 @@ def generate_measurement_16bit():
     np.savetxt(
         TEST_DIR / "measurements_16bit.csv",
         data,
-        header="Intensity Luminance",
+        header="intensity_in,luminance",
         comments="",
         fmt="%.18e",
     )
@@ -119,7 +119,7 @@ def generate_measurement_duplicates():
     np.savetxt(
         TEST_DIR / "measurements_duplicates.csv",
         data,
-        header="Intensity Luminance",
+        header="intensity_in,luminance",
         comments="",
         fmt="%.18e",
     )
@@ -170,7 +170,7 @@ def generate_measurement_outliers():
     np.savetxt(
         TEST_DIR / "measurements_outliers.csv",
         data,
-        header="Intensity Luminance",
+        header="intensity_in,luminance",
         comments="",
         fmt="%.18e",
     )
@@ -203,7 +203,7 @@ def generate_measurement_lumrange():
     np.savetxt(
         TEST_DIR / "measurements_lumrange.csv",
         data,
-        header="Intensity Luminance",
+        header="intensity_in,luminance",
         comments="",
         fmt="%.18e",
     )

@@ -19,15 +19,15 @@ The tests cover both individual steps (smoothing and linearization) and the full
 The output LUT files (`lut_*.csv`) adhere to the format defined in `hrl.luts`:
 
 ```
-IntensityIn,IntensityOut,Luminance
+intensity_in,intensity_out,luminance
 <intensity_in>,<intensity_out>,<luminance>
 ...
 ```
 
 where:
-- `IntensityIn`: Input intensity values (0-1 range)
-- `IntensityOut`: Gamma-corrected output intensity values (0-1 range)
-- `Luminance`: Corresponding luminance values (cd/m²)
+- `intensity_in`: Input intensity values (0-1 range)
+- `intensity_out`: Gamma-corrected output intensity values (0-1 range)
+- `luminance`: Corresponding luminance values (cd/m²)
 
 
 The input measurement files (`measurements_*.csv`)
@@ -36,7 +36,7 @@ contain raw intensity-luminance measurement pairs
 in a version of this format as well:
 
 ```
-IntensityIn,Luminance
+intensity_in,luminance
 <intensity_value>,<luminance_value>
 ...
 ```
@@ -53,7 +53,7 @@ even from the same input measurements.
 
 ### Test Cases
 
-1. **Output format** (`test_linearize_output_format`): Validates CSV structure with required headers (IntensityIn, IntensityOut, Luminance), valid data ranges (0-1 for intensities)
+1. **Output format** (`test_linearize_output_format`): Validates CSV structure with required headers (intensity_in, intensity_out, luminance), valid data ranges (0-1 for intensities)
 2. **Luminance linearity** (`test_linearize_luminance_linearity`): Verifies output produces approximately uniform luminance increments (CV < 1.5)
 3. **8-bit resolution** (`test_linearize_8bit`): Tests 8-bit measurements linearized to an 8-bit (≤256 entries) LUT. Tests against known `lut_8bit.csv`.
 4. **16-bit resolution** (`test_linearize_16bit`): Tests 16-bit measurements linearized to an 16-bit (≤65536 entries) LUT. Tests against known `lut_16bit.csv`.
@@ -73,7 +73,7 @@ average duplicate measurements, filter outliers, and optionally apply kernel smo
 
 This test suite validates:
 
-1. **Output format** (`test_smooth_output_format`): Validates CSV structure with required headers (Input, Luminance), no NaN values, non-negative values
+1. **Output format** (`test_smooth_output_format`): Validates CSV structure with required headers (intensity_in, luminance), no NaN values, non-negative values
 2. **Basic averaging (no smoothing)** (`test_smooth_basic_no_smoothing`): Tests basic averaging, without smoothing
     `measurements_8bit.csv` → `smoothed_measurements_8bit.csv`
 4. **Duplicate averaging** (`test_smooth_averages_duplicates`): Verifies multiple measurements at same intensity are correctly averaged.

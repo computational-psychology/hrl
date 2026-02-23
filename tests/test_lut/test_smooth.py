@@ -69,7 +69,7 @@ def test_smooth_output_format(measure_simple_input):
     """Output CSV file structure and data validity.
 
     Input: 256 intensity measurements with gamma~2.2 nonlinearity and small noise
-    Output: Smoothed data with 2 columns (Input, Luminance)
+    Output: Smoothed data with 2 columns (intensity_in, luminance)
     Validates: Presence of required headers, no NaN values, non-negative values
     """
     subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
@@ -78,7 +78,7 @@ def test_smooth_output_format(measure_simple_input):
     with open("smooth.csv", "r") as f:
         header = f.readline().strip()
 
-    assert "Input" in header and "Luminance" in header
+    assert "intensity_in" in header and "luminance" in header
 
     result = np.genfromtxt("smooth.csv", skip_header=1)
     assert result.shape[1] == 2

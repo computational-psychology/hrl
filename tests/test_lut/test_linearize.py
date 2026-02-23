@@ -51,7 +51,7 @@ def test_linearize_output_format(input_16bit):
     """Output CSV file structure and data validity.
 
     Input: 65536 intensity-luminance measurement pairs (gamma~2.2, 1-101 cd/m²)
-    Output: LUT with 3 columns (IntensityIn, IntensityOut, Luminance)
+    Output: LUT with 3 columns (intensity_in, intensity_out, luminance)
     Validates: Presence of required headers, no NaN values, intensities in [0,1] range
     """
     subprocess.run(["hrl-util", "lut", "linearize", "-r", "10"], check=True)
@@ -59,9 +59,9 @@ def test_linearize_output_format(input_16bit):
     with open("lut.csv", "r") as f:
         header = f.readline().strip()
 
-    assert "IntensityIn" in header
-    assert "IntensityOut" in header
-    assert "Luminance" in header
+    assert "intensity_in" in header
+    assert "intensity_out" in header
+    assert "luminance" in header
 
     result = np.genfromtxt("lut.csv", skip_header=1)
     assert result.shape[1] == 3
