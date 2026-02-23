@@ -1,12 +1,8 @@
-### Imports ###
-
-import argparse as ap
+import argparse
 
 import numpy as np
 
-### Argument parser ###
-
-prsr = ap.ArgumentParser(
+parser = argparse.ArgumentParser(
     prog="hrl-util lut linearize",
     description="""
     This script takes the result of hrl-util lut smooth, i.e. smooth.csv,
@@ -18,36 +14,44 @@ prsr = ap.ArgumentParser(
     """,
 )
 
-prsr.add_argument(
-    "-r", dest="res", default=16, type=int, help="The subsampling resoultion in bits. Default: 16"
+parser.add_argument(
+    "-r",
+    dest="res",
+    default=16,
+    type=int,
+    help="The subsampling resoultion in bits. Default: 16",
 )
-
-### Core ###
 
 
 def linearize(args):
-    args = prsr.parse_args(args)
+    """Sample a linear subset of the gamma table"""
+    parsed_args = parser.parse_args(args)
+    bit_depth = parsed_args.res
+    n_steps = 2**bit_depth
 
-    # Sample a linear subset of the gamma table
-    tbl = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
+    # Load (smoothed) LUT
+    lut = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
+    intensities = lut[:, 0]
+    luminances = lut[:, 1]
+
     idx = 0
     idxs = []
-    smpl_idx = np.zeros(2**args.res, dtype=bool)
-    itss = tbl[:, 0]
-    lmns = tbl[:, 1]
-    for i, smp in enumerate(np.linspace(np.min(lmns), np.max(lmns), 2**args.res)):
-        idx = np.nonzero(lmns >= smp)[0][0]
+    smpl_idx = np.zeros(n_steps, dtype=bool)
+    for i, smp in enumerate(np.linspace(np.min(luminances), np.max(luminances), n_steps)):
+        idx = np.nonzero(luminances >= smp)[0][0]
         if not len(idxs) or (idx != idxs[-1]):
             smpl_idx[i] = True
             idxs.append(idx)
-    ofl = open("lut.csv", "w")
-    ofl.write("intensity_in,intensity_out,luminance\r\n")
-    rslt = np.array(
-        [np.linspace(0, 1, 2**args.res)[smpl_idx], itss[idxs], lmns[idxs]]
+    linearized_lut = np.array(
+        [np.linspace(0, 1, n_steps)[smpl_idx], intensities[idxs], luminances[idxs]]
     ).transpose()
 
+    # Save linearized LUT to file
     print("Saving to File...")
+    out_file = open("lut.csv", "w")
+    headers = "intensity_in,intensity_out,luminance\n"
+    out_file.write(headers)
+    np.savetxt(out_file, linearized_lut, delimiter=",")
+    out_file.close()
 
-    np.savetxt(ofl, rslt, delimiter=",")
-    ofl.close()
-    # return lambda x: np.interp(x,np.linspace(0,1,2**args.res),itss[idxs])
+    # return lambda x: np.interp(x,np.linspace(0,1,2**parsed_args.res),intensities[idxs])

@@ -1,24 +1,13 @@
-### Imports ###
+import argparse
+from datetime import timedelta
+from random import shuffle
+from timeit import default_timer as timer
 
-# Package Imports
+import numpy as np
+
 from hrl import HRL
 
-# Qualified Imports
-import numpy as np
-import sys
-import argparse as ap
-import os
-
-# Unqualified Imports
-from random import shuffle
-
-# Timing
-from timeit import default_timer as timer
-from datetime import timedelta
-
-
-# Argument parser
-prsr = ap.ArgumentParser(
+parser = argparse.ArgumentParser(
     prog="hrl-util lut measure",
     description="""
     This script measures the relationship between the desired intensity (a
@@ -29,7 +18,7 @@ prsr = ap.ArgumentParser(
     """,
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-sz",
     dest="sz",
     default=0.5,
@@ -37,7 +26,7 @@ prsr.add_argument(
     help="The size of the central patch, as a fraction of the total screen size. Default: 0.5",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-s",
     dest="stps",
     default=65536,
@@ -45,15 +34,23 @@ prsr.add_argument(
     help="The number of unique intensity values to be sampled. Default: 65536",
 )
 
-prsr.add_argument(
-    "-mn", dest="mn", default=0.0, type=float, help="The minimum sampled intensity. Default: 0.0"
+parser.add_argument(
+    "-mn",
+    dest="mn",
+    default=0.0,
+    type=float,
+    help="The minimum sampled intensity. Default: 0.0",
 )
 
-prsr.add_argument(
-    "-mx", dest="mx", default=1.0, type=float, help="The maximum sampled intensity. Default: 1.0"
+parser.add_argument(
+    "-mx",
+    dest="mx",
+    default=1.0,
+    type=float,
+    help="The maximum sampled intensity. Default: 1.0",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-n",
     dest="nsmps",
     default=5,
@@ -61,7 +58,7 @@ prsr.add_argument(
     help="The number of samples to be taken at each intensity. Default: 5",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-sl",
     dest="slptm",
     default=200,
@@ -69,21 +66,22 @@ prsr.add_argument(
     help="The number of milliseconds to wait between each measurement. Default:200",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-r",
     dest="rndm",
     action="store_true",
     help="Shall we randomize the order of intensity values? Default: False",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-v",
     dest="rvs",
     action="store_true",
-    help="Shall we reverse the order of intensity values (high to low rather than low to high)? Default: False",
+    help="Shall we reverse the order of intensity values"
+    + " (high to low rather than low to high)? Default: False",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-p",
     dest="photometer",
     type=str,
@@ -91,7 +89,7 @@ prsr.add_argument(
     help="The photometer to use. Default: optical",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-o",
     dest="flnm",
     type=str,
@@ -99,7 +97,7 @@ prsr.add_argument(
     help="The output filename. Default: measure.csv",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-bg",
     dest="bg",
     type=float,
@@ -107,126 +105,124 @@ prsr.add_argument(
     help="The background intensity outside of the central patch. Default: 0",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-wd",
     dest="wd",
     type=int,
     default=1024,
-    help="The screen resolution width, in pixels. It should coincide with the settings in xorg.conf. Default: 1024",
+    help="The screen resolution width, in pixels."
+    + " It should coincide with the settings in xorg.conf. Default: 1024",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-hg",
     dest="hg",
     type=int,
     default=768,
-    help="The screen resolution height, in pixels. It should coincide with the settings in xorg.conf. Default: 768",
+    help="The screen resolution height, in pixels."
+    + " It should coincide with the settings in xorg.conf. Default: 768",
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-gr",
     dest="graphics",
     type=str,
     default="datapixx",
-    help="Whether using the GPU ('gpu'), the DataPixx interface ('datapixx')" +
-          " or the ViewPixx3D ('viewpixx'). Default: datapixx",
+    help="Whether using the GPU ('gpu'), the DataPixx interface ('datapixx')"
+    + " or the ViewPixx3D ('viewpixx'). Default: datapixx",
 )
 
-prsr.add_argument("-sc", dest="scrn", type=str, default="1", help="Screen number. Default: 1")
+parser.add_argument(
+    "-sc",
+    dest="scrn",
+    type=str,
+    default="1",
+    help="Screen number. Default: 1",
+)
 
-prsr.add_argument(
+parser.add_argument(
     "-wo",
     dest="wdth_offset",
     type=int,
     default=0,
-    help="Horizontal offset for window. Useful for configurations with a single Xscreen and multiple monitors. Default: 0",
+    help="Horizontal offset for window."
+    + "Useful for configurations with a single Xscreen and multiple monitors. Default: 0",
 )
 
 
-# Settings (these can all be changed with system arguments)
-
-
 def measure(args):
-    args = prsr.parse_args(args)
-
-    wdth = args.wd
-    hght = args.hg
+    parsed_args = parser.parse_args(args)
 
     # Starting timer
     start = timer()
 
     # Initializing HRL
-    flnm = args.flnm
-    flds = ["Intensity"] + ["Luminance" + str(i) for i in range(args.nsmps)]
+    filename = parsed_args.flnm
+    headers = ["Intensity"] + ["Luminance" + str(i) for i in range(parsed_args.nsmps)]
 
-    graphics = args.graphics
-    inputs = "keyboard"
-    photometer = args.photometer
-    scrn = args.scrn
-    bg = args.bg
-    wdth_offset = args.wdth_offset
+    graphics = parsed_args.graphics
+    photometer = parsed_args.photometer
+    screen = parsed_args.scrn
+    screen_width = parsed_args.wd
+    screen_height = parsed_args.hg
+    width_offset = parsed_args.wdth_offset
+    background_intensity = parsed_args.bg
 
-    hrl = HRL(
+    ihrl = HRL(
         graphics=graphics,
-        inputs=inputs,
+        inputs="keyboard",
         photometer=photometer,
-        wdth=wdth,
-        hght=hght,
-        bg=bg,
+        wdth=screen_width,
+        hght=screen_height,
+        bg=background_intensity,
         fs=True,
-        wdth_offset=wdth_offset,
+        wdth_offset=width_offset,
         db=True,
-        scrn=scrn,
-        rfl=flnm,
-        rhds=flds,
+        scrn=screen,
+        rfl=filename,
+        rhds=headers,
     )
 
-    itss = np.linspace(args.mn, args.mx, args.stps)
-    if args.rndm:
-        shuffle(itss)
-    if args.rvs:
-        itss = itss[::-1]
+    intensities = np.linspace(parsed_args.mn, parsed_args.mx, parsed_args.stps)
+    if parsed_args.rndm:
+        shuffle(intensities)
+    if parsed_args.rvs:
+        intensities = intensities[::-1]
 
-    (pwdth, phght) = (wdth * args.sz, hght * args.sz)
-    ppos = ((wdth - pwdth) / 2, (hght - phght) / 2)
-    print(pwdth)
-    print(ppos)
-    print(phght)
+    (patch_width, patch_height) = (screen_width * parsed_args.sz, screen_height * parsed_args.sz)
+    patch_position = ((screen_width - patch_width) / 2, (screen_height - patch_height) / 2)
+    print(patch_width)
+    print(patch_position)
+    print(patch_height)
 
-    done = False
+    for c, intensity in enumerate(intensities):
+        ihrl.results["Intensity"] = intensity
 
-    c = 0
+        patch = ihrl.graphics.newTexture(np.array([[intensity]]))
+        patch.draw(patch_position, (patch_width, patch_height))
+        ihrl.graphics.flip()
 
-    for its in itss:
-        c += 1
-        hrl.results["Intensity"] = its
+        print(
+            f"Current Intensity: {intensity:.2f} [progress: {c / len(intensities) * 100}% -- {c:d} of {len(intensities)}]"
+        )
+        samples = []
+        for i in range(parsed_args.nsmps):
+            samples.append(ihrl.photometer.readLuminance(5, parsed_args.slptm))
 
-        ptch = hrl.graphics.newTexture(np.array([[its]]))
-        ptch.draw(ppos, (pwdth, phght))
-        hrl.graphics.flip()
+        for i in range(len(samples)):
+            ihrl.results["Luminance" + str(i)] = samples[i]
 
-        print("Current Intensity: %f / progress: %d of %d" % (its, c, args.stps))
-        smps = []
-        for i in range(args.nsmps):
-            smps.append(hrl.photometer.readLuminance(5, args.slptm))
+        ihrl.writeResultLine()
 
-        for i in range(len(smps)):
-            hrl.results["Luminance" + str(i)] = smps[i]
-
-        hrl.writeResultLine()
-
-        if hrl.inputs.checkEscape():
+        if ihrl.inputs.checkEscape():
             break
 
     # Experiment is over!
-    hrl.close()
-
-    # stop timer
-    end = timer()
+    ihrl.close()
 
     # Time elapsed
-    print("Time elapsed:")
-    print(timedelta(seconds=end - start))
+    end = timer()
+    print(f"Time elapsed: {timedelta(seconds=end - start)}")
 
 
 if __name__ == "__main__":

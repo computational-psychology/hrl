@@ -1,12 +1,8 @@
-### Imports ###
-
-import argparse as ap
+import argparse
 
 import numpy as np
 
-### Argument parser ###
-
-prsr = ap.ArgumentParser(
+parser = argparse.ArgumentParser(
     prog="hrl-util lut smooth",
     description="""
     This script applies a kernel smoothing algorithm to the data contained in
@@ -27,7 +23,7 @@ prsr = ap.ArgumentParser(
     """,
 )
 
-prsr.add_argument(
+parser.add_argument(
     "-o",
     dest="ordr",
     default=0,
@@ -36,57 +32,65 @@ prsr.add_argument(
 )
 
 
-### Core ###
-
-
 def smooth(args):
-    args = prsr.parse_args(args)
+    parsed_args = parser.parse_args(args)
 
-    # Create the average table
-    hshmp = {}
-    fls = ["measure.csv"]
-    tbls = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in fls]
-    # First we build up a big intensity to luminance map
-    for tbl in tbls:
-        for rw in tbl:
-            if rw[0] in hshmp:
-                hshmp[rw[0]] = np.concatenate([hshmp[rw[0]], rw[1:]])
+    # Load measurement data
+    files = ["measure.csv"]
+    measurements = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in files]
+
+    # Concatenate measurements into one big intensity to luminances map
+    luminance_map = {}
+    for table in measurements:
+        for row in table:
+            if row[0] in luminance_map:
+                luminance_map[row[0]] = np.concatenate([luminance_map[row[0]], row[1:]])
             else:
-                hshmp[rw[0]] = rw[1:]
+                luminance_map[row[0]] = row[1:]
 
-    # Now we average the values, clearing all nans from the picture.
-    for ky in hshmp.keys():
-        values = hshmp[ky][~np.isnan(hshmp[ky])]
-        # set outliers to NaN. Outliers are values that are more than 0.05 cd
-        # or more than 0.5% of their value from the closest measurement at the
-        # same intensity.
-        if len(values) > 1:
-            min_diff = np.empty_like(values)
-            for i in range(len(values)):
-                idx = np.ones(len(values), dtype=bool)
+    # Average measurements at each intensity, removing NaNs and outliers
+    for intensity_value, luminance_measurements in luminance_map.items():
+        luminance_measurements = luminance_measurements[~np.isnan(luminance_measurements)]
+
+        # Only perform outlier detection if there are multiple measurements
+        if len(luminance_measurements) > 1:
+            # set outliers to NaN. Outliers are values that are more than 0.05 cd
+            # or more than 0.5% of their value from the closest measurement at the
+            # same intensity.
+            min_diff = np.empty_like(luminance_measurements)
+            for i in range(len(luminance_measurements)):
+                idx = np.ones(len(luminance_measurements), dtype=bool)
                 idx[i] = False
-                min_diff[i] = np.min(np.abs(values[idx] - values[i]))
-            values[(min_diff > 0.075) & (min_diff / values > 0.0075)] = np.nan
-        hshmp[ky] = np.mean(values[np.isnan(values) == False])
-        if np.isnan(hshmp[ky]):
-            raise RuntimeError("no valid measurement for %f" % ky)
-    tbl = np.array([list(hshmp.keys()), list(hshmp.values())]).transpose()
-    tbl = tbl[tbl[:, 0].argsort()]
-    print(tbl.shape)
+                min_diff[i] = np.min(
+                    np.abs(luminance_measurements[idx] - luminance_measurements[i])
+                )
+            luminance_measurements[
+                (min_diff > 0.075) & (min_diff / luminance_measurements > 0.0075)
+            ] = np.nan
 
-    # And smooth it
-    krn = [0.2, 0.2, 0.2, 0.2, 0.2]
-    wfl = "smooth.csv"
+        luminance_map[intensity_value] = np.mean(
+            luminance_measurements[~np.isnan(luminance_measurements)]
+        )
 
-    smthd = tbl[:, 1]
+        if np.isnan(luminance_map[intensity_value]):
+            raise RuntimeError(f"no valid measurement for {intensity_value:.4f}")
 
-    for i in range(args.ordr):
-        smthd = np.hstack((np.ones(2) * smthd[0], smthd, np.ones(2) * smthd[-1]))
-        smthd = np.convolve(smthd, krn, "valid")
+    table = np.array([list(luminance_map.keys()), list(luminance_map.values())]).transpose()
+    table = table[table[:, 0].argsort()]
+    print(table.shape)
 
+    # Smooth LUT
+    kernel = [0.2, 0.2, 0.2, 0.2, 0.2]
+    smoothed = table[:, 1]
+    for i in range(parsed_args.ordr):
+        smoothed = np.hstack((np.ones(2) * smoothed[0], smoothed, np.ones(2) * smoothed[-1]))
+        smoothed = np.convolve(smoothed, kernel, "valid")
+
+    # Save smoothed LUT to file
     print("Saving to File...")
-    tbl[:, 1] = smthd
-    ofl = open(wfl, "w")
-    ofl.write("intensity_in,luminance\r\n")
-    np.savetxt(ofl, tbl, delimiter=",")
-    ofl.close()
+    out_filename = "smooth.csv"
+    table[:, 1] = smoothed
+    out_file = open(out_filename, "w")
+    out_file.write("intensity_in,luminance\n")
+    np.savetxt(out_file, table, delimiter=",")
+    out_file.close()
