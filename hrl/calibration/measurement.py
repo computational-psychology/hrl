@@ -2,89 +2,219 @@ import numpy as np
 
 
 def combine(measurements):
-    # Concatenate measurements into one big intensity to luminances map
+    """Construct an intensity-to-luminance map from (sets of) measurements
+
+    Build a dictionary of {intensity: luminances}, from measurements.
+    Measurements should be a collection (list, tuple, set), of numpy.ndarrays,
+    where each array (measurements table) has
+    a first column indicating the set monitor intensity (in domain [0, 1]),
+    and a second column with the measured luminance (in cd/m2).
+
+    Also removes NaN measurements.
+
+    The reason this output is a dict (and not, say, a numpy array)
+    is that the number of measured luminances could be different for each intensity.
+
+
+    Parameters
+    ----------
+    measurements : Collection[numpy.ndarray]
+        (set of) measurement table(s)
+
+    Returns
+    -------
+    dict[float: numpy.ndarray]
+        dictionary mapping {intensity: measured luminances}
+
+    Raises
+    ------
+    RuntimeError
+        when there are no valid (non-NaN) measurements left for a given intensity value
+    """
     luminance_map = {}
     for table in measurements:
         for row in table:
-            if row[0] in luminance_map:
-                luminance_map[row[0]] = np.concatenate([luminance_map[row[0]], row[1:]])
-            else:
-                luminance_map[row[0]] = row[1:]
+            intensity = row[0]
+            luminances = row[1:]
+
+            # Remove NaN measurements
+            luminances = luminances[~np.isnan(luminances)]
+
+            # Add to map
+            if intensity not in luminance_map:
+                luminance_map[intensity] = []
+            luminance_map[intensity] = np.concatenate([luminance_map[intensity], luminances])
+
+    # Check for NaNs
+    for intensity, luminances in luminance_map.items():
+        if not luminances.any():  # empty array
+            raise RuntimeError(f"no valid measurement for {intensity:.4f}")
 
     return luminance_map
 
 
-def remove_outliers(luminance_map):
-    # Remove outliers and NaNs
-    # Outliers are values that are more than 0.05 cd or more than 0.5% of their value
-    # from the closest measurement at the same intensity.
-    for intensity, luminance_measurements in luminance_map.items():
-        luminance_measurements = luminance_measurements[~np.isnan(luminance_measurements)]
+def remove_outliers(luminance_map, abs_tol=0.075, rel_tol=0.0075):
+    """Remove outlier measurements from intensity-to-luminance map
 
-        if len(luminance_measurements) > 1:
-            min_diff = np.empty_like(luminance_measurements)
-            for i in range(len(luminance_measurements)):
-                idx = np.ones(len(luminance_measurements), dtype=bool)
-                idx[i] = False
-                min_diff[i] = np.min(
-                    np.abs(luminance_measurements[idx] - luminance_measurements[i])
-                )
-            luminance_measurements[
-                (min_diff > 0.075) & (min_diff / luminance_measurements > 0.0075)
-            ] = np.nan
+    Outliers are values that deviate more than abs_tol from
+    the closest measurement at the same intensity,
+    AND where that deviation is more than rel_tol.
 
-        luminance_map[intensity] = luminance_measurements
+    Parameters
+    ----------
+    luminance_map : dict[float: numpy.ndarray]
+        dictionary mapping {intensity: measured luminances}, output from combine
+    abs_tol : float, optional
+        absolute tolerance, in cd/m2, by default 0.075
+    rel_tol : float, optional
+        relative tolerance, i.e., proportion of closest measurement, by default 0.0075
+
+    Returns
+    -------
+    dict[float: numpy.ndarray]
+        dictionary mapping {intensity: measured luminances}, without outliers
+
+    Raises
+    ------
+    RuntimeError
+        when there are no valid (non-NaN) measurements left for a given intensity value
+    """
+    # set outliers to NaN.
+    for intensity, luminances in luminance_map.items():
+        min_diff = np.zeros_like(luminances)
+        for i, lum in enumerate(luminances):
+            diffs = np.abs(luminances - lum)  # absolute difference between this lum, and all lums
+            diffs[i] = np.nan  # don't compare to yourself
+            min_diff[i] = np.nanmin(diffs)  # get minimum difference, i.e., to closest measurement
+
+        # Set outliers to NaN
+        luminances[(min_diff > abs_tol) & (min_diff / luminances > rel_tol)] = np.nan
+
+        # Reinsert into map
+        if all(np.isnan(luminances)):
+            raise RuntimeError(f"no valid measurement for {intensity:.4f}")
+        luminance_map[intensity] = luminances
 
     return luminance_map
 
 
 def average(luminance_map):
-    # Average measurements at each intensity
-    for intensity, luminance_measurements in luminance_map.items():
-        luminance_map[intensity] = np.mean(
-            luminance_measurements[~np.isnan(luminance_measurements)]
-        )
-        if np.isnan(luminance_map[intensity]):
-            raise RuntimeError(f"no valid measurement for {intensity:.4f}")
+    """Average measured luminances per intensity value, and return as table
 
-    table = np.array([list(luminance_map.keys()), list(luminance_map.values())]).transpose()
-    table = table[table[:, 0].argsort()]
+    Parameters
+    ----------
+    luminance_map : dict[float: numpy.ndarray]
+        dictionary mapping {intensity: measured luminances}
+
+    Returns
+    -------
+    numpy.ndarray
+        table with a first column indicating the set monitor intensity (in domain [0, 1]),
+        and a second column with the average measured luminance (in cd/m2)
+    """
+    for intensity, luminances in luminance_map.items():
+        luminance_map[intensity] = np.nanmean(luminances)
+
+    # Convert to numpy array
+    table = np.array(list(luminance_map.items()))
+
+    # Sort
+    table = table[table.argsort(axis=0)[:, 0]]
+
     # print(table.shape)
 
     return table
 
 
-def smooth(luminances, order):
+def smooth(measurements, order=1, kernel=[0.2, 0.2, 0.2, 0.2, 0.2]):
+    """Smooth measurements (of adjacent intensities) by given kernel
 
-    kernel = [0.2, 0.2, 0.2, 0.2, 0.2]
+    Parameters
+    ----------
+    measurements : numpy.ndarray
+        1D array of luminance values (in cd/m²), one value per intensity level
+    order : int, optional
+        order of smoothing, i.e., number of repeated smoothings, by default 1
+    kernel : ArrayLike, optional
+        smoothing kernel, by default [0.2, 0.2, 0.2, 0.2, 0.2]
 
-    smoothed = luminances
+    Returns
+    -------
+    numpy.ndarray
+        1D array of smoothed luminance values, same length as input
+    """
+
+    smoothed = np.array(measurements).copy()
+
     for _ in range(order):
-        smoothed = np.hstack((np.ones(2) * smoothed[0], smoothed, np.ones(2) * smoothed[-1]))
+        # Pad
+        smoothed = np.pad(
+            smoothed,
+            pad_width=len(kernel) // 2,
+            constant_values=(smoothed[0], smoothed[-1]),
+        )
+
+        # Convolve
         smoothed = np.convolve(smoothed, kernel, "valid")
 
     return smoothed
 
 
-def linearize(lut, bit_depth=16):
-    """Sample a linear subset of the gamma table"""
-    intensities = lut[:, 0]
-    luminances = lut[:, 1]
+def linearize(measurements, bit_depth=16):
+    """Linearize LUT from measurements
 
-    n_steps = 2**bit_depth
+    Finds each measurement that most closely corresponding to
+    each linear luminance step between measured max and min luminance.
 
-    idx = 0
-    idxs = []
-    sample_indices = np.zeros(n_steps, dtype=bool)
-    for i, smp in enumerate(np.linspace(np.min(luminances), np.max(luminances), n_steps)):
-        idx = np.nonzero(luminances >= smp)[0][0]
-        if not len(idxs) or (idx != idxs[-1]):
+    NOTE: that this linearization *does not* interpolate between measurements.
+    Thus, the resulting LUT is *at most* as long as the measurements.
+    Possibly, it is shorter:
+    if multiple input values were measured as (approx.) the same luminance.
+
+    Parameters
+    ----------
+    measurements : ArrayLike
+        monitor measurements; first column must be specified intensities,
+        second column must be corresponding measured luminances
+    bit_depth : int, optional
+        bit depth, i.e., resolution of the linearized LUT, by default 16 (2**16 = 65536 entries)
+
+    Returns
+    -------
+    numpy.ndarray
+        linearized LUT, with columns "Intensity In", "Intensity Out", (measured) "Luminance"
+    """
+
+    # Separate measured intensities, luminances
+    ints_measured = measurements[:, 0]
+    lums_measured = measurements[:, 1]
+
+    n_samples = 2**bit_depth
+
+    # Setup linearized luminances
+    linear_luminances = np.linspace(np.min(lums_measured), np.max(lums_measured), n_samples)
+    linear_intensities = np.linspace(0, 1, n_samples)
+
+    # Find unique measured luminances for linear steps
+    measurement_indices = []
+    sample_indices = np.zeros(n_samples, dtype=bool)
+    for i, lum_desired in enumerate(linear_luminances):
+        # Which measured luminance is the first greater than the desired luminance for this step?
+        first_idx = np.argwhere(lums_measured >= lum_desired)[0][0]
+
+        # If this measurement is not yet in our list, add it
+        if not len(measurement_indices) or (first_idx != measurement_indices[-1]):
             sample_indices[i] = True
-            idxs.append(idx)
+            measurement_indices.append(first_idx)
 
-    linearized_lut = np.array(
-        [np.linspace(0, 1, n_steps)[sample_indices], intensities[idxs], luminances[idxs]]
-    ).transpose()
+    # Construct Lookup Table
+    linearized_lut = np.transpose(
+        [
+            linear_intensities[sample_indices],  # intensity in
+            ints_measured[measurement_indices],  # intensity out (measured)
+            lums_measured[measurement_indices],  # luminance (measured)
+        ]
+    )
 
     return linearized_lut
-    # return lambda x: np.interp(x,np.linspace(0,1,2**args.res),itss[idxs])
+    # return lambda x: np.interp(x,np.linspace(0,1,n_samples),ints_measured[measurement_indices])
