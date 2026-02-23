@@ -45,7 +45,7 @@ def smooth(args):
     # Create the average table
     hshmp = {}
     fls = ["measure.csv"]
-    tbls = [np.genfromtxt(fl, skip_header=1) for fl in fls]
+    tbls = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in fls]
     # First we build up a big intensity to luminance map
     for tbl in tbls:
         for rw in tbl:
@@ -87,6 +87,6 @@ def smooth(args):
     print("Saving to File...")
     tbl[:, 1] = smthd
     ofl = open(wfl, "w")
-    ofl.write("Input Luminance\r\n")
-    np.savetxt(ofl, tbl)
+    ofl.write("intensity_in,luminance\r\n")
+    np.savetxt(ofl, tbl, delimiter=",")
     ofl.close()
