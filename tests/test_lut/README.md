@@ -103,3 +103,10 @@ measurements_8bit.csv → smoothed_measurements_8bit.csv → lut_8bit.csv (8-bit
 measurements_16bit.csv → smoothed_measurements_16bit.csv → lut_10bit.csv (10-bit resolution)
                                                           → lut_16bit.csv (16-bit resolution)
 ```
+
+**Luminance range preservation** (`test_pipeline_preserves_luminance_range`):
+Additionally, we test the pipeline with a measurements in a different luminance range,
+to ensure that the pipeline correctly handles different input ranges
+and produces LUTs that preserve the original luminance range.
+- `measurements_lumrange.csv` (2.5-150 cd/m²) → smooth (order=1) → linearize (8-bit) → `lut_lumrange.csv`
+- Confirms final LUT min/max luminance within 10% of original range
