@@ -2,6 +2,7 @@ import argparse
 
 import numpy as np
 
+import hrl.calibration.measurement
 from hrl.util.lut import intensities_argparser
 
 parser = argparse.ArgumentParser(
@@ -25,20 +26,9 @@ def command(parsed_args):
 
     # Load (smoothed) LUT
     lut = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
-    intensities = lut[:, 0]
-    luminances = lut[:, 1]
 
-    idx = 0
-    idxs = []
-    smpl_idx = np.zeros(n_steps, dtype=bool)
-    for i, smp in enumerate(np.linspace(np.min(luminances), np.max(luminances), n_steps)):
-        idx = np.nonzero(luminances >= smp)[0][0]
-        if not len(idxs) or (idx != idxs[-1]):
-            smpl_idx[i] = True
-            idxs.append(idx)
-    linearized_lut = np.array(
-        [np.linspace(0, 1, n_steps)[smpl_idx], intensities[idxs], luminances[idxs]]
-    ).transpose()
+    # Linearize LUT
+    linearized_lut = hrl.calibration.measurement.linearize(lut, bit_depth=parsed_args.bit_depth)
 
     # Save linearized LUT to file
     print("Saving to File...")
@@ -47,8 +37,6 @@ def command(parsed_args):
     out_file.write(headers)
     np.savetxt(out_file, linearized_lut, delimiter=",")
     out_file.close()
-
-    # return lambda x: np.interp(x,np.linspace(0,1,2**parsed_args.res),intensities[idxs])
 
 
 if __name__ == "__main__":
