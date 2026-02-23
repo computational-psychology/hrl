@@ -59,3 +59,20 @@ even from the same input measurements.
 4. **16-bit resolution** (`test_linearize_16bit`): Tests 16-bit measurements linearized to an 16-bit (≤65536 entries) LUT. Tests against known `lut_16bit.csv`.
 5. **10-bit resolution** (`test_linearize_10bit`): Tests 16-bit measurements linearized to a 10-bit (≤1024 entries) LUT. Tests against known `lut_10bit.csv`.
 
+
+
+## Smoothing tests (`test_smooth.py`)
+
+Before linearization, we often first combine several sets of raw measurements,
+remove outliers, and smooth the data
+to create a cleaner dataset for LUT generation.
+The `hrl-util lut smooth` command processes raw monitor luminance measurements to remove noise,
+average duplicate measurements, filter outliers, and optionally apply kernel smoothing.
+
+### Test Cases
+
+This test suite validates:
+
+1. **Output format** (`test_smooth_output_format`): Validates CSV structure with required headers (Input, Luminance), no NaN values, non-negative values
+2. **Basic averaging (no smoothing)** (`test_smooth_basic_no_smoothing`): Tests basic averaging, without smoothing
+    `measurements_8bit.csv` → `smoothed_measurements_8bit.csv`
