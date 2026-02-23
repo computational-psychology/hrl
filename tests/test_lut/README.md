@@ -76,3 +76,13 @@ This test suite validates:
 1. **Output format** (`test_smooth_output_format`): Validates CSV structure with required headers (Input, Luminance), no NaN values, non-negative values
 2. **Basic averaging (no smoothing)** (`test_smooth_basic_no_smoothing`): Tests basic averaging, without smoothing
     `measurements_8bit.csv` → `smoothed_measurements_8bit.csv`
+4. **Duplicate averaging** (`test_smooth_averages_duplicates`): Verifies multiple measurements at same intensity are correctly averaged.
+   `measurements_duplicates.csv` (20 unique intensities × 3 measurements each)
+    → `smoothed_measurements_duplicates.csv`
+5. **Outlier filtering** (`test_smooth_filters_outliers`): Confirms outlier measurements are correctly excluded
+    measurements_outliers.csv` (50 intensities with 2-3 measurements, some 30% outliers)
+    → `smoothed_measurements_outliers.csv`
+3. **Order=2 kernel smoothing** (`test_smooth_with_kernel`): Tests kernel smoothing iterations 
+    `measurements_8bit.csv` with `order=2`
+    → `smoothed_measurements_kernel.csv`
+
