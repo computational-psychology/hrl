@@ -17,10 +17,6 @@ class RESPONSEPixx(Input):
     implementation.
     """
 
-    def __init__(self, device):
-        super(RESPONSEPixx, self).__init__()
-        self.device = device
-
     ## new function in HRL3. waitButton() function implemented in python
     ## in previous version of HRL waitButton() was a function of the
     ## datapixx.so python wrapper
