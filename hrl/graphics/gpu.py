@@ -43,7 +43,7 @@ class GPU_grey(Graphics_grey):
 
         # Discretize to 8-bit integers, single channel
         arr = img * (2**self.bitdepth - 1)
-        arr = np.uint32(arr)
+        arr = np.asarray(arr, dtype=np.uint32)
 
         # Duplicate to 4 channels, with max alpha
         channels = (
@@ -95,7 +95,7 @@ class GPU_RGB(Graphics_RGB):
 
         # Discretize to 8-bit integers, single channel
         arr = img * (2**self.bitdepth - 1)
-        arr = np.uint32(arr)
+        arr = np.asarray(arr, dtype=np.uint32)
 
         # Convert to 4 channels, with max alpha
         arr = (
