@@ -1,8 +1,8 @@
 ### Imports ###
 
-import numpy as np
 import argparse as ap
-import scipy as sp
+
+import numpy as np
 
 ### Argument parser ###
 
@@ -45,7 +45,7 @@ def smooth(args):
     # Create the average table
     hshmp = {}
     fls = ["measure.csv"]
-    tbls = [np.genfromtxt(fl, skip_header=1) for fl in fls]
+    tbls = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in fls]
     # First we build up a big intensity to luminance map
     for tbl in tbls:
         for rw in tbl:
@@ -60,12 +60,13 @@ def smooth(args):
         # set outliers to NaN. Outliers are values that are more than 0.05 cd
         # or more than 0.5% of their value from the closest measurement at the
         # same intensity.
-        min_diff = np.empty_like(values)
-        for i in range(len(values)):
-            idx = np.ones(len(values), dtype=bool)
-            idx[i] = False
-            min_diff[i] = np.min(np.abs(values[idx] - values[i]))
-        values[(min_diff > 0.075) & (min_diff / values > 0.0075)] = np.NaN
+        if len(values) > 1:
+            min_diff = np.empty_like(values)
+            for i in range(len(values)):
+                idx = np.ones(len(values), dtype=bool)
+                idx[i] = False
+                min_diff[i] = np.min(np.abs(values[idx] - values[i]))
+            values[(min_diff > 0.075) & (min_diff / values > 0.0075)] = np.nan
         hshmp[ky] = np.mean(values[np.isnan(values) == False])
         if np.isnan(hshmp[ky]):
             raise RuntimeError("no valid measurement for %f" % ky)
@@ -81,11 +82,11 @@ def smooth(args):
 
     for i in range(args.ordr):
         smthd = np.hstack((np.ones(2) * smthd[0], smthd, np.ones(2) * smthd[-1]))
-        smthd = sp.convolve(smthd, krn, "valid")
+        smthd = np.convolve(smthd, krn, "valid")
 
     print("Saving to File...")
     tbl[:, 1] = smthd
     ofl = open(wfl, "w")
-    ofl.write("Input Luminance\r\n")
-    np.savetxt(ofl, tbl)
+    ofl.write("intensity_in,luminance\r\n")
+    np.savetxt(ofl, tbl, delimiter=",")
     ofl.close()
