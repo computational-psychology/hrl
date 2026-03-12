@@ -73,13 +73,13 @@ class VIEWPixx_grey(Graphics_grey):
 
         # Discretize to 16-bit integers, single channel
         arr = img * (2 ** (2 * self.bitdepth) - 1)
-        arr = np.uint32(arr)
+        arr = np.asarray(arr, dtype=np.uint32)
 
         # Convert to datapixx R-G concatenated format
         channels = (
             arr // (2**self.bitdepth),  # R channel (high byte)
             arr % (2**self.bitdepth),  # G channel (low byte)
-            0,  # B channel (not used)
+            np.zeros_like(arr),  # B channel (not used)
             2**self.bitdepth - 1,  # Alpha channel (max intensity)
         )
 
@@ -149,7 +149,7 @@ class VIEWPixx_RGB(Graphics_RGB):
 
         # Discretize to 8-bit integers, single channel
         arr = img * (2**self.bitdepth - 1)
-        arr = np.uint32(arr)
+        arr = np.asarray(arr, dtype=np.uint32)
 
         # Convert to 4 channels, with max alpha
         arr = (
