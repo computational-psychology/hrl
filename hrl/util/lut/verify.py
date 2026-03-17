@@ -150,7 +150,7 @@ parser.add_argument(
 )
 
 
-def verify(args):
+def command(args):
     parsed_args = parser.parse_args(args)
 
     lut = parsed_args.lut
@@ -233,4 +233,4 @@ def verify(args):
 
 
 if __name__ == "__main__":
-    main()
+    command()

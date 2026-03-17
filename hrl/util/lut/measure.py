@@ -145,7 +145,7 @@ parser.add_argument(
 )
 
 
-def measure(args):
+def command(args):
     parsed_args = parser.parse_args(args)
 
     # Starting timer
@@ -219,4 +219,4 @@ def measure(args):
 
 
 if __name__ == "__main__":
-    main()
+    command()

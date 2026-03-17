@@ -35,7 +35,7 @@ parser.add_argument(
 )
 
 
-def smooth(args):
+def command(args):
     parsed_args = parser.parse_args(args)
 
     # Load measurement data

@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(
 )
 
 
-def plot(args):
+def command(args):
     parsed_args = parser.parse_args(args)
 
     lut = np.genfromtxt("lut.csv", skip_header=1)

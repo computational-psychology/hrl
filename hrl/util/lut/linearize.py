@@ -23,7 +23,7 @@ parser.add_argument(
 )
 
 
-def linearize(args):
+def command(args):
     """Sample a linear subset of the gamma table"""
     parsed_args = parser.parse_args(args)
 

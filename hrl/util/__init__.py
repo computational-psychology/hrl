@@ -53,27 +53,18 @@ def main():
             verify - Take luminance measures given a lookup table
                 """
                 )
+
+            # Select subcommand
             elif args[1] == "measure":
-                from hrl.util.lut.measure import measure
-
-                measure(args[2:])
-
+                from hrl.util.lut.measure import command
             elif args[1] == "smooth":
-                from hrl.util.lut.smooth import smooth
-
-                smooth(args[2:])
-
+                from hrl.util.lut.smooth import command
             elif args[1] == "linearize":
-                from hrl.util.lut.linearize import linearize
-
-                linearize(args[2:])
-
+                from hrl.util.lut.linearize import command
             elif args[1] == "plot":
-                from hrl.util.lut.plot import plot
-
-                plot(args[2:])
-
+                from hrl.util.lut.plot import command
             elif args[1] == "verify":
-                from hrl.util.lut.verify import verify
+                from hrl.util.lut.verify import command
 
-                verify(args[2:])
+            # Run subcommand with remaining args
+            command(args[2:])
