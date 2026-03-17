@@ -29,7 +29,7 @@ docs = [
 dev = ["ruff>=0.14.7", { include-group = "test" }, { include-group = "docs" }]
 
 [project.scripts]
-hrl-util = "hrl.util:main"
+hrl-util = "hrl.util.__main__:main"
 
 [project.urls]
 repository = 'https://github.com/computational-psychology/hrl'
