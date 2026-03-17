@@ -96,3 +96,7 @@ def command(args):
     out_file.write("intensity_in,luminance\n")
     np.savetxt(out_file, table, delimiter=",")
     out_file.close()
+
+
+if __name__ == "__main__":
+    command()

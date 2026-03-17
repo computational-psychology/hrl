@@ -36,3 +36,7 @@ def command(args):
     plt.legend(loc="upper left")
 
     plt.show()
+
+
+if __name__ == "__main__":
+    command()

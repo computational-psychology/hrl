@@ -55,3 +55,7 @@ def command(args):
     out_file.close()
 
     # return lambda x: np.interp(x,np.linspace(0,1,2**parsed_args.res),intensities[idxs])
+
+
+if __name__ == "__main__":
+    command()
