@@ -55,10 +55,10 @@ def test_full_pipeline(measure_integration_input):
     Validates: Final LUT matches expected values from unit tests
     """
     # Step 1: Smooth
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
 
     # Step 2: Linearize
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True)
 
     # Compare
     result_lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
@@ -76,10 +76,10 @@ def test_pipeline_preserves_luminance_range(measure_lumrange_input):
     lum_min, lum_max = 2.5, 150.0
 
     # Step 1: Smooth
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "1"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "1"], check=True)
 
     # Step 2: Linearize
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True)
 
     # Verify luminance range
     result_lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")

@@ -54,7 +54,7 @@ def test_linearize_output_format(input_16bit):
     Output: LUT with 3 columns (intensity_in, intensity_out, luminance)
     Validates: Presence of required headers, no NaN values, intensities in [0,1] range
     """
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "10"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize"], check=True)
 
     with open("lut.csv", "r") as f:
         header = f.readline().strip()
@@ -77,7 +77,7 @@ def test_linearize_luminance_linearity(input_16bit):
     Output: 16-bit LUT mapping intensities to produce linear luminance progression
     Validates: Monotonic luminance increase with low step-size variability (CV < 1.5)
     """
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "16"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize"], check=True)
 
     result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
     luminances = result[:, 2]
@@ -99,7 +99,7 @@ def test_linearize_16bit(input_16bit):
     Output: Up to 2^16 LUT entries mapping intensities for linear luminance progression
     Validates: Numerical accuracy via regression against known-good output
     """
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "16"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "16"], check=True)
 
     result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(TEST_DIR / "lut_16bit.csv", skip_header=1, delimiter=",")
@@ -114,7 +114,7 @@ def test_linearize_8bit(input_8bit):
     Output: ≤256 LUT entries mapping intensities for linear luminance progression
     Validates: Numerical accuracy and compliance with 8-bit length constraint
     """
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True)
 
     result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(TEST_DIR / "lut_8bit.csv", skip_header=1, delimiter=",")
@@ -131,7 +131,7 @@ def test_linearize_10bit(input_16bit):
     Output: ≤1024 LUT entries mapping intensities for linear luminance progression
     Validates: Numerical accuracy and compliance with 10-bit length constraint
     """
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "10"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "10"], check=True)
 
     result = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(TEST_DIR / "lut_10bit.csv", skip_header=1, delimiter=",")

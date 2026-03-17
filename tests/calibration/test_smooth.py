@@ -72,7 +72,7 @@ def test_smooth_output_format(measure_simple_input):
     Output: Smoothed data with 2 columns (intensity_in, luminance)
     Validates: Presence of required headers, no NaN values, non-negative values
     """
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
 
     # Verify format
     with open("smooth.csv", "r") as f:
@@ -93,7 +93,7 @@ def test_smooth_basic_no_smoothing(measure_simple_input):
     Output: Averaged measurements without kernel smoothing
     Validates: Numerical accuracy via regression against known-good output
     """
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
 
     result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
@@ -108,7 +108,7 @@ def test_smooth_with_kernel(measure_simple_input):
     Output: Smoothed data with 2 iterations of kernel smoothing applied
     Validates: Numerical accuracy via regression against known-good output
     """
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "2"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "2"], check=True)
 
     result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(
@@ -125,7 +125,7 @@ def test_smooth_averages_duplicates(measure_duplicates_input):
     Output: 20 unique intensity points with averaged luminance values
     Validates: Correct duplicate averaging and numerical accuracy
     """
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
 
     result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(
@@ -145,7 +145,7 @@ def test_smooth_filters_outliers(measure_outliers_input):
     Output: Smoothed data with outliers removed from averaging
     Validates: Correct outlier filtering and numerical accuracy
     """
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
 
     result = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
     expected = np.genfromtxt(

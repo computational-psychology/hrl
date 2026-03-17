@@ -16,19 +16,22 @@ parser = argparse.ArgumentParser(
     has been evenly sampled across the intensity range, as internally the
     algorithm has no idea how far apart in intensity each sample is, and
     implicitly assumes each step size to be the same.
-
-    Right now the kernel can be directly changed but it looks like this:
-    [0.2,0.2,0.2,0.2,0.2]. Use the other parameters to experiment with
-    different smoothing parameters.
     """,
 )
-
 parser.add_argument(
-    "-o",
-    dest="ordr",
+    "-n",
+    "--order",
     default=0,
     type=int,
-    help="The number of times (order) to smooth the data. Default: 0 (no smoothing, just averaging",
+    help="number of times (order) to smooth the data, by default 0 (no smoothing, just averaging)",
+)
+parser.add_argument(
+    "-k",
+    "--kernel",
+    default=[0.2, 0.2, 0.2, 0.2, 0.2],
+    type=float,
+    nargs="+",
+    help="kernel for smoothing, by default [0.2, 0.2, 0.2, 0.2, 0.2]",
 )
 
 
@@ -80,11 +83,10 @@ def smooth(args):
     print(table.shape)
 
     # Smooth LUT
-    kernel = [0.2, 0.2, 0.2, 0.2, 0.2]
     smoothed = table[:, 1]
-    for i in range(parsed_args.ordr):
+    for i in range(parsed_args.order):
         smoothed = np.hstack((np.ones(2) * smoothed[0], smoothed, np.ones(2) * smoothed[-1]))
-        smoothed = np.convolve(smoothed, kernel, "valid")
+        smoothed = np.convolve(smoothed, parsed_args.kernel, "valid")
 
     # Save smoothed LUT to file
     print("Saving to File...")

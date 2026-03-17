@@ -15,19 +15,19 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    "-r",
-    dest="res",
+    "-b",
+    "--bit_depth",
     default=16,
     type=int,
-    help="The subsampling resoultion in bits. Default: 16",
+    help="Subsampling resolution (in bits), by default 16 -> 2**16 = 65536 levels",
 )
 
 
 def linearize(args):
     """Sample a linear subset of the gamma table"""
     parsed_args = parser.parse_args(args)
-    bit_depth = parsed_args.res
-    n_steps = 2**bit_depth
+
+    n_steps = 2**parsed_args.bit_depth
 
     # Load (smoothed) LUT
     lut = np.genfromtxt("smooth.csv", skip_header=1, delimiter=",")
