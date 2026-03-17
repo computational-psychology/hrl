@@ -150,9 +150,7 @@ parser.add_argument(
 )
 
 
-def command(args):
-    parsed_args = parser.parse_args(args)
-
+def command(parsed_args):
     lut = parsed_args.lut
 
     # Starting timer
@@ -233,4 +231,4 @@ def command(args):
 
 
 if __name__ == "__main__":
-    command()
+    command(argparse.ArgumentParser(parents=[parser]).parse_args())

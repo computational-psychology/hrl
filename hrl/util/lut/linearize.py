@@ -23,10 +23,8 @@ parser.add_argument(
 )
 
 
-def command(args):
+def command(parsed_args):
     """Sample a linear subset of the gamma table"""
-    parsed_args = parser.parse_args(args)
-
     n_steps = 2**parsed_args.bit_depth
 
     # Load (smoothed) LUT
@@ -58,4 +56,4 @@ def command(args):
 
 
 if __name__ == "__main__":
-    command()
+    command(argparse.ArgumentParser(parents=[parser]).parse_args())

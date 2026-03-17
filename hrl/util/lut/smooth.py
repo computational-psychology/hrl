@@ -35,9 +35,7 @@ parser.add_argument(
 )
 
 
-def command(args):
-    parsed_args = parser.parse_args(args)
-
+def command(parsed_args):
     # Load measurement data
     files = ["measure.csv"]
     measurements = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in files]
@@ -99,4 +97,4 @@ def command(args):
 
 
 if __name__ == "__main__":
-    command()
+    command(argparse.ArgumentParser(parents=[parser]).parse_args())

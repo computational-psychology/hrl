@@ -56,15 +56,15 @@ def main():
 
             # Select subcommand
             elif args[1] == "measure":
-                from hrl.util.lut.measure import command
+                from hrl.util.lut.measure import command, parser
             elif args[1] == "smooth":
-                from hrl.util.lut.smooth import command
+                from hrl.util.lut.smooth import command, parser
             elif args[1] == "linearize":
-                from hrl.util.lut.linearize import command
+                from hrl.util.lut.linearize import command, parser
             elif args[1] == "plot":
-                from hrl.util.lut.plot import command
+                from hrl.util.lut.plot import command, parser
             elif args[1] == "verify":
-                from hrl.util.lut.verify import command
+                from hrl.util.lut.verify import command, parser
 
             # Run subcommand with remaining args
-            command(args[2:])
+            command(parser.parse_args(args[2:]))

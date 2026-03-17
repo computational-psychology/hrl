@@ -12,9 +12,7 @@ parser = argparse.ArgumentParser(
 )
 
 
-def command(args):
-    parsed_args = parser.parse_args(args)
-
+def command(parsed_args):
     lut = np.genfromtxt("lut.csv", skip_header=1)
 
     plt.figure()
@@ -39,4 +37,4 @@ def command(args):
 
 
 if __name__ == "__main__":
-    command()
+    command(argparse.ArgumentParser(parents=[parser]).parse_args())
