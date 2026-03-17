@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser(
-    prog="hrl-util lut smooth",
+    prog="smooth",
     description="""
     This script applies a kernel smoothing algorithm to the data contained in
     the file 'measure.csv' and generates 'smooth.csv' as a result.
@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser(
     algorithm has no idea how far apart in intensity each sample is, and
     implicitly assumes each step size to be the same.
     """,
+    add_help=False,
 )
 parser.add_argument(
     "-n",
@@ -97,4 +98,4 @@ def command(parsed_args):
 
 
 if __name__ == "__main__":
-    command(argparse.ArgumentParser(parents=[parser]).parse_args())
+    command(parser.parse_args())

@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 parser = argparse.ArgumentParser(
-    prog="hrl-util lut plot",
+    prog="plot",
     description="""
     This function takes the lookup table data and plots it to to depict the
     results of the correction.
     """,
+    add_help=False,
 )
 
 
@@ -37,4 +38,4 @@ def command(parsed_args):
 
 
 if __name__ == "__main__":
-    command(argparse.ArgumentParser(parents=[parser]).parse_args())
+    command(parser.parse_args())

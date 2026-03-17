@@ -8,7 +8,7 @@ import numpy as np
 from hrl import HRL
 
 parser = argparse.ArgumentParser(
-    prog="hrl-util lut measure",
+    prog="measure",
     description="""
     This script measures the relationship between the desired intensity (a
     normalized value between 0 and 1) given to the monitor, and the luminance
@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser(
     the first step in generating a lookup table for normalizing a monitor's
     luminance.
     """,
+    add_help=False,
 )
 
 parser.add_argument(
@@ -217,4 +218,4 @@ def command(parsed_args):
 
 
 if __name__ == "__main__":
-    command(argparse.ArgumentParser(parents=[parser]).parse_args())
+    command(parser.parse_args())

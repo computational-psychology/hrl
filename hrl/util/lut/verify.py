@@ -8,11 +8,12 @@ import numpy as np
 from hrl import HRL
 
 parser = argparse.ArgumentParser(
-    prog="hrl-util lut verify",
+    prog="verify",
     description="""
     This script verifies a lookup table by measuring luminance values with
     the LUT applied, ensuring the linearization is working correctly.
     """,
+    add_help=False,
 )
 
 parser.add_argument(

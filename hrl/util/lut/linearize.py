@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser(
-    prog="hrl-util lut linearize",
+    prog="linearize",
     description="""
     This script takes the result of hrl-util lut smooth, i.e. smooth.csv,
     and linearly subsamples the luminance axis at a given resolution.
@@ -12,6 +12,7 @@ parser = argparse.ArgumentParser(
     new intensity function which linearly increases luminance. This is the
     final step in generating a look up table.
     """,
+    add_help=False,
 )
 
 parser.add_argument(
@@ -56,4 +57,4 @@ def command(parsed_args):
 
 
 if __name__ == "__main__":
-    command(argparse.ArgumentParser(parents=[parser]).parse_args())
+    command(parser.parse_args())

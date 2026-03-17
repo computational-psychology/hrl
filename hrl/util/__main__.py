@@ -1,72 +1,29 @@
 #!/usr/bin/env python -O
 
-import sys
+import argparse
 
 
 def main():
-    args = sys.argv[1:]
+    """Main entry point for hrl-util CLI."""
+    from hrl.util.lut import register_lut_commands
 
-    if len(args) == 0 or args[0] == "--help":
-        print(
-            """
+    toplevel_parser = argparse.ArgumentParser(
+        prog="hrl-util",
+        description="""
         Welcome to the HRL utility program. From here, various scripts can be
         accessed for calibrating and testing configurations of experiment hardware.
-        Type \'hrl-util [command]\' in order to access the provided functionality.
-        Adding the switch --help at the end will display the command specific help
-        text.
+        """,
+    )
+    toplevel_subparsers = toplevel_parser.add_subparsers(
+        dest="command",
+        required=True,
+        metavar="<command>",
+    )
 
-        Provided commands are:
+    register_lut_commands(toplevel_subparsers)
 
-            tests - Simple hardware and software tests
-            lut - Scripts for generating gamma correction lookup tables
-        """
-        )
-
-    elif args[0] == "lut":
-        if len(args) == 1 or args[1] == "--help":
-            print(
-                """
-    When considering monitors, one may distinguish between the actual
-    luminance produced by the monitor, and the scale free 'intensity'
-    that the software and computer request of the monitor. In general,
-    luminance is not a simple, linear function of the requested
-    intensity (typically it's a so called 'gamma function') which means
-    that it is not immediately clear what luminances subjects are being
-    subjected to.
-
-    The scripts provided here can be used to generate a lookup table
-    (LUT) which can in turn be used in combination with the HRL
-    library to linearize the relationship between intensity and
-    luminance. This allows more precise control of displayed
-    luminances.
-
-    Currently implemented commands are:
-
-        measure - Measure the relationship between intensity and luminance
-            creates: 'samples.csv'
-        smooth - Apply kernel smoothing to generate an approximate function
-            creates: 'gamma.csv'
-        linearize - Invert the function approximation to generate a final lookup table
-            creates: 'lut.csv'
-        plot - Generate helpful plots for the three generated csv files
-        verify - Take luminance measures given a lookup table
-            """
-            )
-
-        # Select subcommand
-        elif args[1] == "measure":
-            from hrl.util.lut.measure import command, parser
-        elif args[1] == "smooth":
-            from hrl.util.lut.smooth import command, parser
-        elif args[1] == "linearize":
-            from hrl.util.lut.linearize import command, parser
-        elif args[1] == "plot":
-            from hrl.util.lut.plot import command, parser
-        elif args[1] == "verify":
-            from hrl.util.lut.verify import command, parser
-
-        # Run subcommand with remaining args
-        command(parser.parse_args(args[2:]))
+    args = toplevel_parser.parse_args()
+    args.func(args)
 
 
 if __name__ == "__main__":
