@@ -2,6 +2,8 @@ import argparse
 
 import numpy as np
 
+from hrl.util.lut import intensities_argparser
+
 parser = argparse.ArgumentParser(
     prog="linearize",
     description="""
@@ -13,14 +15,7 @@ parser = argparse.ArgumentParser(
     final step in generating a look up table.
     """,
     add_help=False,
-)
-
-parser.add_argument(
-    "-b",
-    "--bit_depth",
-    default=16,
-    type=int,
-    help="Subsampling resolution (in bits), by default 16 -> 2**16 = 65536 levels",
+    parents=[intensities_argparser],
 )
 
 
