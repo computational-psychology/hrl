@@ -57,6 +57,7 @@ Using small in-memory arrays to validate basic properties of the linearization f
 - **Three-column output** (`test_linearize_output_has_three_columns`): output has columns intensity_in, intensity_out, luminance
 - **Length bound** (`test_linearize_length_bounded_by_bit_depth`): number of output rows never exceeds 2**bit_depth
 - **Intensity range** (`test_linearize_intensities_in_unit_range`): both intensity columns stay within [0, 1]
+- **Monotonic output** (`test_linearize_output_columns_monotonic`): both intensity_out and luminance columns are non-decreasing
 
 ### Regression tests
 Against pre-computed CSV files generated from known input measurements, validating:

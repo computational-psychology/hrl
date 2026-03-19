@@ -30,6 +30,19 @@ def test_linearize_intensities_in_unit_range():
     assert np.all(result[:, 1] >= 0) and np.all(result[:, 1] <= 1)
 
 
+def test_linearize_output_columns_monotonic():
+    """Both intensity_out and luminance columns in the output are non-decreasing."""
+    # Setup
+    measurements = np.column_stack([np.linspace(0, 1, 100), np.linspace(1.0, 100.0, 100)])
+
+    # Run
+    result = linearize(measurements, bit_depth=8)
+
+    # Verify
+    assert np.all(np.diff(result[:, 1]) >= 0)  # intensity_out
+    assert np.all(np.diff(result[:, 2]) >= 0)  # luminance
+
+
 ### REGRESSION TESTS ###
 def test_linearize_luminance_linearity():
     """Resulting luminance values increase in approximately uniform steps.
