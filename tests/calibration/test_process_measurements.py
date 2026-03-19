@@ -93,6 +93,20 @@ def test_remove_outliers_keeps_close_measurements():
     assert np.sum(~np.isnan(result[0.5])) == 3
 
 
+def test_remove_outliers_single_measurement_per_intensity():
+    """A single measurement per intensity is kept unchanged."""
+    # Setup
+    lum_map = {0.0: np.array([1.0]), 0.5: np.array([5.0]), 1.0: np.array([10.0])}
+
+    # Run
+    result = remove_outliers(lum_map)
+
+    # Verify: no outliers can be flagged with only one measurement
+    assert result[0.0][0] == 1.0
+    assert result[0.5][0] == 5.0
+    assert result[1.0][0] == 10.0
+
+
 def test_remove_outliers_raises_when_all_removed():
     """If all measurements for an intensity are flagged as outliers, raise an error."""
     # Setup

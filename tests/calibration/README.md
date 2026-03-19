@@ -80,7 +80,8 @@ Testing combine, remove_outliers, and average in isolation with small in-memory 
 1. **Combining sessions** (`test_combine_*`): Multiple measurement tables are merged into
    a single intensity-to-luminance map; NaN readings are dropped.
 2. **Outlier removal** (`test_remove_outliers_*`): Measurements that deviate strongly from
-   the median at an intensity level are excluded.
+   the median at an intensity level are excluded;
+   a single measurement per intensity is always kept unchanged.
 3. **Averaging** (`test_average_*`): The remaining measurements at each intensity level
    are averaged to produce a clean intensity–luminance table.
 
