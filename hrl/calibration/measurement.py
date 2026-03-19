@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 
@@ -31,10 +33,34 @@ def setup_intensities(i_min, i_max, n_steps, shuffle=False, reverse=False):
 
     return intensities
 
+
+def draw_uniform_square(ihrl, intensity, patch_size=0.5):
+    """Draw a centered square patch of uniform intensity
+
+    Parameters
+    ----------
+    ihrl : HRL
+        the HRL instance to use for drawing the patch
+    intensity : float
+        intensity of the patch (0.0 to 1.0)
+    patch_size : float, optional
+        size of the patch as a fraction of the screen, by default 0.5
+    """
+    screen_width, screen_height = ihrl.graphics.width, ihrl.graphics.height
+    patch_width = screen_width * patch_size
+    patch_height = screen_height * patch_size
+    patch_position = (
+        (screen_width - patch_width) / 2,
+        (screen_height - patch_height) / 2,
+    )
+    patch = ihrl.graphics.newTexture(np.array([[intensity]]))
+    patch.draw(patch_position, (patch_width, patch_height))
+
+
 def measure_lut(
     ihrl,
     intensities=setup_intensities(0.0, 1.0, 2**16),
-    patch_size=0.5,
+    stim_draw_func=partial(draw_uniform_square, patch_size=0.5),
     n_samples=5,
     sleep_time=0.1,
 ):
@@ -46,19 +72,15 @@ def measure_lut(
         the HRL instance to use
     intensities : array-like
         intensity values to measure, by default 2**16 steps from 0 to 1
-    patch_size : float
-        size of the patch in proportion of screen size (0.0 to 1.0), by default 0.5
+    stim_draw_func : callable, optional
+        function with signature `(ihrl, intensity)` that draws the stimulus
+        for each measurement; defaults to `draw_uniform_square(patch_size=0.5)`
     n_samples : int
         number of photometer readings per intensity level, by default 5
     sleep_time : float
         time in seconds to wait between photometer readings, by default 0.1
     """
     _sleeptime = int(sleep_time * 1000)  # convert to ms once
-
-    screen_width, screen_height = ihrl.graphics.width, ihrl.graphics.height
-
-    (patch_width, patch_height) = (screen_width * patch_size, screen_height * patch_size)
-    patch_position = ((screen_width - patch_width) / 2, (screen_height - patch_height) / 2)
 
     for idx_int, intensity in enumerate(intensities):
         print(
@@ -68,8 +90,8 @@ def measure_lut(
         )
         ihrl.results["Intensity"] = intensity
 
-        patch = ihrl.graphics.newTexture(np.array([[intensity]]))
-        patch.draw(patch_position, (patch_width, patch_height))
+        # Draw (update) stimulus
+        stim_draw_func(ihrl, intensity)
         ihrl.graphics.flip()
 
         # Multiple samples for each intensity value

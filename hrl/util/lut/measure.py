@@ -1,9 +1,10 @@
 import argparse
 from datetime import timedelta
+from functools import partial
 from timeit import default_timer as timer
 
 from hrl import HRL
-from hrl.calibration.measurement import measure_lut, setup_intensities
+from hrl.calibration.measurement import draw_uniform_square, measure_lut, setup_intensities
 from hrl.util import graphics_argparser
 from hrl.util.lut import intensities_argparser
 
@@ -103,7 +104,7 @@ def command(parsed_args):
     measure_lut(
         ihrl,
         intensities=intensities,
-        patch_size=parsed_args.patch_size,
+        stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
         n_samples=parsed_args.n_samples,
         sleep_time=parsed_args.sleep_time / 1000,
     )
