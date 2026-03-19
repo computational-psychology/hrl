@@ -181,3 +181,18 @@ def test_linearize_different_bitdepths(tmp_path, input_bitdepth, bit_depth):
     assert len(result) <= 2**bit_depth
     expected = np.genfromtxt(TEST_DIR / f"lut_{bit_depth}bit.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
+
+
+### ERROR HANDLING ###
+def test_smooth_fails_on_missing_input(tmp_path):
+    """Smooth command exits with non-zero status when input file (measure.csv) is missing."""
+    result = subprocess.run(
+        ["hrl-util", "lut", "smooth", "--order", "0"], cwd=tmp_path, capture_output=True
+    )
+    assert result.returncode != 0
+
+
+def test_linearize_fails_on_missing_input(tmp_path):
+    """Linearize command exits with non-zero status when input file (smooth.csv) is missing."""
+    result = subprocess.run(["hrl-util", "lut", "linearize"], cwd=tmp_path, capture_output=True)
+    assert result.returncode != 0

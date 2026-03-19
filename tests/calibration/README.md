@@ -146,6 +146,8 @@ These mirror the integration tests but validate the command-line interface and f
 - **Kernel smoothing** (`test_smooth_with_kernel`): `order=2` output matches `smoothed_measurements_kernel.csv`
 - **Linearization output format** (`test_linearize_output_format`): correct headers and valid intensity/luminance ranges
 - **Linearization bit depths** (`test_linearize_different_bitdepths`, parametrized): 8-bit, 10-bit, 16-bit outputs match expected LUT files
+- **Missing smooth input** (`test_smooth_fails_on_missing_input`): smooth command exits non-zero when `measure.csv` is absent
+- **Missing linearize input** (`test_linearize_fails_on_missing_input`): linearize command exits non-zero when `smooth.csv` is absent
 
 ## Regenerating Test Data
 
