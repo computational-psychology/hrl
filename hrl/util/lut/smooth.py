@@ -2,6 +2,8 @@ import argparse
 
 import numpy as np
 
+import hrl.calibration.measurement
+
 parser = argparse.ArgumentParser(
     prog="smooth",
     description="""
@@ -41,56 +43,23 @@ def command(parsed_args):
     files = ["measure.csv"]
     measurements = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in files]
 
-    # Concatenate measurements into one big intensity to luminances map
-    luminance_map = {}
-    for table in measurements:
-        for row in table:
-            if row[0] in luminance_map:
-                luminance_map[row[0]] = np.concatenate([luminance_map[row[0]], row[1:]])
-            else:
-                luminance_map[row[0]] = row[1:]
+    # Combine
+    luminance_map = hrl.calibration.measurement.combine(measurements)
 
-    # Average measurements at each intensity, removing NaNs and outliers
-    for intensity_value, luminance_measurements in luminance_map.items():
-        luminance_measurements = luminance_measurements[~np.isnan(luminance_measurements)]
+    # Remove outliers
+    luminance_map = hrl.calibration.measurement.remove_outliers(luminance_map)
 
-        # Only perform outlier detection if there are multiple measurements
-        if len(luminance_measurements) > 1:
-            # set outliers to NaN. Outliers are values that are more than 0.05 cd
-            # or more than 0.5% of their value from the closest measurement at the
-            # same intensity.
-            min_diff = np.empty_like(luminance_measurements)
-            for i in range(len(luminance_measurements)):
-                idx = np.ones(len(luminance_measurements), dtype=bool)
-                idx[i] = False
-                min_diff[i] = np.min(
-                    np.abs(luminance_measurements[idx] - luminance_measurements[i])
-                )
-            luminance_measurements[
-                (min_diff > 0.075) & (min_diff / luminance_measurements > 0.0075)
-            ] = np.nan
+    # Average
+    table = hrl.calibration.measurement.average(luminance_map)
 
-        luminance_map[intensity_value] = np.mean(
-            luminance_measurements[~np.isnan(luminance_measurements)]
-        )
-
-        if np.isnan(luminance_map[intensity_value]):
-            raise RuntimeError(f"no valid measurement for {intensity_value:.4f}")
-
-    table = np.array([list(luminance_map.keys()), list(luminance_map.values())]).transpose()
-    table = table[table[:, 0].argsort()]
-    print(table.shape)
-
-    # Smooth LUT
-    smoothed = table[:, 1]
-    for i in range(parsed_args.order):
-        smoothed = np.hstack((np.ones(2) * smoothed[0], smoothed, np.ones(2) * smoothed[-1]))
-        smoothed = np.convolve(smoothed, parsed_args.kernel, "valid")
+    # Smooth
+    table[:, 1] = hrl.calibration.measurement.smooth(
+        table[:, 1], order=parsed_args.order, kernel=parsed_args.kernel
+    )
 
     # Save smoothed LUT to file
     print("Saving to File...")
     out_filename = "smooth.csv"
-    table[:, 1] = smoothed
     out_file = open(out_filename, "w")
     out_file.write("intensity_in,luminance\n")
     np.savetxt(out_file, table, delimiter=",")
