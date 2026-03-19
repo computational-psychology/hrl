@@ -125,6 +125,10 @@ validating the end-to-end behavior and ensuring that the final output matches ex
 measurements_8bit.csv → combine → remove_outliers → average → smooth(order=0) → linearize → lut_8bit.csv
 ```
 
+**Multiple sessions** (`test_pipeline_combines_multiple_sessions`):
+Splits the same 256 measurements into two interleaved sessions and combines them,
+verifying the multi-session combine path produces the same LUT as a single session.
+
 **Luminance range preservation** (`test_pipeline_preserves_luminance_range`):
 Tests the pipeline with measurements in a different luminance range
 to confirm that the LUT preserves the original range.
