@@ -2,10 +2,8 @@ import argparse
 from datetime import timedelta
 from timeit import default_timer as timer
 
-import numpy as np
-
 from hrl import HRL
-from hrl.calibration.measurement import measure_lut
+from hrl.calibration.measurement import measure_lut, setup_intensities
 from hrl.util import graphics_argparser
 from hrl.util.lut import intensities_argparser
 
@@ -90,12 +88,16 @@ def command(parsed_args):
     )
 
     # Set up intensity values to be measured
-    steps = 2**parsed_args.bit_depth
-    intensities = np.linspace(parsed_args.int_min, parsed_args.int_max, steps)
-    if parsed_args.randomize:
-        np.random.shuffle(intensities)
-    if parsed_args.reverse:
-        intensities = intensities[::-1]
+    intensities = setup_intensities(
+        parsed_args.int_min,
+        parsed_args.int_max,
+        2**parsed_args.bit_depth,
+        parsed_args.randomize,
+        parsed_args.reverse,
+    )
+    print(
+        f"Measuring {len(intensities)} intensity values ([{parsed_args.int_min}, {parsed_args.int_max}])..."
+    )
 
     # Measure luminance for intensity values
     measure_lut(

@@ -1,9 +1,39 @@
 import numpy as np
 
 
+def setup_intensities(i_min, i_max, n_steps, shuffle=False, reverse=False):
+    """Set up the intensity values to be measured
+
+    Parameters
+    ----------
+    i_min : float
+        minimum intensity value to be measured
+    i_max : float
+        maximum intensity value to be measured
+    n_steps : int
+        number of intensity values to be measured
+    shuffle : bool, optional
+        shuffle the intensity values, by default False
+    reverse : bool, optional
+        reverse the order of the intensity values, by default False
+
+    Returns
+    -------
+    np.ndarray
+        array of intensity values to be measured
+    """
+    intensities = np.linspace(i_min, i_max, n_steps)
+
+    if shuffle:
+        np.random.shuffle(intensities)
+    elif reverse:
+        intensities = intensities[::-1]
+
+    return intensities
+
 def measure_lut(
     ihrl,
-    intensities,
+    intensities=setup_intensities(0.0, 1.0, 2**16),
     patch_size=0.5,
     n_samples=5,
     sleep_time=0.1,
