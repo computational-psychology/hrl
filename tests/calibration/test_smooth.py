@@ -45,6 +45,20 @@ def test_smooth_length_preserved():
     assert len(result) == len(measurements)
 
 
+def test_smooth_order_one_reduces_noise():
+    """Default smoothing (order=1) reduces point-to-point variance."""
+    # Setup
+    rng = np.random.default_rng(42)
+    base = np.linspace(0.0, 1.0, 50)
+    noisy = base + rng.normal(0, 0.05, size=50)
+
+    # Run
+    result = smooth(noisy, order=1)
+
+    # Verify
+    assert np.std(np.diff(result)) < np.std(np.diff(noisy))
+
+
 def test_smooth_with_kernel():
     """Order=2 kernel smoothing matches pre-computed expected values.
 

@@ -104,6 +104,7 @@ reducing luminance differences between neighboring intensity steps.
 Using small in-memory arrays to validate basic properties of the smoothing function:
 
 - **No smoothing** (`test_smooth_order_zero_unchanged`): `order=0` returns the input unchanged
+- **Default order reduces noise** (`test_smooth_order_one_reduces_noise`): `order=1` (the default) reduces point-to-point variance
 - **Constant array** (`test_smooth_constant_array_unchanged`): smoothing a constant array leaves it unchanged
 - **Length preserved** (`test_smooth_length_preserved`): output has the same length as the input
 
