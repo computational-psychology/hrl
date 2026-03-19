@@ -1,11 +1,12 @@
 import argparse
 from datetime import timedelta
-from random import shuffle
+from functools import partial
 from timeit import default_timer as timer
 
 import numpy as np
 
 from hrl import HRL
+from hrl.calibration.measurement import draw_uniform_square, measure_lut
 from hrl.util.lut import intensities_argparser
 from hrl.util.lut.measure import measurement_argparser
 
@@ -37,81 +38,49 @@ parser.add_argument(
 
 
 def command(parsed_args):
-    lut = parsed_args.lut
 
     # Starting timer
     start = timer()
 
     # Initializing HRL
-    filename = parsed_args.out_file
     headers = ["Intensity"] + ["Luminance" + str(i) for i in range(parsed_args.n_samples)]
 
-    graphics = parsed_args.graphics
-    photometer = parsed_args.photometer
-    screen = parsed_args.screen
-    screen_width = parsed_args.width
-    screen_height = parsed_args.height
-    width_offset = parsed_args.width_offset
-    background_intensity = parsed_args.background
-
     ihrl = HRL(
-        graphics=graphics,
+        graphics=parsed_args.graphics,
+        lut=parsed_args.lut,  # Apply the LUT that needs to be verified
         inputs="keyboard",
-        photometer=photometer,
-        wdth=screen_width,
-        hght=screen_height,
-        bg=background_intensity,
+        photometer=parsed_args.photometer,
+        wdth=parsed_args.width,
+        hght=parsed_args.height,
+        bg=parsed_args.background,
         fs=True,
-        lut=lut,
-        wdth_offset=width_offset,
+        wdth_offset=parsed_args.width_offset,
         db=True,
-        scrn=screen,
-        rfl=filename,
-        rhds=headers,
+        scrn=parsed_args.screen,
+        flnm=parsed_args.out_file,
+        hdrs=headers,
     )
 
-    steps = 2**parsed_args.bit_depth
-    intensities = np.linspace(parsed_args.int_min, parsed_args.int_max, steps)
+    # Set up intensity values to be measured
+    lut = np.genfromtxt(parsed_args.lut, skip_header=1, delimiter=",")
+    intensities = lut[:, 0]  # Use the input intensity values from the LUT
+    print(f"Measuring {len(intensities)} intensity values from LUT ({parsed_args.lut})...")
     if parsed_args.randomize:
-        shuffle(intensities)
-    if parsed_args.reverse:
+        np.random.shuffle(intensities)
+    elif parsed_args.reverse:
         intensities = intensities[::-1]
 
-    (patch_width, patch_height) = (
-        screen_width * parsed_args.patch_size,
-        screen_height * parsed_args.patch_size,
+    # Measure luminance for intensity values
+    measure_lut(
+        ihrl,
+        intensities=intensities,
+        stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
+        n_samples=parsed_args.n_samples,
+        sleep_time=parsed_args.sleep_time / 1000,
     )
-    patch_position = ((screen_width - patch_width) / 2, (screen_height - patch_height) / 2)
-    print(patch_width)
-    print(patch_position)
-    print(patch_height)
 
-    for c, intensity in enumerate(intensities):
-        ihrl.results["Intensity"] = intensity
-
-        patch = ihrl.graphics.newTexture(np.array([[intensity]]))
-        patch.draw(patch_position, (patch_width, patch_height))
-        ihrl.graphics.flip()
-
-        print(
-            f"Current Intensity: {intensity:.2f} [progress: {c / len(intensities) * 100}% -- {c:d} of {len(intensities)}]"
-        )
-        samples = []
-        for i in range(parsed_args.n_samples):
-            samples.append(ihrl.photometer.readLuminance(5, parsed_args.sleep_time))
-
-        for i in range(len(samples)):
-            ihrl.results["Luminance" + str(i)] = samples[i]
-
-        ihrl.writeResultLine()
-
-        if ihrl.inputs.checkEscape():
-            break
-
-    # Experiment is over!
+    # Measurement is over!
     ihrl.close()
-
-    # Time elapsed
     end = timer()
     print(f"Time elapsed: {timedelta(seconds=end - start)}")
 
