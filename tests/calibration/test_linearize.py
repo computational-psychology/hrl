@@ -1,42 +1,37 @@
-"""Unit tests for the linearize function using static test data."""
+"""Tests for the linearize function using hrl.calibration.measurement."""
 
-import shutil
-import subprocess
 from pathlib import Path
 
 import numpy as np
 
+from hrl.calibration.measurement import linearize
+
 TEST_DIR = Path(__file__).parent
 
 
-def test_linearize_output_format(tmp_path):
-    """Output CSV file structure and data validity.
+### UNIT TESTS
+def test_linearize_output_has_three_columns():
+    """Output table has three columns (intensity_in, intensity_out, luminance)."""
+    measurements = np.column_stack([np.linspace(0, 1, 100), np.linspace(1.0, 100.0, 100)])
+    assert linearize(measurements, bit_depth=4).shape[1] == 3
 
-    Input: 65536 intensity-luminance measurement pairs (gamma~2.2, 1-101 cd/m²)
-    Output: LUT with 3 columns (intensity_in, intensity_out, luminance)
-    Validates: Presence of required headers, no NaN values, intensities in [0,1] range
-    """
-    # Setup
-    shutil.copy(TEST_DIR / "measurements_16bit.csv", tmp_path / "smooth.csv")
 
-    # Run
-    subprocess.run(["hrl-util", "lut", "linearize"], check=True, cwd=tmp_path)
-    header = (tmp_path / "lut.csv").read_text().splitlines()[0]
-    result = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+def test_linearize_length_bounded_by_bit_depth():
+    """Number of output rows never exceeds 2**bit_depth."""
+    measurements = np.column_stack([np.linspace(0, 1, 100), np.linspace(1.0, 100.0, 100)])
+    assert len(linearize(measurements, bit_depth=4)) <= 2**4
 
-    # Verify format
-    assert "intensity_in" in header
-    assert "intensity_out" in header
-    assert "luminance" in header
-    assert result.shape[1] == 3
 
-    # Verify values
-    assert not np.any(np.isnan(result))
+def test_linearize_intensities_in_unit_range():
+    """Both intensity columns stay within [0, 1]."""
+    measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=8)
     assert np.all(result[:, 0] >= 0) and np.all(result[:, 0] <= 1)
     assert np.all(result[:, 1] >= 0) and np.all(result[:, 1] <= 1)
 
 
-def test_linearize_luminance_linearity(tmp_path):
+### REGRESSION TESTS ###
+def test_linearize_luminance_linearity():
     """Resulting luminance values increase in approximately uniform steps.
 
     Input: 65536 intensity-luminance measurement pairs (gamma~2.2, 1-101 cd/m²)
@@ -44,11 +39,10 @@ def test_linearize_luminance_linearity(tmp_path):
     Validates: Monotonic luminance increase with low step-size variability (CV < 1.5)
     """
     # Setup
-    shutil.copy(TEST_DIR / "measurements_16bit.csv", tmp_path / "smooth.csv")
+    measurements = np.genfromtxt(TEST_DIR / "measurements_16bit.csv", skip_header=1, delimiter=",")
 
     # Run
-    subprocess.run(["hrl-util", "lut", "linearize"], check=True, cwd=tmp_path)
-    result = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=16)
     luminances = result[:, 2]
 
     # Verify monotonicity
@@ -62,7 +56,7 @@ def test_linearize_luminance_linearity(tmp_path):
         assert cv < 1.5
 
 
-def test_linearize_16bit(tmp_path):
+def test_linearize_16bit():
     """16-bit resolution LUT matches pre-computed expected values.
 
     Input: 65536 intensity-luminance measurement pairs (gamma~2.2, 1-101 cd/m²)
@@ -70,17 +64,17 @@ def test_linearize_16bit(tmp_path):
     Validates: Numerical accuracy via regression against known-good output
     """
     # Setup
-    shutil.copy(TEST_DIR / "measurements_16bit.csv", tmp_path / "smooth.csv")
+    measurements = np.genfromtxt(TEST_DIR / "measurements_16bit.csv", skip_header=1, delimiter=",")
 
     # Run
-    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "16"], check=True, cwd=tmp_path)
+    result = linearize(measurements, bit_depth=16)
 
     # Verify
     expected = np.genfromtxt(TEST_DIR / "lut_16bit.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
 
-def test_linearize_8bit(tmp_path):
+def test_linearize_8bit():
     """8-bit resolution LUT has ≤256 entries and matches expected values.
 
     Input: 256 intensity-luminance measurement pairs (gamma~2.2, 1-101 cd/m²)
@@ -88,11 +82,10 @@ def test_linearize_8bit(tmp_path):
     Validates: Numerical accuracy and compliance with 8-bit length constraint
     """
     # Setup
-    shutil.copy(TEST_DIR / "measurements_8bit.csv", tmp_path / "smooth.csv")
+    measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
 
     # Run
-    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True, cwd=tmp_path)
-    result = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=8)
 
     # Verify
     assert len(result) <= 2**8
@@ -100,7 +93,7 @@ def test_linearize_8bit(tmp_path):
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
 
-def test_linearize_10bit(tmp_path):
+def test_linearize_10bit():
     """10-bit resolution LUT has ≤1024 entries and matches expected values.
 
     Input: 65536 intensity-luminance measurement pairs (gamma~2.2, 1-101 cd/m²)
@@ -108,11 +101,10 @@ def test_linearize_10bit(tmp_path):
     Validates: Numerical accuracy and compliance with 10-bit length constraint
     """
     # Setup
-    shutil.copy(TEST_DIR / "measurements_16bit.csv", tmp_path / "smooth.csv")
+    measurements = np.genfromtxt(TEST_DIR / "measurements_16bit.csv", skip_header=1, delimiter=",")
 
     # Run
-    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "10"], check=True, cwd=tmp_path)
-    result = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=10)
 
     # Verify
     assert len(result) <= 2**10
