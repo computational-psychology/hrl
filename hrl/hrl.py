@@ -118,7 +118,7 @@ class HRL:
         fs = False
 
         ## Load Graphics Device ##
-        if graphics in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
+        if graphics.lower() in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
             from .graphics.gpu import GPU_grey
 
             self.graphics = GPU_grey(
@@ -130,7 +130,7 @@ class HRL:
                 lut=lut,
                 mouse=mouse,
             )
-        elif graphics in ("gpu_RGB", "RGB"):
+        elif graphics.lower() in ("gpu_rgb", "rgb"):
             from .graphics.gpu import GPU_RGB
 
             self.graphics = GPU_RGB(
@@ -143,7 +143,7 @@ class HRL:
                 mouse=mouse,
             )
 
-        elif graphics == "datapixx":
+        elif graphics.lower() == "datapixx":
             from .graphics.datapixx import DATAPixx
 
             self.graphics = DATAPixx(
@@ -155,7 +155,7 @@ class HRL:
                 lut=lut,
                 mouse=mouse,
             )
-        elif graphics in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
+        elif graphics.lower() in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
             from .graphics.viewpixx import VIEWPixx_grey
 
             self.graphics = VIEWPixx_grey(
@@ -168,7 +168,7 @@ class HRL:
                 mouse=mouse,
             )
 
-        elif graphics in ("viewpixx_RGB", "viewpixx_color", "viewpixx_colour"):
+        elif graphics.lower() in ("viewpixx_rgb", "viewpixx_color", "viewpixx_colour"):
             from .graphics.viewpixx import VIEWPixx_RGB
 
             self.graphics = VIEWPixx_RGB(
