@@ -57,8 +57,8 @@ def command(parsed_args):
         wdth_offset=parsed_args.width_offset,
         db=True,
         scrn=parsed_args.screen,
-        flnm=parsed_args.out_file,
-        hdrs=headers,
+        rfl=parsed_args.out_file,
+        rhds=headers,
     )
 
     # Set up intensity values to be measured
