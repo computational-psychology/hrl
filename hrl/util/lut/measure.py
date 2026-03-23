@@ -15,8 +15,8 @@ measurement_arggroup.add_argument(
     "-p",
     "--photometer",
     type=str,
-    default="optical",
-    help="Photometer to use, by default 'optical'",
+    default="minolta",
+    help="Photometer to use, by default 'minolta'",
 )
 measurement_arggroup.add_argument(
     "-n",
