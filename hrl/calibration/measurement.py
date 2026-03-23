@@ -62,7 +62,7 @@ def measure_lut(
     intensities=setup_intensities(0.0, 1.0, 2**16),
     stim_draw_func=partial(draw_uniform_square, patch_size=0.5),
     n_samples=5,
-    sleep_time=0.1,
+    sleep_time=200,
 ):
     """Measure luminance for a range of intensity values
 
@@ -78,9 +78,8 @@ def measure_lut(
     n_samples : int
         number of photometer readings per intensity level, by default 5
     sleep_time : float
-        time in seconds to wait between photometer readings, by default 0.1
+        time (ms) to wait between photometer readings, by default 200ms
     """
-    _sleeptime = int(sleep_time * 1000)  # convert to ms once
 
     for idx_int, intensity in enumerate(intensities):
         print(
@@ -96,7 +95,7 @@ def measure_lut(
 
         # Multiple samples for each intensity value
         for idx_sample in range(n_samples):
-            sample = ihrl.photometer.readLuminance(5, _sleeptime)
+            sample = ihrl.photometer.readLuminance(5, int(sleep_time))
             ihrl.results[f"Luminance{idx_sample}"] = sample
 
         # Write measured samples to file

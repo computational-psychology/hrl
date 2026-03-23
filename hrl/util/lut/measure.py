@@ -106,7 +106,7 @@ def command(parsed_args):
         intensities=intensities,
         stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
         n_samples=parsed_args.n_samples,
-        sleep_time=parsed_args.sleep_time / 1000,
+        sleep_time=parsed_args.sleep_time,
     )
 
     # Experiment is over!
