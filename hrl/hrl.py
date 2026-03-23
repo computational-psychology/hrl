@@ -221,19 +221,19 @@ class HRL:
             if os.path.exists(rfl):
                 # checks how many trials have been run
                 r = open(rfl, "r")
-                reader = csv.DictReader(r, delimiter=" ")
+                reader = csv.DictReader(r, delimiter=",")
                 l = list(reader)
                 r.close()
                 # length of list is the number of rows that has been written (without counting the header)
                 self.starttrial = len(l)
 
                 self._rfl = open(rfl, "a")
-                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=" ")
+                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=",")
 
             # if it doesnt exist, open in 'wb' mode and write the header
             else:
                 self._rfl = open(rfl, "w")
-                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=" ")
+                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=",")
                 self._rfl.write(" ".join(rhds) + "\r\n")  # writes header
                 self.starttrial = 0
 
@@ -244,7 +244,7 @@ class HRL:
         self._dfl = None
         if dfl != None:
             self._dfl = open(dfl, "r")
-            self.designs = csv.DictReader(self._dfl, delimiter=" ", skipinitialspace=True)
+            self.designs = csv.DictReader(self._dfl, delimiter=",", skipinitialspace=True)
             # skip trials already done
             for i in range(self.starttrial):
                 self.designs.next()
