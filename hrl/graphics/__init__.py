@@ -1,5 +1,6 @@
 """HRL Graphics module - display device interfaces."""
 
+import importlib
 import os
 import platform
 
@@ -7,6 +8,29 @@ __all__ = [
     "new_graphics",
     "Texture",
 ]
+
+GRAPHICS_GREY_ALIASES = {
+    "gpu_grey": "gpu.GPU_grey",
+    "grey": "gpu.GPU_grey",
+    "gray": "gpu.GPU_grey",
+    "gray8": "gpu.GPU_grey",
+    "viewpixx": "viewpixx.VIEWPixx_grey",
+    "viewpixx_grey": "viewpixx.VIEWPixx_grey",
+    "viewpixx_gray": "viewpixx.VIEWPixx_grey",
+    "viewpixx_gray8": "viewpixx.VIEWPixx_grey",
+    "datapixx": "datapixx.DATAPixx",
+    "datapixx_grey": "datapixx.DATAPixx",
+    "datapixx_gray": "datapixx.DATAPixx",
+    "datapixx_gray8": "datapixx.DATAPixx",
+}
+GRAPHICS_RGB_ALIASES = {
+    "gpu_RGB": "gpu.GPU_RGB",
+    "RGB": "gpu.GPU_RGB",
+    "viewpixx_RGB": "viewpixx.VIEWPixx_RGB",
+    "viewpixx_color": "viewpixx.VIEWPixx_RGB",
+    "viewpixx_colour": "viewpixx.VIEWPixx_RGB",
+}
+GRAPHICS_ALIASES = {**GRAPHICS_GREY_ALIASES, **GRAPHICS_RGB_ALIASES}
 
 
 def new_graphics(
@@ -69,23 +93,14 @@ def new_graphics(
         if the provided graphics_alias does not match any known device aliases
     """
     # Lazy import the graphics class based on alias
-    if graphics_alias in ["gpu", "gpu_grey", "grey", "gray", "gray8"]:
-        from .gpu import GPU_grey as graphics_class
-    elif graphics_alias in ["gpu_RGB", "RGB"]:
-        from .gpu import GPU_RGB as graphics_class
-    elif graphics_alias in ["viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"]:
-        from .viewpixx import VIEWPixx_grey as graphics_class
-    elif graphics_alias in ["viewpixx_RGB", "viewpixx_color", "viewpixx_colour"]:
-        from .viewpixx import VIEWPixx_RGB as graphics_class
-    elif graphics_alias in ["datapixx", "datapixx_grey", "datapixx_gray", "datapixx_gray8"]:
-        from .datapixx import DATAPixx as graphics_class
+    if graphics_alias in GRAPHICS_ALIASES:
+        module_name, class_name = GRAPHICS_ALIASES[graphics_alias].rsplit(".", 1)
+        module = importlib.import_module(f".{module_name}", package=__name__)
+        graphics_class = getattr(module, class_name)
     else:
         raise ValueError(
             f"Unknown graphics device '{graphics_alias}'. Valid options are: "
-            f"'gpu', 'gpu_grey', 'grey', 'gray', 'gray8', 'gpu_RGB', 'RGB', "
-            f"'viewpixx', 'viewpixx_grey', 'viewpixx_gray', 'viewpixx_gray8', "
-            f"'viewpixx_RGB', 'viewpixx_color', 'viewpixx_colour', "
-            f"'datapixx', 'datapixx_grey', 'datapixx_gray', 'datapixx_gray8'"
+            f"{', '.join(list(GRAPHICS_GREY_ALIASES.keys()) + list(GRAPHICS_RGB_ALIASES.keys()))}"
         )
 
     # Run screen setup for multiple monitor support
