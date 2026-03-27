@@ -1,7 +1,6 @@
 """HRL utility package for calibration and testing."""
 
 import argparse
-import inspect
 
 import hrl.graphics
 
@@ -10,12 +9,7 @@ graphics_arggroup = graphics_argparser.add_argument_group("Graphics settings")
 graphics_arggroup.add_argument(
     "-gr",
     "--graphics",
-    choices=[
-        alias
-        for alias in hrl.graphics.__all__
-        if not inspect.isabstract(device := getattr(hrl.graphics, alias))
-        and issubclass(device, hrl.graphics.Graphics_grey)
-    ],
+    choices=[hrl.graphics.GRAPHICS_GREY_ALIASES.keys()],
     default="datapixx",
     help="Graphics device (default: datapixx)",
 )
