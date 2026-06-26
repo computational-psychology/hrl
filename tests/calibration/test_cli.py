@@ -4,7 +4,6 @@ Using subprocess to run the CLI commands,
 and validating outputs against expected results in files.
 """
 
-import shutil
 import subprocess
 from pathlib import Path
 
@@ -23,16 +22,41 @@ def test_full_pipeline(tmp_path, input_bitdepth, bit_depth):
     Pipeline: smooth(order=0) → linearize at {bit_depth}-bit resolution
     Validates: Final LUT matches lut_{bit_depth}bit.csv
     """
-    shutil.copy(TEST_DIR / f"measurements_{input_bitdepth}bit.csv", tmp_path / "measure.csv")
+    smooth_file = tmp_path / "smooth.csv"
+    lut_file = tmp_path / "lut.csv"
 
     # Step 1: Smooth
-    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True, cwd=tmp_path)
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "smooth",
+            "--in_file",
+            str(TEST_DIR / f"measurements_{input_bitdepth}bit.csv"),
+            "--out_file",
+            str(smooth_file),
+            "--order",
+            "0",
+        ],
+        check=True,
+    )
 
     # Step 2: Linearize
     subprocess.run(
-        ["hrl-util", "lut", "linearize", "--bit_depth", str(bit_depth)], check=True, cwd=tmp_path
+        [
+            "hrl-util",
+            "lut",
+            "linearize",
+            "--in_file",
+            str(smooth_file),
+            "--out_file",
+            str(lut_file),
+            "--bit_depth",
+            str(bit_depth),
+        ],
+        check=True,
     )
-    result_lut = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    result_lut = np.genfromtxt(lut_file, skip_header=1, delimiter=",")
 
     # Verify
     expected_lut = np.genfromtxt(
@@ -49,14 +73,41 @@ def test_pipeline_preserves_luminance_range(tmp_path):
     Validates: Final LUT matches expected values and preserves min/max luminance within 5%
     """
     lum_min, lum_max = 2.5, 150.0
-    shutil.copy(TEST_DIR / "measurements_lumrange.csv", tmp_path / "measure.csv")
+    smooth_file = tmp_path / "smooth.csv"
+    lut_file = tmp_path / "lut.csv"
 
     # Step 1: Smooth
-    subprocess.run(["hrl-util", "lut", "smooth", "--order", "1"], check=True, cwd=tmp_path)
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "smooth",
+            "--in_file",
+            str(TEST_DIR / "measurements_lumrange.csv"),
+            "--out_file",
+            str(smooth_file),
+            "--order",
+            "1",
+        ],
+        check=True,
+    )
 
     # Step 2: Linearize
-    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True, cwd=tmp_path)
-    result_lut = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "linearize",
+            "--in_file",
+            str(smooth_file),
+            "--out_file",
+            str(lut_file),
+            "--bit_depth",
+            "8",
+        ],
+        check=True,
+    )
+    result_lut = np.genfromtxt(lut_file, skip_header=1, delimiter=",")
 
     # Verify luminance range
     assert np.isclose(result_lut[0, 2], lum_min, rtol=0.05)
@@ -75,13 +126,25 @@ def test_smooth_output_format(tmp_path):
     Output: Smoothed data with 2 columns (intensity_in, luminance)
     Validates: Presence of required headers, no NaN values, non-negative values
     """
-    # Setup
-    shutil.copy(TEST_DIR / "measurements_8bit.csv", tmp_path / "measure.csv")
+    out_file = tmp_path / "smooth.csv"
 
     # Run
-    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True, cwd=tmp_path)
-    header = (tmp_path / "smooth.csv").read_text().splitlines()[0]
-    result = np.genfromtxt(tmp_path / "smooth.csv", skip_header=1, delimiter=",")
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "smooth",
+            "--in_file",
+            str(TEST_DIR / "measurements_8bit.csv"),
+            "--out_file",
+            str(out_file),
+            "--order",
+            "0",
+        ],
+        check=True,
+    )
+    header = out_file.read_text().splitlines()[0]
+    result = np.genfromtxt(out_file, skip_header=1, delimiter=",")
 
     # Verify format
     assert "intensity_in" in header and "luminance" in header
@@ -99,12 +162,24 @@ def test_averaging(tmp_path):
     Output: Averaged measurements without kernel smoothing
     Validates: Numerical accuracy via regression against known-good output
     """
-    # Setup
-    shutil.copy(TEST_DIR / "measurements_8bit.csv", tmp_path / "measure.csv")
+    out_file = tmp_path / "smooth.csv"
 
     # Run
-    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True, cwd=tmp_path)
-    result = np.genfromtxt(tmp_path / "smooth.csv", skip_header=1, delimiter=",")
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "smooth",
+            "--in_file",
+            str(TEST_DIR / "measurements_8bit.csv"),
+            "--out_file",
+            str(out_file),
+            "--order",
+            "0",
+        ],
+        check=True,
+    )
+    result = np.genfromtxt(out_file, skip_header=1, delimiter=",")
 
     # Verify
     expected = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
@@ -118,12 +193,24 @@ def test_smooth_with_kernel(tmp_path):
     Output: Smoothed data with 2 iterations of kernel smoothing applied
     Validates: Numerical accuracy via regression against known-good output
     """
-    # Setup
-    shutil.copy(TEST_DIR / "measurements_8bit.csv", tmp_path / "measure.csv")
+    out_file = tmp_path / "smooth.csv"
 
     # Run
-    subprocess.run(["hrl-util", "lut", "smooth", "--order", "2"], check=True, cwd=tmp_path)
-    result = np.genfromtxt(tmp_path / "smooth.csv", skip_header=1, delimiter=",")
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "smooth",
+            "--in_file",
+            str(TEST_DIR / "measurements_8bit.csv"),
+            "--out_file",
+            str(out_file),
+            "--order",
+            "2",
+        ],
+        check=True,
+    )
+    result = np.genfromtxt(out_file, skip_header=1, delimiter=",")
 
     # Verify
     expected = np.genfromtxt(
@@ -140,13 +227,23 @@ def test_linearize_output_format(tmp_path):
     Output: LUT with 3 columns (intensity_in, intensity_out, luminance)
     Validates: Presence of required headers, no NaN values, intensities in [0,1] range
     """
-    # Setup
-    shutil.copy(TEST_DIR / "measurements_8bit.csv", tmp_path / "smooth.csv")
+    out_file = tmp_path / "lut.csv"
 
     # Run
-    subprocess.run(["hrl-util", "lut", "linearize"], check=True, cwd=tmp_path)
-    header = (tmp_path / "lut.csv").read_text().splitlines()[0]
-    result = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "linearize",
+            "--in_file",
+            str(TEST_DIR / "measurements_8bit.csv"),
+            "--out_file",
+            str(out_file),
+        ],
+        check=True,
+    )
+    header = out_file.read_text().splitlines()[0]
+    result = np.genfromtxt(out_file, skip_header=1, delimiter=",")
 
     # Verify format
     assert "intensity_in" in header
@@ -168,14 +265,24 @@ def test_linearize_different_bitdepths(tmp_path, input_bitdepth, bit_depth):
     Output: ≤2**{bit_depth} LUT entries mapping intensities for linear luminance progression
     Validates: Output length within bounds and numerical accuracy vs lut_{bit_depth}bit.csv
     """
-    # Setup
-    shutil.copy(TEST_DIR / f"measurements_{input_bitdepth}bit.csv", tmp_path / "smooth.csv")
+    out_file = tmp_path / "lut.csv"
 
     # Run
     subprocess.run(
-        ["hrl-util", "lut", "linearize", "--bit_depth", str(bit_depth)], check=True, cwd=tmp_path
+        [
+            "hrl-util",
+            "lut",
+            "linearize",
+            "--in_file",
+            str(TEST_DIR / f"measurements_{input_bitdepth}bit.csv"),
+            "--out_file",
+            str(out_file),
+            "--bit_depth",
+            str(bit_depth),
+        ],
+        check=True,
     )
-    result = np.genfromtxt(tmp_path / "lut.csv", skip_header=1, delimiter=",")
+    result = np.genfromtxt(out_file, skip_header=1, delimiter=",")
 
     # Verify
     assert len(result) <= 2**bit_depth
@@ -185,14 +292,30 @@ def test_linearize_different_bitdepths(tmp_path, input_bitdepth, bit_depth):
 
 ### ERROR HANDLING ###
 def test_smooth_fails_on_missing_input(tmp_path):
-    """Smooth command exits with non-zero status when input file (measure.csv) is missing."""
+    """Smooth command exits with non-zero status when input file is missing."""
     result = subprocess.run(
-        ["hrl-util", "lut", "smooth", "--order", "0"], cwd=tmp_path, capture_output=True
+        [
+            "hrl-util",
+            "lut",
+            "smooth",
+            "--in_file",
+            str(tmp_path / "nonexistent.csv"),
+        ],
+        capture_output=True,
     )
     assert result.returncode != 0
 
 
 def test_linearize_fails_on_missing_input(tmp_path):
-    """Linearize command exits with non-zero status when input file (smooth.csv) is missing."""
-    result = subprocess.run(["hrl-util", "lut", "linearize"], cwd=tmp_path, capture_output=True)
+    """Linearize command exits with non-zero status when input file is missing."""
+    result = subprocess.run(
+        [
+            "hrl-util",
+            "lut",
+            "linearize",
+            "--in_file",
+            str(tmp_path / "nonexistent.csv"),
+        ],
+        capture_output=True,
+    )
     assert result.returncode != 0

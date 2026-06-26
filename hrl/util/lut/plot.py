@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,10 +12,18 @@ parser = argparse.ArgumentParser(
     """,
     add_help=False,
 )
+parser.add_argument(
+    "-i",
+    "--in_file",
+    default="lut.csv",
+    type=Path,
+    help="path to LUT csv plot, by default 'lut.csv'",
+)
 
 
 def command(parsed_args):
-    lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    lut_file = parsed_args.in_file.expanduser().resolve()
+    lut = np.genfromtxt(lut_file, delimiter=",", skip_header=1)
 
     plt.figure()
 
