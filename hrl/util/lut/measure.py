@@ -1,6 +1,7 @@
 import argparse
 from datetime import timedelta
 from functools import partial
+from pathlib import Path
 from timeit import default_timer as timer
 
 from hrl import HRL
@@ -58,9 +59,9 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "-o",
     "--out_file",
-    type=str,
+    type=Path,
     default="measure.csv",
-    help="Output filename, by default 'measure.csv'",
+    help="path to output measurements csv, by default 'measure.csv'",
 )
 
 
@@ -71,8 +72,6 @@ def command(parsed_args):
     start = timer()
 
     # Initializing HRL
-    headers = ["Intensity"] + ["Luminance" + str(i) for i in range(parsed_args.n_samples)]
-
     ihrl = HRL(
         graphics=parsed_args.graphics,
         inputs="keyboard",
@@ -84,8 +83,6 @@ def command(parsed_args):
         wdth_offset=parsed_args.width_offset,
         db=True,
         scrn=parsed_args.screen,
-        rfl=parsed_args.out_file,
-        rhds=headers,
     )
 
     # Set up intensity values to be measured
@@ -105,6 +102,7 @@ def command(parsed_args):
         ihrl,
         intensities=intensities,
         stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
+        out_file=parsed_args.out_file,
         n_samples=parsed_args.n_samples,
         sleep_time=parsed_args.sleep_time,
     )
