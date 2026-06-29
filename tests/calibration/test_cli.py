@@ -5,12 +5,22 @@ and validating outputs against expected results in files.
 """
 
 import subprocess
+import types
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 import pytest
 
+from hrl.photometer.mock import MockPhotometer
+
 TEST_DIR = Path(__file__).parent
+
+
+def _mock_draw(ihrl, intensity, patch_size=None):
+    """Draw stub: records intensity on the mock photometer."""
+    intensity_out = ihrl.graphics.gamma_correct(intensity)
+    ihrl.photometer.current_intensity = intensity_out
 
 
 ### INTEGRATED LUT PROCESSING PIPELINE
@@ -116,6 +126,55 @@ def test_pipeline_preserves_luminance_range(tmp_path):
     # Verify values
     expected_lut = np.genfromtxt(TEST_DIR / "lut_lumrange.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result_lut, expected_lut, decimal=10)
+
+
+### STEP 0: MEASURE LUMINANCE VALUES ###
+def test_measure(tmp_path):
+    """measure command runs end-to-end with mocked HRL and writes correct measurements.
+
+    HRL (which opens a display and connects to a photometer) is replaced by a minimal
+    stand-in so the test runs without any hardware. draw_uniform_square is wrapped to
+    update photometer.current_intensity so MockPhotometer returns the correct luminance
+    for each drawn intensity.
+    """
+    from hrl.util.lut.measure import command, parser
+
+    lut = np.genfromtxt(TEST_DIR / "lut_8bit.csv", delimiter=",", skip_header=1)
+    out_file = tmp_path / "measure.csv"
+    bit_depth = 4  # 2**4 = 16 intensity steps
+    n_samples = 2
+
+    args = parser.parse_args(
+        [
+            "--bit_depth",
+            str(bit_depth),
+            "--out_file",
+            str(out_file),
+            "--n_samples",
+            str(n_samples),
+        ]
+    )
+
+    mock_ihrl = types.SimpleNamespace(
+        photometer=MockPhotometer(lut=lut),
+        graphics=types.SimpleNamespace(gamma_correct=lambda x: x),
+        inputs=None,
+        close=lambda: None,
+    )
+
+    with patch("hrl.util.lut.measure.HRL", return_value=mock_ihrl):
+        with patch("hrl.util.lut.measure.draw_uniform_square", _mock_draw):
+            command(args)
+
+    measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
+    assert measurements.shape == (2**bit_depth, n_samples + 1)
+
+    expected_intensities = np.linspace(0.0, 1.0, 2**bit_depth)
+    np.testing.assert_array_equal(measurements[:, 0], expected_intensities)
+
+    expected_luminances = np.interp(expected_intensities, lut[:, 1], lut[:, -1])
+    for i in range(n_samples):
+        np.testing.assert_allclose(measurements[:, i + 1], expected_luminances, rtol=1e-6)
 
 
 ### STEP 1: PROCESSING MEASUREMENTS ###
