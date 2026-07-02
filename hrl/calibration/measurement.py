@@ -91,7 +91,6 @@ def measure_lut(
 
         # Draw (update) stimulus
         stim_draw_func(ihrl, intensity)
-        ihrl.graphics.flip()
 
         # Multiple samples for each intensity value
         for idx_sample in range(n_samples):
