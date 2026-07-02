@@ -100,7 +100,7 @@ def measure_lut(
         # Write measured samples to file
         ihrl.writeResultLine()
 
-        if ihrl.inputs.checkEscape():
+        if ihrl.inputs is not None and ihrl.inputs.checkEscape():
             break
 
 
