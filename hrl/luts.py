@@ -125,12 +125,16 @@ def create_lut(
             intensity_out = intensity_in^(1/gamma)
             luminance = k * intensity_in^gamma + dark
     """
+    # Linearly spaced input intensities from 0 to 1
     x = np.linspace(0.0, 1.0, n)
 
-    out = x ** (1 / gamma)
+    # Linearly spaced luminance value.
+    # Use linspace, because that's also what we use in the calibration (linearize())
+    # This way, luminance values are bit-identical, important for testing and reproducibility.
+    lum = np.linspace(dark, k + dark, n)
 
-    lum = k * x**gamma + dark
-    lum[0] = dark  # enforce zero row
+    # Output intensities: apply inverse gamma correction
+    out = x ** (1 / gamma)
 
     return np.column_stack([x, out, lum])
 
