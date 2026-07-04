@@ -20,22 +20,11 @@ def mock_hrl():
     No actual graphics or inputs; mock photometer to simulate luminance readings based on a LUT.
 
     Factory fixture: call mock_hrl(lut) to get a minimal hrl stand-in.
-
-    Recorded rows are available as ihrl._recorded after measure_lut returns:
-    each entry is a dict with keys 'Intensity', 'Luminance0', 'Luminance1', ...
     """
 
     def _make(lut):
         ihrl = types.SimpleNamespace()
         ihrl.photometer = MockPhotometer(lut=lut)
-
-        # Mock results recording: measure_lut writes to ihrl.results
-        # and calls ihrl.writeResultLine() to record a row.
-        ihrl.results = {}
-        ihrl._recorded = []
-        ihrl.writeResultLine = lambda: ihrl._recorded.append(dict(ihrl.results))
-
-        # Mock graphics and inputs to have the same interface as the real HRL object, but do nothing.
         ihrl.graphics = types.SimpleNamespace(gamma_correct=lambda x: x)
         ihrl.inputs = None
         return ihrl
@@ -64,14 +53,38 @@ def test_measure_lut(n, gamma, k, dark, n_samples, mock_hrl):
     lut = create_lut(n=n, gamma=gamma, k=k, dark=dark)
     ihrl = mock_hrl(lut)
 
-    measure_lut(ihrl, intensities=lut[:, 1], stim_draw_func=mock_draw, n_samples=n_samples)
+    measurements = measure_lut(
+        ihrl, intensities=lut[:, 1], stim_draw_func=mock_draw, n_samples=n_samples
+    )
 
-    assert len(ihrl._recorded) == len(lut)
-
-    recorded_intensities = np.array([row["Intensity"] for row in ihrl._recorded])
-    np.testing.assert_array_equal(recorded_intensities, lut[:, 1])
+    assert len(measurements) == len(lut)
+    np.testing.assert_array_equal(measurements[:, 0], lut[:, 1])
 
     # Each luminance sample should match the LUT value for that intensity
     for i in range(n_samples):
-        recorded_luminances = np.array([row[f"Luminance{i}"] for row in ihrl._recorded])
-        np.testing.assert_array_equal(recorded_luminances, lut[:, -1])
+        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+
+
+@pytest.mark.parametrize("n_samples", [1, 3])  # skip large n_samples for speed
+@pytest.mark.parametrize("n,gamma,k,dark", _LUT_CASES)
+def test_csv_output(n, gamma, k, dark, n_samples, mock_hrl, tmp_path):
+    lut = create_lut(n=n, gamma=gamma, k=k, dark=dark)
+    ihrl = mock_hrl(lut)
+    out_file = tmp_path / "measurements.csv"
+
+    measure_lut(
+        ihrl,
+        intensities=lut[:, 1],
+        stim_draw_func=mock_draw,
+        n_samples=n_samples,
+        out_file=out_file,
+    )
+
+    measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
+
+    assert len(measurements) == len(lut)
+    np.testing.assert_array_equal(measurements[:, 0], lut[:, 1])
+
+    # Each luminance sample should match the LUT value for that intensity
+    for i in range(n_samples):
+        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])

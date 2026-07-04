@@ -1,4 +1,5 @@
 from functools import partial
+from pathlib import Path
 
 import numpy as np
 
@@ -61,6 +62,7 @@ def measure_lut(
     ihrl,
     intensities=setup_intensities(0.0, 1.0, 2**16),
     stim_draw_func=partial(draw_uniform_square, patch_size=0.5),
+    out_file=None,
     n_samples=5,
     sleep_time=200,
 ):
@@ -75,11 +77,14 @@ def measure_lut(
     stim_draw_func : callable, optional
         function with signature `(ihrl, intensity)` that draws the stimulus
         for each measurement; defaults to `draw_uniform_square(patch_size=0.5)`
+    out_file : str or Path, optional
+        path to output file for measurements, by default None (no file output)
     n_samples : int
         number of photometer readings per intensity level, by default 5
     sleep_time : float
         time (ms) to wait between photometer readings, by default 200ms
     """
+    measurements = np.ndarray((len(intensities), n_samples + 1), dtype=float)
 
     for idx_int, intensity in enumerate(intensities):
         print(
@@ -87,7 +92,6 @@ def measure_lut(
             f"[{idx_int:d} of {len(intensities)} "
             f"({idx_int / len(intensities) * 100:.1f}%)]"
         )
-        ihrl.results["Intensity"] = intensity
 
         # Draw (update) stimulus
         stim_draw_func(ihrl, intensity)
@@ -95,13 +99,24 @@ def measure_lut(
         # Multiple samples for each intensity value
         for idx_sample in range(n_samples):
             sample = ihrl.photometer.readLuminance(5, int(sleep_time))
-            ihrl.results[f"Luminance{idx_sample}"] = sample
+            measurements[idx_int, idx_sample + 1] = sample
 
         # Write measured samples to file
-        ihrl.writeResultLine()
+        measurements[idx_int, 0] = intensity
+        if out_file is not None:
+            out_file = Path(out_file).expanduser().resolve()
+            np.savetxt(
+                out_file,
+                measurements,
+                delimiter=",",
+                header="intensity," + ",".join([f"luminance{i}" for i in range(n_samples)]),
+                comments="",
+            )
 
         if ihrl.inputs is not None and ihrl.inputs.checkEscape():
             break
+
+    return measurements
 
 
 def combine(measurements):
