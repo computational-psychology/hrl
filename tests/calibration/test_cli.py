@@ -24,16 +24,24 @@ def _mock_draw(ihrl, intensity, patch_size=None):
 
 
 ### INTEGRATED LUT PROCESSING PIPELINE
-@pytest.mark.parametrize("input_bitdepth, bit_depth", [(16, 16), (8, 8), (16, 10)])
-def test_full_pipeline(tmp_path, input_bitdepth, bit_depth):
-    """Complete workflow from raw measurements through smoothing to linearized LUT.
+@pytest.mark.parametrize(
+    "input_bit_depth, output_bit_depth",
+    [
+        pytest.param(8, 8, id="8bit"),
+        pytest.param(16, 16, id="16bit"),
+        pytest.param(16, 10, id="10bit-from-16bit"),
+    ],
+)
+def test_full_pipeline(tmp_path, input_bit_depth, output_bit_depth):
+    """Complete CLI workflow: measure → smooth → linearize.
 
     Input: intensity-luminance measurements from measurements_{input_bitdepth}bit.csv
     Pipeline: smooth(order=0) → linearize at {bit_depth}-bit resolution
     Validates: Final LUT matches lut_{bit_depth}bit.csv
     """
+    measure_file = TEST_DIR / f"measurements_{input_bit_depth}bit.csv"
     smooth_file = tmp_path / "smooth.csv"
-    lut_file = tmp_path / "lut.csv"
+    lut_file = f"lut_{output_bit_depth}bit.csv"
 
     # Step 1: Smooth
     subprocess.run(
@@ -42,7 +50,7 @@ def test_full_pipeline(tmp_path, input_bitdepth, bit_depth):
             "lut",
             "smooth",
             "--in_file",
-            str(TEST_DIR / f"measurements_{input_bitdepth}bit.csv"),
+            str(measure_file),
             "--out_file",
             str(smooth_file),
             "--order",
@@ -60,18 +68,15 @@ def test_full_pipeline(tmp_path, input_bitdepth, bit_depth):
             "--in_file",
             str(smooth_file),
             "--out_file",
-            str(lut_file),
+            str(tmp_path / lut_file),
             "--bit_depth",
-            str(bit_depth),
+            str(output_bit_depth),
         ],
         check=True,
     )
-    result_lut = np.genfromtxt(lut_file, skip_header=1, delimiter=",")
+    result_lut = np.genfromtxt(tmp_path / lut_file, skip_header=1, delimiter=",")
 
-    # Verify
-    expected_lut = np.genfromtxt(
-        TEST_DIR / f"lut_{bit_depth}bit.csv", skip_header=1, delimiter=","
-    )
+    expected_lut = np.genfromtxt(TEST_DIR / lut_file, skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result_lut, expected_lut, decimal=10)
 
 
