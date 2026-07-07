@@ -354,6 +354,50 @@ def test_linearize_different_bitdepths(tmp_path, input_bitdepth, bit_depth):
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
 
+def test_verify(tmp_path):
+    """Verify command runs end-to-end with mocked HRL and validates LUT.
+
+    Input: LUT from lut_8bit.csv
+    Output: Verification CSV with measured luminance values for each intensity
+    Validates: Measured luminance values match expected values from LUT within tolerance
+    """
+    from hrl.luts import gamma_correct_grey
+    from hrl.util.lut.verify import command, parser
+
+    lut_file = TEST_DIR / "lut_8bit.csv"
+    lut = np.genfromtxt(lut_file, skip_header=1, delimiter=",")
+    out_file = tmp_path / "verify.csv"
+    n_samples = 2
+
+    args = parser.parse_args(
+        [
+            "--lut",
+            str(lut_file),
+            "--out_file",
+            str(out_file),
+            "--n_samples",
+            str(n_samples),
+        ]
+    )
+
+    mock_ihrl = types.SimpleNamespace(
+        photometer=MockPhotometer(lut=lut),
+        graphics=types.SimpleNamespace(gamma_correct=lambda x: gamma_correct_grey(x, LUT=lut)),
+        inputs=None,
+        close=lambda: None,
+    )
+
+    with patch("hrl.util.lut.verify.HRL", return_value=mock_ihrl):
+        with patch("hrl.util.lut.verify.draw_uniform_square", _mock_draw):
+            command(args)
+
+    measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
+    assert measurements.shape == (256, n_samples + 1)
+
+    for i in range(n_samples):
+        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+
+
 ### ERROR HANDLING ###
 def test_smooth_fails_on_missing_input(tmp_path):
     """Smooth command exits with non-zero status when input file is missing."""
