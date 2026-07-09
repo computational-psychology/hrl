@@ -26,6 +26,13 @@ intensities_arggroup.add_argument(
     help="Maximum intensity, by default 1.0",
 )
 intensities_arggroup.add_argument(
+    "-n",
+    "--n_samples",
+    type=int,
+    default=5,
+    help="Samples per intensity, by default 5",
+)
+intensities_arggroup.add_argument(
     "-rn",
     "--randomize",
     action="store_true",
