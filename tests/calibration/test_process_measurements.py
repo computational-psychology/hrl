@@ -119,55 +119,55 @@ def test_remove_outliers_raises_when_all_removed():
 
 
 ### AVERAGE ###
-def test_average_returns_two_column_table():
-    """Output is a 2-column table of intensity and mean luminance."""
-    # Setup
-    lum_map = {0.0: np.array([1.0, 1.2]), 1.0: np.array([10.0, 10.4])}
-
-    # Run
-    result = average(lum_map)
-
-    # Verify
-    assert result.shape == (2, 2)
-
-
-def test_average_computes_mean():
+@pytest.mark.parametrize("measurements_file", ["measurements_8bit.csv", "measurements_16bit.csv"])
+def test_average(measurements_file):
     """Average computes the mean of measurements at each intensity."""
     # Setup
-    lum_map = {0.5: np.array([10.0, 20.0])}
+    measurements = np.genfromtxt(TEST_DIR / measurements_file, skip_header=1, delimiter=",")
+
+    # Duplicate measurements with noise to simulate multiple measurements per intensity
+    measurements_wide = np.column_stack([measurements[:, 1]] * 3)
+    measurements_wide[:, 1] += np.random.normal(0, 0.1, measurements.shape[0])
+    measurements_wide[:, 2] += np.random.normal(0, 0.1, measurements.shape[0])
+
+    # Convert to long format for averaging
+    measurements_long = measurements_wide.flatten()
+    measurements_long = np.column_stack((np.repeat(measurements[:, 0], 3), measurements_long))
 
     # Run
-    result = average(lum_map)
+    result = average(measurements_long)
 
     # Verify
-    np.testing.assert_almost_equal(result[0, 1], 15.0)
+    expected = np.mean(measurements_wide, axis=1)
+    expected = np.column_stack((measurements[:, 0], expected))
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)
 
 
-def test_average_sorts_by_intensity():
-    """Output table is sorted by intensity in ascending order."""
+@pytest.mark.parametrize("measurements_file", ["measurements_8bit.csv", "measurements_16bit.csv"])
+def test_average_no_ops(measurements_file):
+    """Average of a single measurement per intensity level, is unchanged."""
     # Setup
-    lum_map = {0.5: np.array([5.0]), 0.0: np.array([1.0]), 1.0: np.array([10.0])}
+    measurements = np.genfromtxt(TEST_DIR / measurements_file, skip_header=1, delimiter=",")
 
     # Run
-    result = average(lum_map)
+    result = average(measurements)
 
     # Verify
-    np.testing.assert_array_equal(result[:, 0], np.sort(result[:, 0]))
+    np.testing.assert_array_equal(result, measurements)
 
 
 def test_average_ignores_nan():
     """NaN measurements are ignored when computing the average."""
     # Setup
-    lum_map = {0.5: np.array([5.0, np.nan, 5.2])}
+    measurements = {0.5: np.array([5.0, np.nan, 5.2])}
 
     # Run
-    result = average(lum_map)
+    result = average(measurements)
 
     # Verify
     np.testing.assert_almost_equal(result[0, 1], 5.1)
 
 
-### INTEGRATED REGRESSION TESTS ###
 def test_averaging_duplicates():
     """Multiple measurements at same intensity are correctly averaged.
 
@@ -179,11 +179,9 @@ def test_averaging_duplicates():
     measurements = np.genfromtxt(
         TEST_DIR / "measurements_duplicates.csv", skip_header=1, delimiter=","
     )
-    lum_map = combine([measurements])
-    lum_map = remove_outliers(lum_map)
 
     # Run
-    result = average(lum_map)
+    result = average(measurements)
 
     # Verify
     assert len(result) == 256
@@ -204,11 +202,10 @@ def test_averaging_filters_outliers():
     measurements = np.genfromtxt(
         TEST_DIR / "measurements_outliers.csv", skip_header=1, delimiter=","
     )
-    lum_map = combine([measurements])
 
     # Run
-    lum_map = remove_outliers(lum_map)
-    result = average(lum_map)
+    measurements = remove_outliers(measurements)
+    result = average(measurements)
 
     # Verify
     expected = np.genfromtxt(
