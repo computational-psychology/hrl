@@ -64,26 +64,24 @@ def command(parsed_args):
         filename = file.expanduser().resolve()
         print(f"Loading from {filename} ...")
         measurements.append(np.genfromtxt(filename, delimiter=",", skip_header=1))
-
-    # Combine
-    luminance_map = hrl.calibration.measurement.combine(measurements)
+    measurements = np.vstack(measurements)
 
     # Remove outliers
-    luminance_map = hrl.calibration.measurement.remove_outliers(luminance_map)
+    measurements = hrl.calibration.measurement.remove_outliers(measurements)
 
     # Average
-    table = hrl.calibration.measurement.average(luminance_map)
+    measurements = hrl.calibration.measurement.average(measurements)
 
     # Smooth
-    table[:, 1] = hrl.calibration.measurement.smooth(
-        table[:, 1], order=parsed_args.order, kernel=parsed_args.kernel
+    measurements = hrl.calibration.measurement.smooth(
+        measurements, order=parsed_args.order, kernel=parsed_args.kernel
     )
 
     # Save smoothed LUT to file
     out_file = parsed_args.out_file.expanduser().resolve()
     print(f"Saving to {out_file}...")
     header = "intensity_in,luminance"
-    np.savetxt(out_file, table, delimiter=",", header=header, comments="")
+    np.savetxt(out_file, measurements, delimiter=",", header=header, comments="")
 
 
 if __name__ == "__main__":

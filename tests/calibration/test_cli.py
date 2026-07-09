@@ -172,14 +172,14 @@ def test_measure(tmp_path):
             command(args)
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
-    assert measurements.shape == (2**bit_depth, n_samples + 1)
+    assert measurements.shape == (n_samples * 2**bit_depth, 2)
 
     expected_intensities = np.linspace(0.0, 1.0, 2**bit_depth)
+    expected_intensities = np.repeat(expected_intensities, n_samples)
     np.testing.assert_array_equal(measurements[:, 0], expected_intensities)
 
     expected_luminances = np.interp(expected_intensities, lut[:, 1], lut[:, -1])
-    for i in range(n_samples):
-        np.testing.assert_allclose(measurements[:, i + 1], expected_luminances, rtol=1e-6)
+    np.testing.assert_array_equal(measurements[:, 1], expected_luminances)
 
 
 ### STEP 1: PROCESSING MEASUREMENTS ###
@@ -351,7 +351,7 @@ def test_linearize_different_bitdepths(tmp_path, input_bitdepth, bit_depth):
     # Verify
     assert len(result) <= 2**bit_depth
     expected = np.genfromtxt(TEST_DIR / f"lut_{bit_depth}bit.csv", skip_header=1, delimiter=",")
-    np.testing.assert_array_almost_equal(result, expected, decimal=10)
+    np.testing.assert_array_equal(result, expected)
 
 
 def test_verify(tmp_path):
@@ -392,10 +392,9 @@ def test_verify(tmp_path):
             command(args)
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
-    assert measurements.shape == (256, n_samples + 1)
+    assert measurements.shape == (lut.shape[0], 2)
 
-    for i in range(n_samples):
-        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+    np.testing.assert_array_equal(measurements[:, 1], lut[:, -1])
 
 
 ### ERROR HANDLING ###

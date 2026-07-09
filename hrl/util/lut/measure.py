@@ -20,13 +20,6 @@ measurement_arggroup.add_argument(
     help="Photometer to use, by default 'minolta'",
 )
 measurement_arggroup.add_argument(
-    "-n",
-    "--n_samples",
-    type=int,
-    default=5,
-    help="Samples per intensity, by default 5",
-)
-measurement_arggroup.add_argument(
     "-sl",
     "--sleep_time",
     type=int,
@@ -87,11 +80,12 @@ def command(parsed_args):
 
     # Set up intensity values to be measured
     intensities = setup_intensities(
-        parsed_args.int_min,
-        parsed_args.int_max,
-        2**parsed_args.bit_depth,
-        parsed_args.randomize,
-        parsed_args.reverse,
+        i_min=parsed_args.int_min,
+        i_max=parsed_args.int_max,
+        n_steps=2**parsed_args.bit_depth,
+        n_samples=parsed_args.n_samples,
+        shuffle=parsed_args.randomize,
+        reverse=parsed_args.reverse,
     )
     print(
         f"Measuring {len(intensities)} intensity values ([{parsed_args.int_min}, {parsed_args.int_max}])..."
@@ -103,7 +97,6 @@ def command(parsed_args):
         intensities=intensities,
         stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
         out_file=parsed_args.out_file,
-        n_samples=parsed_args.n_samples,
         sleep_time=parsed_args.sleep_time,
     )
 
