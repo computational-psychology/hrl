@@ -85,6 +85,9 @@ def measure_lut(
     sleep_time : float
         time (ms) to wait between photometer readings, by default 200ms
     """
+    if out_file is not None:
+        out_file = Path(out_file).expanduser().resolve()
+
     measurements = np.full((len(intensities), 2), np.nan, dtype=float)
 
     for idx_int, intensity in enumerate(intensities):
@@ -105,7 +108,6 @@ def measure_lut(
 
         # Write measured samples to file
         if out_file is not None:
-            out_file = Path(out_file).expanduser().resolve()
             np.savetxt(
                 out_file,
                 measurements,
