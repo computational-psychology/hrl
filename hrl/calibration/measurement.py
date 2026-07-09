@@ -219,13 +219,14 @@ def remove_outliers(luminance_map, abs_tol=0.075, rel_tol=0.0075):
     return luminance_map
 
 
-def average(luminance_map):
-    """Average measured luminances per intensity value, and return as table
+def average(measurements):
+    """Average measured luminances per intensity value
 
     Parameters
     ----------
-    luminance_map : dict[float: numpy.ndarray]
-        dictionary mapping {intensity: measured luminances}
+    measurements : ArrayLike
+        monitor measurements; first column must be specified intensities,
+        second column must be corresponding measured luminances
 
     Returns
     -------
@@ -233,16 +234,23 @@ def average(luminance_map):
         table with a first column indicating the set monitor intensity (in domain [0, 1]),
         and a second column with the average measured luminance (in cd/m2)
     """
-    for intensity, luminances in luminance_map.items():
-        luminance_map[intensity] = np.nanmean(luminances)
-
-    # Convert to numpy array
-    table = np.array(list(luminance_map.items()))
-
     # Sort
-    table = table[table.argsort(axis=0)[:, 0]]
+    measurements = measurements[np.argsort(measurements[:, 0])]
 
-    # print(table.shape)
+    # Extract intensities
+    intensities = measurements[:, 0].copy()
+
+    # Group by intensity value
+    _id, _pos, m_count = np.unique(intensities, return_index=True, return_counts=True)
+
+    # Summed luminances per intensity value
+    l_sum = np.add.reduceat(measurements[:, 1], _pos, axis=0)
+
+    # Average luminances per intensity value
+    l_avg = l_sum / m_count
+
+    # Out
+    table = np.column_stack((_id, l_avg))
 
     return table
 
