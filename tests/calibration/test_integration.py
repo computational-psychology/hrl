@@ -59,12 +59,7 @@ def test_full_pipeline():
     ihrl = _make_mock_hrl(raw_lut, noise=0.0)
 
     # Step 0: simulate measurements at the raw (intensity_out) intensities, noiseless, 1 sample each
-    measurements = measure_lut(
-        ihrl,
-        intensities=raw_lut[:, 1],
-        stim_draw_func=mock_draw,
-        n_samples=1,
-    )
+    measurements = measure_lut(ihrl, intensities=raw_lut[:, 1], stim_draw_func=mock_draw)
 
     # Step 0b: combine measurements table(s) into luminance map
     lum_map = combine([measurements])

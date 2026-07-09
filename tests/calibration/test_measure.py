@@ -54,15 +54,14 @@ def test_measure_lut(n, gamma, k, dark, n_samples, mock_hrl):
     ihrl = mock_hrl(lut)
 
     measurements = measure_lut(
-        ihrl, intensities=lut[:, 1], stim_draw_func=mock_draw, n_samples=n_samples
+        ihrl, intensities=np.repeat(lut[:, 1], n_samples), stim_draw_func=mock_draw
     )
 
-    assert len(measurements) == len(lut)
-    np.testing.assert_array_equal(measurements[:, 0], lut[:, 1])
+    assert len(measurements) == len(lut) * n_samples
+    np.testing.assert_array_equal(measurements[:, 0], np.repeat(lut[:, 1], n_samples))
 
     # Each luminance sample should match the LUT value for that intensity
-    for i in range(n_samples):
-        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+    np.testing.assert_array_equal(measurements[:, 1], np.repeat(lut[:, -1], n_samples))
 
 
 @pytest.mark.parametrize("n_samples", [1, 3])  # skip large n_samples for speed
@@ -74,17 +73,15 @@ def test_csv_output(n, gamma, k, dark, n_samples, mock_hrl, tmp_path):
 
     measure_lut(
         ihrl,
-        intensities=lut[:, 1],
+        intensities=np.repeat(lut[:, 1], n_samples),
         stim_draw_func=mock_draw,
-        n_samples=n_samples,
         out_file=out_file,
     )
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
 
-    assert len(measurements) == len(lut)
-    np.testing.assert_array_equal(measurements[:, 0], lut[:, 1])
+    assert len(measurements) == len(lut) * n_samples
+    np.testing.assert_array_equal(measurements[:, 0], np.repeat(lut[:, 1], n_samples))
 
     # Each luminance sample should match the LUT value for that intensity
-    for i in range(n_samples):
-        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+    np.testing.assert_array_equal(measurements[:, 1], np.repeat(lut[:, -1], n_samples))
