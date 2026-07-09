@@ -94,7 +94,7 @@ def measure_lut(
         print(
             f"Current Intensity: {intensity:.2f} "
             f"[{idx_int:d} of {len(intensities)} "
-            f"({idx_int / len(intensities) * 100:.1f}%)]"
+            f"({idx_int / len(intensities):.2%}%)]"
         )
 
         measurements[idx_int, 0] = intensity
