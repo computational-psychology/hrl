@@ -174,17 +174,19 @@ def combine(measurements):
     return luminance_map
 
 
-def remove_outliers(luminance_map, abs_tol=0.075, rel_tol=0.0075):
-    """Remove outlier measurements from intensity-to-luminance map
+def remove_outliers(measurements, abs_tol=0.075, rel_tol=0.0075):
+    """Remove outlier measurements from a measurements array
 
     Outliers are values that deviate more than abs_tol from
     the closest measurement at the same intensity,
     AND where that deviation is more than rel_tol.
+    Outliers are set to NaN in the returned array.
 
     Parameters
     ----------
-    luminance_map : dict[float: numpy.ndarray]
-        dictionary mapping {intensity: measured luminances}, output from combine
+    measurements : ArrayLike
+        monitor measurements; first column must be specified intensities,
+        second column must be corresponding measured luminances
     abs_tol : float, optional
         absolute tolerance, in cd/m2, by default 0.075
     rel_tol : float, optional
@@ -192,31 +194,48 @@ def remove_outliers(luminance_map, abs_tol=0.075, rel_tol=0.0075):
 
     Returns
     -------
-    dict[float: numpy.ndarray]
-        dictionary mapping {intensity: measured luminances}, without outliers
+    numpy.ndarray
+        measurements array with outliers set to NaN
 
     Raises
     ------
     RuntimeError
         when there are no valid (non-NaN) measurements left for a given intensity value
     """
-    # set outliers to NaN.
-    for intensity, luminances in luminance_map.items():
-        min_diff = np.zeros_like(luminances)
-        for i, lum in enumerate(luminances):
-            diffs = np.abs(luminances - lum)  # absolute difference between this lum, and all lums
-            diffs[i] = np.nan  # don't compare to yourself
-            min_diff[i] = np.nanmin(diffs)  # get minimum difference, i.e., to closest measurement
+    # Sort by (intensity, luminance) so within each intensity group, luminances are ordered
+    sort_idx = np.lexsort((measurements[:, 1], measurements[:, 0]))
+    measurements = measurements[sort_idx].copy()
 
-        # Set outliers to NaN
-        luminances[(min_diff > abs_tol) & (min_diff / luminances > rel_tol)] = np.nan
+    intensities = measurements[:, 0]
+    luminances = measurements[:, 1]
 
-        # Reinsert into map
-        if all(np.isnan(luminances)):
-            raise RuntimeError(f"no valid measurement for {intensity:.4f}")
-        luminance_map[intensity] = luminances
+    # Identify the start and end indices of each intensity group
+    _, _pos = np.unique(intensities, return_index=True)
+    ends = np.concatenate([_pos[1:] - 1, [len(measurements) - 1]])
 
-    return luminance_map
+    # If measurement is outlier compared to closes neighbor, also compared to all others in group
+    # So, only need to check to nearest neighbors, and since we sorted by luminance (within group),
+    # that's just the previous and next measurement in the array
+    diff_prev = np.abs(np.diff(luminances, prepend=np.inf))
+    diff_next = np.abs(np.diff(luminances, append=np.inf))
+    diff_prev[_pos] = np.inf
+    diff_next[ends] = np.inf
+
+    # Minimum distance to closest measurement at same intensity
+    min_diff = np.minimum(diff_prev, diff_next)
+
+    # Singletons (only measurement at that intensity) have both neighbors set to inf;
+    # they have nothing to be compared against, so they cannot be outliers
+    min_diff[np.isinf(diff_prev) & np.isinf(diff_next)] = 0
+
+    # Identify outliers: those that deviate (minimal distance) more than abs_tol from closest measurement,
+    # AND where that deviation is more than rel_tol
+    outliers = (min_diff > abs_tol) & (min_diff / luminances > rel_tol)
+
+    # Set outliers to NaN
+    measurements[outliers, 1] = np.nan
+
+    return measurements
 
 
 def average(measurements):
