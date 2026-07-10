@@ -122,58 +122,6 @@ def measure_lut(
     return measurements
 
 
-def combine(measurements):
-    """Construct an intensity-to-luminance map from (sets of) measurements
-
-    Build a dictionary of {intensity: luminances}, from measurements.
-    Measurements should be a collection (list, tuple, set), of numpy.ndarrays,
-    where each array (measurements table) has
-    a first column indicating the set monitor intensity (in domain [0, 1]),
-    and a second column with the measured luminance (in cd/m2).
-
-    Also removes NaN measurements.
-
-    The reason this output is a dict (and not, say, a numpy array)
-    is that the number of measured luminances could be different for each intensity.
-
-
-    Parameters
-    ----------
-    measurements : Collection[numpy.ndarray]
-        (set of) measurement table(s)
-
-    Returns
-    -------
-    dict[float: numpy.ndarray]
-        dictionary mapping {intensity: measured luminances}
-
-    Raises
-    ------
-    RuntimeError
-        when there are no valid (non-NaN) measurements left for a given intensity value
-    """
-    luminance_map = {}
-    for table in measurements:
-        for row in table:
-            intensity = row[0]
-            luminances = row[1:]
-
-            # Remove NaN measurements
-            luminances = luminances[~np.isnan(luminances)]
-
-            # Add to map
-            if intensity not in luminance_map:
-                luminance_map[intensity] = []
-            luminance_map[intensity] = np.concatenate([luminance_map[intensity], luminances])
-
-    # Check for NaNs
-    for intensity, luminances in luminance_map.items():
-        if not luminances.any():  # empty array
-            raise RuntimeError(f"no valid measurement for {intensity:.4f}")
-
-    return luminance_map
-
-
 def remove_outliers(measurements, abs_tol=0.075, rel_tol=0.0075):
     """Remove outlier measurements from a measurements array
 
