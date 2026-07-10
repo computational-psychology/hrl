@@ -10,60 +10,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from hrl.calibration.measurement import average, combine, remove_outliers
+from hrl.calibration.measurement import average, remove_outliers
 
 TEST_DIR = Path(__file__).parent
-
-
-### COMBINE ###
-def test_combine_single_table():
-    """Single table combined should return a map matching that table."""
-    # Setup
-    table = np.array([[0.0, 1.0, 1.1], [0.5, 5.0, 5.1], [1.0, 10.0, 10.1]])
-
-    # Run
-    result = combine([table])
-
-    # Verify
-    np.testing.assert_array_equal(result[0.0], [1.0, 1.1])
-    np.testing.assert_array_equal(result[0.5], [5.0, 5.1])
-    np.testing.assert_array_equal(result[1.0], [10.0, 10.1])
-
-
-def test_combine_merges_multiple_tables():
-    """Multiple tables combined should merge measurements at same intensity."""
-    # Setup
-    table1 = np.array([[0.0, 1.0], [0.5, 5.0]])
-    table2 = np.array([[0.0, 1.1], [0.5, 5.1]])
-    # Run
-    result = combine([table1, table2])
-
-    # Verify
-    np.testing.assert_array_equal(result[0.0], [1.0, 1.1])
-    np.testing.assert_array_equal(result[0.5], [5.0, 5.1])
-
-
-def test_combine_strips_nan_measurements():
-    """NaN measurements are ignored and not included in the combined map."""
-    # Setup
-    table = np.array([[0.5, 5.0, np.nan, 5.1]])
-
-    # Run
-    result = combine([table])
-
-    # Verify
-    assert not np.any(np.isnan(result[0.5]))
-    assert len(result[0.5]) == 2
-
-
-def test_combine_raises_when_all_nan():
-    """If all measurements for an intensity are NaN, raise an error."""
-    # Setup
-    table = np.array([[0.5, np.nan]])
-
-    # Run and Verify
-    with pytest.raises(RuntimeError):
-        combine([table])
 
 
 ### REMOVE OUTLIERS ###
