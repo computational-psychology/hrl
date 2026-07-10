@@ -156,16 +156,24 @@ def test_average_no_ops(measurements_file):
     np.testing.assert_array_equal(result, measurements)
 
 
-def test_average_ignores_nan():
+@pytest.mark.parametrize("measurements_file", ["measurements_8bit.csv", "measurements_16bit.csv"])
+def test_average_ignores_nan(measurements_file):
     """NaN measurements are ignored when computing the average."""
     # Setup
-    measurements = {0.5: np.array([5.0, np.nan, 5.2])}
+    measurements = np.genfromtxt(TEST_DIR / measurements_file, skip_header=1, delimiter=",")
+
+    # Add additional NaN measurements for some intensities
+    measurements_with_nan = measurements.copy()
+    measurements_with_nan[::10, 1] = np.nan  # Every 10th measurement is NaN
+    measurements_with_nan = np.vstack(
+        [measurements, measurements_with_nan[::10]]
+    )  # Duplicate some rows with NaN
 
     # Run
-    result = average(measurements)
+    result = average(measurements_with_nan)
 
     # Verify
-    np.testing.assert_almost_equal(result[0, 1], 5.1)
+    np.testing.assert_array_equal(result, measurements)
 
 
 def test_averaging_duplicates():
