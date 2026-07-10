@@ -282,8 +282,9 @@ def smooth(measurements, order=1, kernel=[0.2, 0.2, 0.2, 0.2, 0.2]):
 
     Parameters
     ----------
-    measurements : numpy.ndarray
-        1D array of luminance values (in cd/m²), one value per intensity level
+    measurements : ArrayLike
+        monitor measurements; first column must be specified intensities,
+        second column must be corresponding measured luminances
     order : int, optional
         order of smoothing, i.e., number of repeated smoothings, by default 1
     kernel : ArrayLike, optional
@@ -292,10 +293,10 @@ def smooth(measurements, order=1, kernel=[0.2, 0.2, 0.2, 0.2, 0.2]):
     Returns
     -------
     numpy.ndarray
-        1D array of smoothed luminance values, same length as input
+        measurements array with smoothed luminance values
     """
 
-    smoothed = np.array(measurements).copy()
+    smoothed = np.array(measurements[:, 1]).copy()
 
     for _ in range(order):
         # Pad
@@ -308,7 +309,7 @@ def smooth(measurements, order=1, kernel=[0.2, 0.2, 0.2, 0.2, 0.2]):
         # Convolve
         smoothed = np.convolve(smoothed, kernel, "valid")
 
-    return smoothed
+    return np.column_stack((measurements[:, 0], smoothed))
 
 
 def linearize(measurements, bit_depth=16):
