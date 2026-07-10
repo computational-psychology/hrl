@@ -237,6 +237,9 @@ def average(measurements):
     # Sort
     measurements = measurements[np.argsort(measurements[:, 0])]
 
+    # Drop NaN measurements
+    measurements = measurements[~np.isnan(measurements[:, 1])]
+
     # Extract intensities
     intensities = measurements[:, 0].copy()
 
