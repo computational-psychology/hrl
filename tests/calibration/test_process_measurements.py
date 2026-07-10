@@ -67,55 +67,63 @@ def test_combine_raises_when_all_nan():
 
 
 ### REMOVE OUTLIERS ###
-def test_remove_outliers_flags_obvious_outlier():
-    """Outliers that deviate by more than 20% from the median are flagged as NaN."""
+@pytest.mark.parametrize("measurements_file", ["measurements_8bit.csv", "measurements_16bit.csv"])
+def test_remove_outliers_flags_obvious_outlier(measurements_file):
+    """Outliers that deviate by more than 30% from the others are flagged as NaN."""
     # Setup
-    # 5.0 and 5.0001 are within abs_tol (0.075 cd/m²); 50.0 is far enough to be flagged
-    lum_map = {0.5: np.array([5.0, 5.0001, 50.0], dtype=float)}
+    measurements = np.genfromtxt(TEST_DIR / measurements_file, skip_header=1, delimiter=",")
+
+    # Add a close duplicate + a 30% outlier for every 10th intensity.
+    # The two close measurements protect each other; the spike exceeds both abs_tol and rel_tol.
+    close_rows = measurements[::10].copy()
+    close_rows[:, 1] += 0.001  # well within abs_tol=0.075
+
+    outlier_rows = measurements[::10].copy()
+    outlier_rows[:, 1] *= 1.30  # 30% spike → exceeds both thresholds
+
+    measurements_with_outliers = np.vstack([measurements, close_rows, outlier_rows])
 
     # Run
-    result = remove_outliers(lum_map)
-    valid = result[0.5][~np.isnan(result[0.5])]
+    result = remove_outliers(measurements_with_outliers)
+
+    # Verify: exactly the outlier rows are NaN, everything else is intact
+    assert np.sum(np.isnan(result[:, 1])) == len(outlier_rows)
+    assert np.sum(~np.isnan(result[:, 1])) == len(measurements) + len(close_rows)
+
+
+@pytest.mark.parametrize(
+    "measurements_file",
+    ["measurements_8bit.csv", "measurements_16bit.csv", "measurements_duplicates.csv"],
+)
+def test_remove_outliers_keeps_close_measurements(measurements_file):
+    """Measurements within tolerance of each other are not flagged as outliers."""
+    # Setup
+    measurements = np.genfromtxt(TEST_DIR / measurements_file, skip_header=1, delimiter=",")
+
+    # Add a close duplicate for every 10th intensity (diff=0.001 < abs_tol=0.075 → safe)
+    close_rows = measurements[::10].copy()
+    close_rows[:, 1] += 0.001
+
+    measurements_with_close = np.vstack([measurements, close_rows])
+
+    # Run
+    result = remove_outliers(measurements_with_close)
+
+    # Verify: no measurement was flagged as an outlier
+    assert not np.any(np.isnan(result[:, 1]))
+
+
+@pytest.mark.parametrize("measurements_file", ["measurements_8bit.csv", "measurements_16bit.csv"])
+def test_remove_outliers_no_ops(measurements_file):
+    """Remove outliers of single measurement per intensity, is  unchanged."""
+    # Setup
+    measurements = np.genfromtxt(TEST_DIR / measurements_file, skip_header=1, delimiter=",")
+
+    # Run
+    result = remove_outliers(measurements)
 
     # Verify
-    assert np.all(valid < 10.0)
-
-
-def test_remove_outliers_keeps_close_measurements():
-    """Measurements that are close to each other are not flagged as outliers."""
-    # Setup
-    lum_map = {0.5: np.array([5.0, 5.05, 5.1], dtype=float)}
-
-    # Run
-    result = remove_outliers(lum_map)
-
-    # Verify
-    assert np.sum(~np.isnan(result[0.5])) == 3
-
-
-def test_remove_outliers_single_measurement_per_intensity():
-    """A single measurement per intensity is kept unchanged."""
-    # Setup
-    lum_map = {0.0: np.array([1.0]), 0.5: np.array([5.0]), 1.0: np.array([10.0])}
-
-    # Run
-    result = remove_outliers(lum_map)
-
-    # Verify: no outliers can be flagged with only one measurement
-    assert result[0.0][0] == 1.0
-    assert result[0.5][0] == 5.0
-    assert result[1.0][0] == 10.0
-
-
-def test_remove_outliers_raises_when_all_removed():
-    """If all measurements for an intensity are flagged as outliers, raise an error."""
-    # Setup
-    # Two measurements far apart → each is flagged as an outlier relative to the other
-    lum_map = {0.5: np.array([1.0, 100.0], dtype=float)}
-
-    # Run and Verify
-    with pytest.raises(RuntimeError):
-        remove_outliers(lum_map)
+    np.testing.assert_array_equal(result, measurements)
 
 
 ### AVERAGE ###
