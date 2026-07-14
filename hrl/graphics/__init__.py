@@ -6,10 +6,13 @@ import platform
 
 __all__ = [
     "new_graphics",
+    "ALIASES",
+    "GREY_ALIASES",
+    "RGB_ALIASES",
     "Texture",
 ]
 
-GRAPHICS_GREY_ALIASES = {
+GREY_ALIASES = {
     "gpu_grey": "gpu.GPU_grey",
     "grey": "gpu.GPU_grey",
     "gray": "gpu.GPU_grey",
@@ -23,14 +26,14 @@ GRAPHICS_GREY_ALIASES = {
     "datapixx_gray": "datapixx.DATAPixx",
     "datapixx_gray8": "datapixx.DATAPixx",
 }
-GRAPHICS_RGB_ALIASES = {
+RGB_ALIASES = {
     "gpu_RGB": "gpu.GPU_RGB",
     "RGB": "gpu.GPU_RGB",
     "viewpixx_RGB": "viewpixx.VIEWPixx_RGB",
     "viewpixx_color": "viewpixx.VIEWPixx_RGB",
     "viewpixx_colour": "viewpixx.VIEWPixx_RGB",
 }
-GRAPHICS_ALIASES = {**GRAPHICS_GREY_ALIASES, **GRAPHICS_RGB_ALIASES}
+ALIASES = {**GREY_ALIASES, **RGB_ALIASES}
 
 
 def new_graphics(
@@ -45,7 +48,7 @@ def new_graphics(
     screen=None,
     width_offset=0,
 ):
-    """Factory function to create appropriate Graphics subclass based on configuration.
+    """Factory function to create appropriate Graphics subclass based on provided alias.
 
     This function can be extended to read from a configuration file or environment
     variables to determine which graphics device to instantiate (e.g., GPU, DataPixx, ViewPixx).
@@ -53,11 +56,8 @@ def new_graphics(
     Parameters
     ----------
     graphics_alias : str
-        alias for the desired graphics device. Valid options include:
-        'gpu', 'gpu_grey', 'grey', 'gray', 'gray8', 'gpu_RGB', 'RGB',
-        'viewpixx', 'viewpixx_grey', 'viewpixx_gray', 'viewpixx_gray8',
-        'viewpixx_RGB', 'viewpixx_color', 'viewpixx_colour',
-        'datapixx', 'datapixx_grey', 'datapixx_gray', 'datapixx_gray8'.
+        alias for the desired graphics device. Valid options can be found in the
+        hrl.graphics.ALIASES.keys().
     width : int
         width of the screen in pixels.
     height : int
@@ -85,22 +85,22 @@ def new_graphics(
     Returns
     -------
     Graphics
-        an instance of a concrete Graphics subclass appropriate for the specified hardware setup
+        an instance of a concrete Graphics subclass corresponding to the provided alias
 
     Raises
     ------
     ValueError
-        if the provided graphics_alias does not match any known device aliases
+        if the provided graphics_alias does not match any known device
     """
     # Lazy import the graphics class based on alias
-    if graphics_alias in GRAPHICS_ALIASES:
-        module_name, class_name = GRAPHICS_ALIASES[graphics_alias].rsplit(".", 1)
+    if graphics_alias in ALIASES:
+        module_name, class_name = ALIASES[graphics_alias].rsplit(".", 1)
         module = importlib.import_module(f".{module_name}", package=__name__)
         graphics_class = getattr(module, class_name)
     else:
         raise ValueError(
             f"Unknown graphics device '{graphics_alias}'. Valid options are: "
-            f"{', '.join(list(GRAPHICS_GREY_ALIASES.keys()) + list(GRAPHICS_RGB_ALIASES.keys()))}"
+            f"{', '.join(list(ALIASES.keys()))}"
         )
 
     # Run screen setup for multiple monitor support

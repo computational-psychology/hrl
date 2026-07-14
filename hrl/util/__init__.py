@@ -9,7 +9,7 @@ graphics_arggroup = graphics_argparser.add_argument_group("Graphics settings")
 graphics_arggroup.add_argument(
     "-gr",
     "--graphics",
-    choices=[hrl.graphics.GRAPHICS_GREY_ALIASES.keys()],
+    choices=[hrl.graphics.GREY_ALIASES.keys()],
     default="datapixx",
     help="Graphics device (default: datapixx)",
 )
