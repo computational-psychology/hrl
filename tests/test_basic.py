@@ -57,7 +57,7 @@ def test_hrl_class():
     from hrl import HRL
 
     ihrl = HRL(
-        graphics="gpu",
+        graphics="gpu_grey",
         inputs="keyboard",
         wdth=200,
         hght=200,
