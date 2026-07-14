@@ -56,6 +56,7 @@ def draw_uniform_square(ihrl, intensity, patch_size=0.5):
     )
     patch = ihrl.graphics.newTexture(np.array([[intensity]]))
     patch.draw(patch_position, (patch_width, patch_height))
+    ihrl.graphics.flip()
 
 
 def measure_lut(
