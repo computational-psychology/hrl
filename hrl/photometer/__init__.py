@@ -8,6 +8,7 @@ __all__ = [
 ALIASES = {
     "optical": "optical.OptiCAL",
     "minolta": "minolta.Minolta",
+    "i1pro": "i1pro.I1Pro",
 }
 
 
