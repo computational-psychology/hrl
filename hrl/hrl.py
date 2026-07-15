@@ -118,7 +118,7 @@ class HRL:
         fs = False
 
         ## Load Graphics Device ##
-        if graphics in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
+        if graphics.lower() in ("gpu", "gpu_grey", "grey", "gray", "gray8"):
             from .graphics.gpu import GPU_grey
 
             self.graphics = GPU_grey(
@@ -130,7 +130,7 @@ class HRL:
                 lut=lut,
                 mouse=mouse,
             )
-        elif graphics in ("gpu_RGB", "RGB"):
+        elif graphics.lower() in ("gpu_rgb", "rgb"):
             from .graphics.gpu import GPU_RGB
 
             self.graphics = GPU_RGB(
@@ -143,7 +143,7 @@ class HRL:
                 mouse=mouse,
             )
 
-        elif graphics == "datapixx":
+        elif graphics.lower() == "datapixx":
             from .graphics.datapixx import DATAPixx
 
             self.graphics = DATAPixx(
@@ -155,7 +155,7 @@ class HRL:
                 lut=lut,
                 mouse=mouse,
             )
-        elif graphics in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
+        elif graphics.lower() in ("viewpixx", "viewpixx_grey", "viewpixx_gray", "viewpixx_gray8"):
             from .graphics.viewpixx import VIEWPixx_grey
 
             self.graphics = VIEWPixx_grey(
@@ -168,7 +168,7 @@ class HRL:
                 mouse=mouse,
             )
 
-        elif graphics in ("viewpixx_RGB", "viewpixx_color", "viewpixx_colour"):
+        elif graphics.lower() in ("viewpixx_rgb", "viewpixx_color", "viewpixx_colour"):
             from .graphics.viewpixx import VIEWPixx_RGB
 
             self.graphics = VIEWPixx_RGB(
@@ -221,19 +221,19 @@ class HRL:
             if os.path.exists(rfl):
                 # checks how many trials have been run
                 r = open(rfl, "r")
-                reader = csv.DictReader(r, delimiter=" ")
+                reader = csv.DictReader(r, delimiter=",")
                 l = list(reader)
                 r.close()
                 # length of list is the number of rows that has been written (without counting the header)
                 self.starttrial = len(l)
 
                 self._rfl = open(rfl, "a")
-                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=" ")
+                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=",")
 
             # if it doesnt exist, open in 'wb' mode and write the header
             else:
                 self._rfl = open(rfl, "w")
-                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=" ")
+                self._rwtr = csv.DictWriter(self._rfl, rhds, delimiter=",")
                 self._rfl.write(" ".join(rhds) + "\r\n")  # writes header
                 self.starttrial = 0
 
@@ -244,7 +244,7 @@ class HRL:
         self._dfl = None
         if dfl != None:
             self._dfl = open(dfl, "r")
-            self.designs = csv.DictReader(self._dfl, delimiter=" ", skipinitialspace=True)
+            self.designs = csv.DictReader(self._dfl, delimiter=",", skipinitialspace=True)
             # skip trials already done
             for i in range(self.starttrial):
                 self.designs.next()

@@ -5,6 +5,7 @@ This script creates measurement data files and their expected outputs for testin
 the smooth and linearize functions.
 """
 
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -216,64 +217,58 @@ def generate_measurement_lumrange():
 
 
 def generate_expected_outputs():
-    """Generate expected output files by running smooth and linearize."""
+    """Generate expected output files by running smooth and linearize.
+
+    Run this script from the tests/calibration/ directory.
+    """
     print("\nGenerating expected smooth outputs...")
 
     # Order 2 (kernel smoothing) - tests kernel parameter
-    subprocess.run(["cp", str(TEST_DIR / "measurements_8bit.csv"), "measure.csv"], check=True)
+    shutil.copy(TEST_DIR / "measurements_8bit.csv", "measure.csv")
     print("  → smoothed_measurements_kernel.csv (order=2)")
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "2"], check=True)
-    subprocess.run(
-        ["mv", "smooth.csv", str(TEST_DIR / "smoothed_measurements_kernel.csv")], check=True
-    )
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "2"], check=True)
+    shutil.move("smooth.csv", TEST_DIR / "smoothed_measurements_kernel.csv")
 
     # Duplicates
-    subprocess.run(
-        ["cp", str(TEST_DIR / "measurements_duplicates.csv"), "measure.csv"], check=True
-    )
+    shutil.copy(TEST_DIR / "measurements_duplicates.csv", "measure.csv")
     print("  → smoothed_measurements_duplicates.csv")
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
-    subprocess.run(
-        ["mv", "smooth.csv", str(TEST_DIR / "smoothed_measurements_duplicates.csv")], check=True
-    )
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
+    shutil.move("smooth.csv", TEST_DIR / "smoothed_measurements_duplicates.csv")
 
     # Outliers
-    subprocess.run(["cp", str(TEST_DIR / "measurements_outliers.csv"), "measure.csv"], check=True)
+    shutil.copy(TEST_DIR / "measurements_outliers.csv", "measure.csv")
     print("  → smoothed_measurements_outliers.csv")
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "0"], check=True)
-    subprocess.run(
-        ["mv", "smooth.csv", str(TEST_DIR / "smoothed_measurements_outliers.csv")], check=True
-    )
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "0"], check=True)
+    shutil.move("smooth.csv", TEST_DIR / "smoothed_measurements_outliers.csv")
 
     # Generate expected linearize outputs
     print("\nGenerating expected linearize outputs...")
 
-    # Use measurements_8bit.csv as input for 8-bit LUT
-    subprocess.run(["cp", str(TEST_DIR / "measurements_8bit.csv"), "smooth.csv"], check=True)
+    shutil.copy(TEST_DIR / "measurements_8bit.csv", "smooth.csv")
     print("  → lut_8bit.csv")
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
-    subprocess.run(["mv", "lut.csv", str(TEST_DIR / "lut_8bit.csv")], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True)
+    shutil.move("lut.csv", TEST_DIR / "lut_8bit.csv")
 
-    # Use measurements_16bit.csv as input for 10-bit and 16-bit LUTs
-    subprocess.run(["cp", str(TEST_DIR / "measurements_16bit.csv"), "smooth.csv"], check=True)
+    shutil.copy(TEST_DIR / "measurements_16bit.csv", "smooth.csv")
     print("  → lut_10bit.csv")
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "10"], check=True)
-    subprocess.run(["mv", "lut.csv", str(TEST_DIR / "lut_10bit.csv")], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "10"], check=True)
+    shutil.move("lut.csv", TEST_DIR / "lut_10bit.csv")
 
-    subprocess.run(["cp", str(TEST_DIR / "measurements_16bit.csv"), "smooth.csv"], check=True)
+    shutil.copy(TEST_DIR / "measurements_16bit.csv", "smooth.csv")
     print("  → lut_16bit.csv")
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "16"], check=True)
-    subprocess.run(["mv", "lut.csv", str(TEST_DIR / "lut_16bit.csv")], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "16"], check=True)
+    shutil.move("lut.csv", TEST_DIR / "lut_16bit.csv")
 
     # Lumrange test output (integration test runs smooth itself)
-    subprocess.run(["cp", str(TEST_DIR / "measurements_lumrange.csv"), "measure.csv"], check=True)
+    shutil.copy(TEST_DIR / "measurements_lumrange.csv", "measure.csv")
     print("  → lut_lumrange.csv (via smooth order=1)")
-    subprocess.run(["hrl-util", "lut", "smooth", "-o", "1"], check=True)
-    subprocess.run(["hrl-util", "lut", "linearize", "-r", "8"], check=True)
-    subprocess.run(["mv", "lut.csv", str(TEST_DIR / "lut_lumrange.csv")], check=True)
+    subprocess.run(["hrl-util", "lut", "smooth", "--order", "1"], check=True)
+    subprocess.run(["hrl-util", "lut", "linearize", "--bit_depth", "8"], check=True)
+    shutil.move("lut.csv", TEST_DIR / "lut_lumrange.csv")
 
-    # Cleanup
-    subprocess.run(["rm", "-f", "measure.csv", "smooth.csv"], check=True)
+    # Cleanup intermediate files
+    for f in ["measure.csv", "smooth.csv"]:
+        Path(f).unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

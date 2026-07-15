@@ -68,7 +68,7 @@ def test_datapixx_highres():
     np.savetxt(
         tmpfile,
         high_res_lut(bit_depth=bit_depth),
-        delimiter=" ",
+        delimiter=",",
         header="intensity_in,intensity_out,luminance",
         comments="",
     )
@@ -104,7 +104,7 @@ def test_datapixx_lowres():
     np.savetxt(
         tmpfile,
         high_res_lut(bit_depth=bit_depth),
-        delimiter=" ",
+        delimiter=",",
         header="intensity_in,intensity_out,luminance",
         comments="",
     )
@@ -140,7 +140,7 @@ def test_failure():
     np.savetxt(
         tmpfile,
         high_res_lut(bit_depth=bit_depth),
-        delimiter=" ",
+        delimiter=",",
         header="intensity_in,intensity_out,luminance",
         comments="",
     )
