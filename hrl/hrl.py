@@ -209,6 +209,10 @@ class HRL:
         elif photometer == "minolta":
             from .photometer.minolta import Minolta
             self.photometer = Minolta("/dev/ttyUSB0")
+            
+        elif photometer == "i1pro":
+            from .photometer.i1pro import i1Pro
+            self.photometer = i1Pro("/dev/ttyUSB0")
 
         else:
             self.photometer = None
