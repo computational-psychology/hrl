@@ -14,6 +14,7 @@ __all__ = [
 
 GREY_ALIASES = {
     "gpu_grey": "gpu.GPU_grey",
+    "gpu": "gpu.GPU_grey",
     "grey": "gpu.GPU_grey",
     "gray": "gpu.GPU_grey",
     "gray8": "gpu.GPU_grey",
