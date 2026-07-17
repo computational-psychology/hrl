@@ -6,6 +6,14 @@ from hrl.luts import create_lut
 
 # Standard gamma exponent for all gamma-related fixtures and tests
 DEFAULT_GAMMA = 2.2
+DARK_CHROMATICITY = np.array([0.01, 0.012, 0.015])
+COLOR_MATRIX = np.array(
+    [
+        [0.85, 0.05, 0.01],
+        [0.03, 0.87, 0.04],
+        [0.02, 0.06, 0.84],
+    ]
+)
 
 
 def pytest_addoption(parser):
@@ -28,7 +36,7 @@ def photometer_dev(request):
 
 
 @pytest.fixture
-def no_lut():
+def identity_lut():
     """Simple pass-through LUT with no gamma correction and no dark luminance.
 
     Returns
@@ -73,7 +81,7 @@ def nonlinear_lut():
 
 
 @pytest.fixture
-def no_clut():
+def identity_clut():
     """Simple pass-through CLUT with no gamma correction and no dark chromaticity.
 
     Returns
@@ -97,8 +105,21 @@ def linear_clut():
         R_out = G_out = B_out = intensity_in^(1/1.0) = intensity_in.
         Dark chromaticity: small nonzero values. Color matrix: identity.
     """
-    dark = np.array([0.01, 0.012, 0.015])
-    return create_clut(gamma=1.0, dark_chromaticity=dark, color_matrix=np.eye(3))
+    return create_clut(gamma=1.0, dark_chromaticity=DARK_CHROMATICITY, color_matrix=np.eye(3))
+
+
+@pytest.fixture
+def linear_conversion_clut():
+    """Linear CLUT with channel crosstalk, no gamma correction, no dark chromaticity.
+
+    Returns
+    -------
+    Array
+        with 13 columns [intensity_in, R_out, G_out, B_out, 9 matrix values].
+        R_out = G_out = B_out = intensity_in^(1/1.0) = intensity_in.
+        Dark chromaticity: zeroes. Color matrix: simulates channel crosstalk.
+    """
+    return create_clut(gamma=1.0, dark_chromaticity=np.zeros(3), color_matrix=COLOR_MATRIX)
 
 
 @pytest.fixture
@@ -112,12 +133,6 @@ def nonlinear_clut():
         R_out = G_out = B_out = intensity_in^(1/2.2).
         Dark chromaticity: small nonzero values. Color matrix: simulates channel crosstalk.
     """
-    dark = np.array([0.01, 0.012, 0.015])
-    color_matrix = np.array(
-        [
-            [0.85, 0.05, 0.01],
-            [0.03, 0.87, 0.04],
-            [0.02, 0.06, 0.84],
-        ]
+    return create_clut(
+        gamma=DEFAULT_GAMMA, dark_chromaticity=DARK_CHROMATICITY, color_matrix=COLOR_MATRIX
     )
-    return create_clut(gamma=DEFAULT_GAMMA, dark_chromaticity=dark, color_matrix=color_matrix)

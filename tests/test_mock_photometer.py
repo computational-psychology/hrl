@@ -6,9 +6,9 @@ import pytest
 from hrl.photometer.photometer import MockPhotometer
 
 
-def test_no_lut(no_lut):
-    # no_lut: luminance == intensity_in (k=1, dark=0, gamma=1)
-    phot = MockPhotometer(luminance_mapping=no_lut)
+def test_identity_lut(identity_lut):
+    # identity_lut: luminance == intensity_in (k=1, dark=0, gamma=1)
+    phot = MockPhotometer(luminance_mapping=identity_lut)
 
     phot.current_intensity = 0.5
     assert phot.readLuminance() == 0.5

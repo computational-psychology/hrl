@@ -8,6 +8,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from hrl.cluts import RGB_to_XYZ, XYZ_from_CLUT, gamma_correct_RGB
+
 
 class Photometer(ABC):
     """
@@ -172,3 +174,56 @@ class Colorimeter(Photometer):
 
         # returns Y, which is luminance by definition.
         return lum
+
+
+class MockColorimeter(Colorimeter):
+    def __init__(self, color_mapping=None, noise=0.0, rng=None):
+        super().__init__()
+        self.current_triplet = [0.0, 0.0, 0.0]  # Current RGB triplet
+        self.noise = noise
+        self.rng = np.random.default_rng(rng)
+
+        if callable(color_mapping):
+            self._clut_func = color_mapping
+        elif color_mapping.shape[1] == 4:
+            # 4-column LUT (intensity_in, R_out, G_out, B_out):
+            # can only correct, not convert to XYZ, so we just use the gamma_correct_RGB function.
+            # implicitly assumes that the color matrix is identity and dark chromaticity is zero.
+            clut = np.asarray(color_mapping)
+            self._clut_func = lambda r, g, b: gamma_correct_RGB(
+                np.array([r, g, b]).reshape(1, 1, 3), clut
+            ).flatten()
+        elif color_mapping.shape[1] == 13:
+            # Full 13-column LUT (intensity_in, R_out, G_out, B_out, and 9 columns for color matrix):
+            clut = np.asarray(color_mapping)
+            color_matrix, dark_chromaticity = XYZ_from_CLUT(clut)
+            self._clut_func = lambda r, g, b: RGB_to_XYZ(
+                gamma_correct_RGB(np.array([r, g, b]).reshape(1, 1, 3), clut),
+                color_matrix=color_matrix,
+                dark_chromaticity=dark_chromaticity,
+            ).flatten()
+        else:
+            raise ValueError(
+                "color_mapping must be a callable or an array-like with 4 or 13 columns."
+            )
+
+    def readTristimulus(self, n=3, slp=None):
+        """Return simulated CIE XYZ tristimulus values for the currently displayed RGB triplet.
+
+        Parameters
+        ----------
+        n : int
+            Number of samples to average (mirrors the real photometer API).
+        slp : int
+            Sleep time between samples in ms (ignored in mock).
+
+        Returns
+        -------
+        tuple of float
+            Simulated CIE XYZ tristimulus values, averaged over ``n`` samples.
+        """
+        base_XYZ = self._clut_func(*self.current_triplet)
+        if self.noise > 0.0:
+            samples = base_XYZ + self.rng.normal(0.0, self.noise, size=(n, 3))
+            return tuple(np.mean(samples, axis=0))
+        return tuple(base_XYZ)
