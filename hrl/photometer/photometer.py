@@ -115,3 +115,60 @@ class MockPhotometer(Photometer):
             samples = base_lum + self.rng.normal(0.0, self.noise, size=n)
             return float(np.mean(samples))
         return base_lum
+
+
+class Colorimeter(Photometer):
+    """Abstract Base Class for Colorimeter devices that can measure CIE XYZ Tristimulus values
+
+    Cannot be instantiated directly -- instead need to subclass
+    and implement the abstract method :meth:`readTristimulus`.
+
+    NOTE: Since Y is the luminance component by definition in the CIE XYZ colour space,
+    all Colorimeters are also Photometers.
+    This ABC implements the :meth:`readLuminance` method to return the Y tristimulus value.
+    """
+
+    @abstractmethod
+    def readTristimulus(self, n=3, slp=1):
+        """Take colorimetric measurements and return the CIE XYZ tristimulus values.
+
+        Parameters
+        ----------
+        n : int, optional
+            Maximum number of measurement attempts before giving up, by defaults 3.
+        slp : int, optional
+            Delay in milliseconds inserted before each measurement attempt, by default 1.
+
+        Returns
+        -------
+        tuple of float
+            ``(X, Y, Z)`` tristimulus values from the first successful mmeasurement,
+            or ``numpy.nan`` if all ``n`` attempts failed.
+        """
+        ...
+
+    def readLuminance(self, n=3, slp=1):
+        """Take colorimetric measurements and return the luminance in candela per square meter.
+
+        Convenience wrapper around :meth:`readTristimulus`
+        that returns only the Y tristimulus value,
+        which is luminance by definition in the CIE XYZ colour space.
+
+        Parameters
+        ----------
+        n : int, optional
+            Maximum number of measurement attempts before giving up, by defaults 3.
+        slp : int, optional
+            Delay in milliseconds inserted before each measurement attempt, by default 1.
+
+        Returns
+        -------
+        float
+            Luminance (Y) in candela per square meter from the first successful measurement,
+            or ``numpy.nan`` if all ``n`` attempts failed.
+        """
+        # reads tristimulus values X, Y, Z.
+        _, lum, _ = self.readTristimulus(n=n, slp=slp)
+
+        # returns Y, which is luminance by definition.
+        return lum
