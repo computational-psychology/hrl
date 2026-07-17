@@ -10,15 +10,17 @@ device, and on ``pygame`` for timing and keyboard input during the
 interactive calibration steps.
 """
 
-from .photometer import Photometer
-from pypixxlib.i1 import I1Pro
-import pygame
 import numpy as np
+import pygame
+from pypixxlib.i1 import I1Pro
+
+from .photometer import Photometer
+
 
 def wait_any_button(timeout=0):
     """Block until a key is pressed or an optional timeout elapses.
 
-    Polls the ``pygame`` event queue and returns as soon as a key is pressed. 
+    Polls the ``pygame`` event queue and returns as soon as a key is pressed.
     This is used to pause execution during calibration so the
     experimenter can place move the device and confirm they are ready to continue.
 
@@ -41,8 +43,8 @@ def wait_any_button(timeout=0):
         event = pygame.event.wait(1)  # waits for only 1 ms
         if event.type == pygame.KEYDOWN:
             break
-        
-        
+
+
 class i1Pro(Photometer):
     """Photometer driver for the X-Rite i1Pro spectrophotometer.
 
@@ -84,8 +86,7 @@ class i1Pro(Photometer):
 
         # calibrate always at the start
         self.calibrate()
-                      
-        
+
     def calibrate(self):
         """Run a calibration of the device.
 
@@ -103,17 +104,19 @@ class i1Pro(Photometer):
         -------
         None
         """
-        print('****************************************************')
+        print("****************************************************")
         print("Calibrating device, put the device on its nest and push the side button")
         self.phtm.calibrate("Emission")
-        
+
         print(f"Current color space is {self.phtm.getColorSpace()}")
         print(f"Current measurement mode is {self.phtm.getMeasurementMode()}")
         print(f"Current illumination mode is {self.phtm.getIlluminationMode()}")
         print("... Calibration done.")
-        print('****************************************************')
-        print('')
-        print('Put the device on the screen to be measured and press any key to start / continue the measurements')
+        print("****************************************************")
+        print("")
+        print(
+            "Put the device on the screen to be measured and press any key to start / continue the measurements"
+        )
         wait_any_button(timeout=0)
 
     def readTristimulus(self, n=3, slp=1, verbose=False):
@@ -134,7 +137,7 @@ class i1Pro(Photometer):
             Delay in milliseconds inserted before each measurement attempt,
             applied via ``pygame.time.delay``. Defaults is ``1``.
         verbose : bool, optional
-            If ``True``, print the measured X, Y and Z values to console. 
+            If ``True``, print the measured X, Y and Z values to console.
             Default is ``False``.
 
         Returns
@@ -147,26 +150,25 @@ class i1Pro(Photometer):
         # check if calibration is needed
         if self.phtm.isCalibrationExpired():
             self.calibrate()
-            
+
         # do measurements
         for i in range(n):
             try:
                 pygame.time.delay(slp)
-                
+
                 # measure the XYZ tristimulus values
                 self.phtm.runMeasurement()
                 X, Y, Z = self.phtm.getLatestTriStimulusMeasurements()
                 if verbose:
-                    print('Tristimulus values:')
+                    print("Tristimulus values:")
                     print(f"X: {X}, Y: {Y}, Z:{Z}")
-                                                  
+
                 return X, Y, Z
             except:
                 print("Error in reading from instrument")
         # if no try was successful
         return np.nan, np.nan, np.nan
-        
-        
+
     def readLuminance(self, n=3, slp=1, verbose=False):
         """Read the luminance from the device, in candela per square meter.
 
@@ -200,6 +202,3 @@ class i1Pro(Photometer):
 
         # returns Y, which is luminance by definition.
         return lum
-
-        
-
