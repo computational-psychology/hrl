@@ -25,7 +25,7 @@ def adjust(ihrl, value, step_size=(0.05, 0.01)):
     """
 
     # Wait for key
-    key, _ = ihrl.inputs.readButton(btns=("Escape", "Up", "Down", "Left", "RightSpace"))
+    key, _ = ihrl.inputs.readButton(btns=("Escape", "Up", "Down", "Left", "Right", "Space"))
 
     # Process
     accept = False
