@@ -20,6 +20,7 @@ This will also install the required dependencies:
 - [PyOpenGL](https://pyopengl.sourceforge.net/) (`pyopengl`)
 - [PyGame](https://www.pygame.org/) (`pygame`)
 - [NumPy](https://numpy.org/) (`numpy`)
+- [Matplotlib](https://matplotlib.org/) (`matplotlib`)
 
 
 ## HRL for developers
