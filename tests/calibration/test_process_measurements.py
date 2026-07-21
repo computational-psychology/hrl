@@ -171,8 +171,8 @@ def test_average_ignores_nan():
 def test_averaging_duplicates():
     """Multiple measurements at same intensity are correctly averaged.
 
-    Input: 20 unique intensities, each measured 3 times with slight variations
-    Output: 20 unique intensity points with averaged luminance values
+    Input: 256 unique intensities, each measured 3 times with slight variations
+    Output: 256 unique intensity points with averaged luminance values
     Validates: Correct duplicate averaging and numerical accuracy
     """
     # Setup
@@ -186,7 +186,7 @@ def test_averaging_duplicates():
     result = average(lum_map)
 
     # Verify
-    assert len(result) == 20
+    assert len(result) == 256
     expected = np.genfromtxt(
         TEST_DIR / "averaged_measurements_duplicates.csv", skip_header=1, delimiter=","
     )
@@ -196,7 +196,7 @@ def test_averaging_duplicates():
 def test_averaging_filters_outliers():
     """Outlier measurements are correctly filtered out.
 
-    Input: 50 intensities with 2-3 measurements each, some outliers at 30% deviation
+    Input: 256 intensities with 3 measurements each, every 5th has a 30% outlier
     Output: Averaged data with outliers removed from averaging
     Validates: Correct outlier filtering and numerical accuracy
     """

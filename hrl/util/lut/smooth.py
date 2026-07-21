@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import numpy as np
 
@@ -36,12 +37,33 @@ parser.add_argument(
     nargs="+",
     help="kernel for smoothing, by default [0.2, 0.2, 0.2, 0.2, 0.2]",
 )
+parser.add_argument(
+    "-i",
+    "--in_file",
+    default="measure.csv",
+    type=Path,
+    nargs="+",
+    help="path(s) for input measurement csv(s), by default 'measure.csv'",
+)
+parser.add_argument(
+    "-o",
+    "--out_file",
+    default="smooth.csv",
+    type=Path,
+    help="path for output smoothed measurements csv, by default 'smooth.csv'",
+)
 
 
 def command(parsed_args):
     # Load measurement data
-    files = ["measure.csv"]
-    measurements = [np.genfromtxt(fl, skip_header=1, delimiter=",") for fl in files]
+    measurements = []
+    in_files = parsed_args.in_file
+    if isinstance(in_files, (str, Path)):
+        in_files = [in_files]
+    for file in in_files:
+        filename = file.expanduser().resolve()
+        print(f"Loading from {filename} ...")
+        measurements.append(np.genfromtxt(filename, delimiter=",", skip_header=1))
 
     # Combine
     luminance_map = hrl.calibration.measurement.combine(measurements)
@@ -58,12 +80,10 @@ def command(parsed_args):
     )
 
     # Save smoothed LUT to file
-    print("Saving to File...")
-    out_filename = "smooth.csv"
-    out_file = open(out_filename, "w")
-    out_file.write("intensity_in,luminance\n")
-    np.savetxt(out_file, table, delimiter=",")
-    out_file.close()
+    out_file = parsed_args.out_file.expanduser().resolve()
+    print(f"Saving to {out_file}...")
+    header = "intensity_in,luminance"
+    np.savetxt(out_file, table, delimiter=",", header=header, comments="")
 
 
 if __name__ == "__main__":
