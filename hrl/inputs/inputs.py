@@ -22,6 +22,8 @@ class Input(ABC):
     a clear explanation of the keymap if it deviates from this typical set.
     """
 
+    device = None
+
     @abstractmethod
     def readButton(self, btns, to):
         """
