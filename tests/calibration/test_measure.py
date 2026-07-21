@@ -24,7 +24,7 @@ def mock_hrl():
 
     def _make(lut):
         ihrl = types.SimpleNamespace()
-        ihrl.photometer = MockPhotometer(lut=lut)
+        ihrl.photometer = MockPhotometer(luminance_mapping=lut)
         ihrl.graphics = types.SimpleNamespace(gamma_correct=lambda x: x)
         ihrl.inputs = None
         return ihrl

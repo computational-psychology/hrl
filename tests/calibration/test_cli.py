@@ -161,7 +161,7 @@ def test_measure(tmp_path):
     )
 
     mock_ihrl = types.SimpleNamespace(
-        photometer=MockPhotometer(lut=lut),
+        photometer=MockPhotometer(luminance_mapping=lut),
         graphics=types.SimpleNamespace(gamma_correct=lambda x: x),
         inputs=None,
         close=lambda: None,
@@ -381,7 +381,7 @@ def test_verify(tmp_path):
     )
 
     mock_ihrl = types.SimpleNamespace(
-        photometer=MockPhotometer(lut=lut),
+        photometer=MockPhotometer(luminance_mapping=lut),
         graphics=types.SimpleNamespace(gamma_correct=lambda x: gamma_correct_grey(x, LUT=lut)),
         inputs=None,
         close=lambda: None,

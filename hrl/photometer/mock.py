@@ -35,13 +35,16 @@ class MockPhotometer(Photometer):
 
     Parameters
     ----------
-    lut : array-like or callable
-        Defines the intensity to luminance mapping.
+    luminance_mapping : callable or array-like or
+        Defines the mapping of intensity to luminance, as either a:
 
-        - **array**: shape ``(N, 2)`` or ``(N, 3)``.  Column 0 is intensity
-          (input), the *last* column is luminance (cd/m²).  Values are
-          linearly interpolated.
-        - **callable**: ``lut(intensity: float) -> float`` returning cd/m².
+        - **callable**: ``luminance_mapping(intensity: float) -> float`` returning cd/m².
+            This could be a function, or a lambda,
+            e.g. ``lambda x: 100 * x**2.2`` for a simple gamma mapping.
+        - **array** of shape ``(N, 2)`` or ``(N, 3)``:
+            First column (Column 0) is intensity (input),
+            the *last* column is luminance (cd/m²).
+            Values are linearly interpolated.
     noise : float, optional
         Standard deviation of zero-mean Gaussian noise added to each reading,
         in cd/m², by default 0.0 (noiseless).
@@ -56,23 +59,23 @@ class MockPhotometer(Photometer):
         Update this before calling ``readLuminance``.
     """
 
-    def __init__(self, lut, noise=0.0, rng=None):
+    def __init__(self, luminance_mapping, noise=0.0, rng=None):
         super().__init__()
         self.current_intensity = 0.0
         self.noise = noise
         self.rng = np.random.default_rng(rng)
 
-        if callable(lut):
-            self._lut_func = lut
+        if callable(luminance_mapping):
+            self._lut_func = luminance_mapping
         else:
-            lut = np.asarray(lut)
-            if lut.shape[1] == 3:
+            luminance_mapping = np.asarray(luminance_mapping)
+            if luminance_mapping.shape[1] == 3:
                 # Full 3-column LUT (intensity_in, intensity_out, luminance):
                 # use intensity_out (col 1) as the physical intensity axis.
-                intensities = lut[:, 1]
+                intensities = luminance_mapping[:, 1]
             else:
-                intensities = lut[:, 0]
-            luminances = lut[:, -1]
+                intensities = luminance_mapping[:, 0]
+            luminances = luminance_mapping[:, -1]
             self._lut_func = lambda x: float(np.interp(x, intensities, luminances))
 
     def readLuminance(self, n=3, slp=None):

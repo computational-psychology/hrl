@@ -49,7 +49,7 @@ TEST_DIR = Path(__file__).parent
 def _make_ihrl(lut, noise=0.0, rng=None):
     """Minimal mock HRL stand-in with a MockPhotometer."""
     ihrl = types.SimpleNamespace()
-    ihrl.photometer = MockPhotometer(lut=lut, noise=noise, rng=rng)
+    ihrl.photometer = MockPhotometer(luminance_mapping=lut, noise=noise, rng=rng)
     ihrl.inputs = None
     return ihrl
 

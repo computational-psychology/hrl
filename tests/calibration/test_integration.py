@@ -22,7 +22,7 @@ TEST_DIR = Path(__file__).parent
 
 def _make_mock_hrl(lut, noise=0.0, rng=None):
     ihrl = types.SimpleNamespace()
-    ihrl.photometer = MockPhotometer(lut=lut, noise=noise, rng=rng)
+    ihrl.photometer = MockPhotometer(luminance_mapping=lut, noise=noise, rng=rng)
     ihrl.graphics = types.SimpleNamespace(gamma_correct=lambda x: x)
     ihrl.inputs = None
     return ihrl
