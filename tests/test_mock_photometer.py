@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from hrl.photometer.mock import MockPhotometer
+from hrl.photometer.photometer import MockPhotometer
 
 
 def test_no_lut(no_lut):

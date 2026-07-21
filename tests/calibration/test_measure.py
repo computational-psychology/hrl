@@ -8,7 +8,7 @@ import pytest
 
 from hrl.calibration.measurement import measure_lut
 from hrl.luts import create_lut
-from hrl.photometer.mock import MockPhotometer
+from hrl.photometer.photometer import MockPhotometer
 
 TEST_DIR = Path(__file__).parent
 

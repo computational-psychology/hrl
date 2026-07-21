@@ -15,7 +15,7 @@ from hrl.calibration.measurement import (
     smooth,
 )
 from hrl.luts import create_lut
-from hrl.photometer.mock import MockPhotometer
+from hrl.photometer.photometer import MockPhotometer
 
 TEST_DIR = Path(__file__).parent
 
