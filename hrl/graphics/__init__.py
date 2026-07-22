@@ -111,7 +111,7 @@ def new_graphics(
         width=width,
         height=height,
         background=background,
-        fullscreen=False,
+        fullscreen=fullscreen,
         double_buffer=double_buffer,
         lut=lut,
         mouse=mouse,
