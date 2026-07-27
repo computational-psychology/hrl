@@ -62,8 +62,9 @@ import numpy as np
 import OpenGL.GL as opengl
 import pygame
 
+from hrl.cluts import gamma_correct_RGB
 from hrl.graphics.texture import Texture, deleteTexture, deleteTextureDL
-from hrl.luts import gamma_correct_grey, gamma_correct_RGB
+from hrl.luts import gamma_correct_grey
 
 
 class Graphics(ABC):

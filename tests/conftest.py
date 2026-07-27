@@ -1,7 +1,8 @@
 import numpy as np
 import pytest
 
-from hrl.luts import create_clut, create_lut
+from hrl.cluts import create_clut
+from hrl.luts import create_lut
 
 # Standard gamma exponent for all gamma-related fixtures and tests
 DEFAULT_GAMMA = 2.2
