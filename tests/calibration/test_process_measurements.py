@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from hrl.calibration.measurement import average, remove_outliers
+from hrl.luts import average, remove_outliers
 
 TEST_DIR = Path(__file__).parent
 

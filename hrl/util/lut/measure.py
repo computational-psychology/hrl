@@ -5,7 +5,7 @@ from pathlib import Path
 from timeit import default_timer as timer
 
 from hrl import HRL
-from hrl.calibration.measurement import draw_uniform_square, measure_lut, setup_intensities
+from hrl.luts import _draw_uniform_square, _setup_intensities, measure
 from hrl.util import graphics_argparser
 from hrl.util.lut import intensities_argparser
 
@@ -79,7 +79,7 @@ def command(parsed_args):
     )
 
     # Set up intensity values to be measured
-    intensities = setup_intensities(
+    intensities = _setup_intensities(
         i_min=parsed_args.int_min,
         i_max=parsed_args.int_max,
         n_steps=2**parsed_args.bit_depth,
@@ -92,10 +92,10 @@ def command(parsed_args):
     )
 
     # Measure luminance for intensity values
-    measure_lut(
+    measure(
         ihrl,
         intensities=intensities,
-        stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
+        stim_draw_func=partial(_draw_uniform_square, patch_size=parsed_args.patch_size),
         out_file=parsed_args.out_file,
         sleep_time=parsed_args.sleep_time,
     )

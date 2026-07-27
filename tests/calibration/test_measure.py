@@ -1,4 +1,4 @@
-"""Tests for calibration.measurement.measure_lut using MockPhotometer."""
+"""Tests for hrl.lut.measure using MockPhotometer."""
 
 import types
 from pathlib import Path
@@ -6,8 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from hrl.calibration.measurement import measure_lut
-from hrl.luts import create_lut
+from hrl.luts import create_lut, measure
 from hrl.photometer.photometer import MockPhotometer
 
 TEST_DIR = Path(__file__).parent
@@ -49,11 +48,11 @@ _LUT_CASES = [
 
 @pytest.mark.parametrize("n_samples", [1, 3, 5])
 @pytest.mark.parametrize("n,gamma,k,dark", _LUT_CASES)
-def test_measure_lut(n, gamma, k, dark, n_samples, mock_hrl):
+def test_measure(n, gamma, k, dark, n_samples, mock_hrl):
     lut = create_lut(n=n, gamma=gamma, k=k, dark=dark)
     ihrl = mock_hrl(lut)
 
-    measurements = measure_lut(
+    measurements = measure(
         ihrl, intensities=np.repeat(lut[:, 1], n_samples), stim_draw_func=mock_draw
     )
 
@@ -71,7 +70,7 @@ def test_csv_output(n, gamma, k, dark, n_samples, mock_hrl, tmp_path):
     ihrl = mock_hrl(lut)
     out_file = tmp_path / "measurements.csv"
 
-    measure_lut(
+    measure(
         ihrl,
         intensities=np.repeat(lut[:, 1], n_samples),
         stim_draw_func=mock_draw,

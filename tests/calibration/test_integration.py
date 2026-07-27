@@ -6,14 +6,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from hrl.calibration.measurement import (
+from hrl.luts import (
     average,
+    create_lut,
     linearize,
-    measure_lut,
+    measure,
     remove_outliers,
     smooth,
 )
-from hrl.luts import create_lut
 from hrl.photometer.photometer import MockPhotometer
 
 TEST_DIR = Path(__file__).parent
@@ -40,7 +40,7 @@ def test_full_pipeline():
     The physical monitor response is simulated via create_lut (gamma=2.2).
 
     Starting point: 256 intensity measurements with gamma~2.2 nonlinearity
-    Pipeline: measure_lut → combine → remove_outliers → average → smooth(order=0) → linearize
+    Pipeline: measure → combine → remove_outliers → average → smooth(order=0) → linearize
     Validates: mock + pipeline produces exactly the same LUT as linearize(gamma_curve) directly.
     Pipeline: smooth with order=0 (averaging) → linearize at 8-bit resolution
     Validates: Final LUT matches expected values from unit tests
@@ -58,7 +58,7 @@ def test_full_pipeline():
     ihrl = _make_mock_hrl(raw_lut, noise=0.0)
 
     # Step 0: simulate measurements at the raw (intensity_out) intensities, noiseless, 1 sample each
-    measurements = measure_lut(ihrl, intensities=raw_lut[:, 1], stim_draw_func=mock_draw)
+    measurements = measure(ihrl, intensities=raw_lut[:, 1], stim_draw_func=mock_draw)
 
     # Step 1: remove outliers
     measurements = remove_outliers(measurements)

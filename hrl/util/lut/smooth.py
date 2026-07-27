@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-import hrl.calibration.measurement
+import hrl.luts
 
 parser = argparse.ArgumentParser(
     prog="smooth",
@@ -67,13 +67,13 @@ def command(parsed_args):
     measurements = np.vstack(measurements)
 
     # Remove outliers
-    measurements = hrl.calibration.measurement.remove_outliers(measurements)
+    measurements = hrl.luts.remove_outliers(measurements)
 
     # Average
-    measurements = hrl.calibration.measurement.average(measurements)
+    measurements = hrl.luts.average(measurements)
 
     # Smooth
-    measurements = hrl.calibration.measurement.smooth(
+    measurements = hrl.luts.smooth(
         measurements, order=parsed_args.order, kernel=parsed_args.kernel
     )
 
