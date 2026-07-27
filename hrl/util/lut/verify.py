@@ -6,7 +6,7 @@ from timeit import default_timer as timer
 import numpy as np
 
 from hrl import HRL
-from hrl.calibration.measurement import draw_uniform_square, measure_lut
+from hrl.luts import _draw_uniform_square, measure
 from hrl.util.lut import intensities_argparser
 from hrl.util.lut.measure import measurement_argparser
 
@@ -67,10 +67,10 @@ def command(parsed_args):
         intensities = intensities[::-1]
 
     # Measure luminance for intensity values
-    measure_lut(
+    measure(
         ihrl,
         intensities=intensities,
-        stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
+        stim_draw_func=partial(_draw_uniform_square, patch_size=parsed_args.patch_size),
         sleep_time=parsed_args.sleep_time,
         out_file=parsed_args.out_file,
     )

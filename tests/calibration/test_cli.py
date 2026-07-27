@@ -168,7 +168,7 @@ def test_measure(tmp_path):
     )
 
     with patch("hrl.util.lut.measure.HRL", return_value=mock_ihrl):
-        with patch("hrl.util.lut.measure.draw_uniform_square", _mock_draw):
+        with patch("hrl.util.lut.measure._draw_uniform_square", _mock_draw):
             command(args)
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
@@ -388,7 +388,7 @@ def test_verify(tmp_path):
     )
 
     with patch("hrl.util.lut.verify.HRL", return_value=mock_ihrl):
-        with patch("hrl.util.lut.verify.draw_uniform_square", _mock_draw):
+        with patch("hrl.util.lut.verify._draw_uniform_square", _mock_draw):
             command(args)
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from hrl.calibration.measurement import smooth
+from hrl.luts import smooth
 
 TEST_DIR = Path(__file__).parent
 
