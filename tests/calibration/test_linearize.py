@@ -1,10 +1,10 @@
-"""Tests for the linearize function using hrl.calibration.measurement."""
+"""Tests for the linearize function using hrl.luts."""
 
 from pathlib import Path
 
 import numpy as np
 
-from hrl.calibration.measurement import linearize
+from hrl.luts import linearize
 
 TEST_DIR = Path(__file__).parent
 

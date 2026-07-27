@@ -5,7 +5,7 @@ from pathlib import Path
 from timeit import default_timer as timer
 
 from hrl import HRL
-from hrl.calibration.measurement import draw_uniform_square, measure_lut, setup_intensities
+from hrl.luts import _draw_uniform_square, _setup_intensities, measure
 from hrl.util import graphics_argparser
 from hrl.util.lut import intensities_argparser
 
@@ -18,13 +18,6 @@ measurement_arggroup.add_argument(
     type=str,
     default="minolta",
     help="Photometer to use, by default 'minolta'",
-)
-measurement_arggroup.add_argument(
-    "-n",
-    "--n_samples",
-    type=int,
-    default=5,
-    help="Samples per intensity, by default 5",
 )
 measurement_arggroup.add_argument(
     "-sl",
@@ -86,24 +79,24 @@ def command(parsed_args):
     )
 
     # Set up intensity values to be measured
-    intensities = setup_intensities(
-        parsed_args.int_min,
-        parsed_args.int_max,
-        2**parsed_args.bit_depth,
-        parsed_args.randomize,
-        parsed_args.reverse,
+    intensities = _setup_intensities(
+        i_min=parsed_args.int_min,
+        i_max=parsed_args.int_max,
+        n_steps=2**parsed_args.bit_depth,
+        n_samples=parsed_args.n_samples,
+        shuffle=parsed_args.randomize,
+        reverse=parsed_args.reverse,
     )
     print(
         f"Measuring {len(intensities)} intensity values ([{parsed_args.int_min}, {parsed_args.int_max}])..."
     )
 
     # Measure luminance for intensity values
-    measure_lut(
+    measure(
         ihrl,
         intensities=intensities,
-        stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
+        stim_draw_func=partial(_draw_uniform_square, patch_size=parsed_args.patch_size),
         out_file=parsed_args.out_file,
-        n_samples=parsed_args.n_samples,
         sleep_time=parsed_args.sleep_time,
     )
 
