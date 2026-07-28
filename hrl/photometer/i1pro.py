@@ -14,7 +14,7 @@ import numpy as np
 import pygame
 from pypixxlib.i1 import I1Pro
 
-from .photometer import Photometer
+from .photometer import Colorimeter
 
 
 def wait_any_button(timeout=0):
@@ -45,10 +45,10 @@ def wait_any_button(timeout=0):
             break
 
 
-class i1Pro(Photometer):
-    """Photometer driver for the X-Rite i1Pro spectrophotometer.
+class i1Pro(Colorimeter):
+    """Colorimeter driver for the X-Rite i1Pro spectrophotometer.
 
-    Concrete implementation of the :class:`~hrl.photometer.photometer.Photometer`
+    Concrete implementation of the :class:`~hrl.photometer.photometer.Colorimeter`
     abstract base class for the X-Rite i1Pro. On construction the device is
     connected, its colour space is set to CIE XYZ and a calibration is performed,
     so that the instance is ready to take measurements. The device is calibrated
@@ -168,37 +168,3 @@ class i1Pro(Photometer):
                 print("Error in reading from instrument")
         # if no try was successful
         return np.nan, np.nan, np.nan
-
-    def readLuminance(self, n=3, slp=1, verbose=False):
-        """Read the luminance from the device, in candela per square meter.
-
-        Convenience wrapper around :meth:`readTristimulus` that returns only
-        the Y tristimulus value, which is luminance by definition in the CIE
-        XYZ colour space.
-
-        Parameters
-        ----------
-        n : int, optional
-            Maximum number of measurement attempts before giving up.
-            Defaults to ``3``.
-        slp : int, optional
-            Delay in milliseconds inserted before each measurement attempt.
-            Defaults to ``1``.
-        verbose : bool, optional
-            If ``True``, print the measured X, Y and Z values. Defaults to
-            ``False``.
-
-        Returns
-        -------
-        float
-            The luminance (Y) in candela per square meter. If every
-            measurement attempt fails, :meth:`readTristimulus` returns
-            ``numpy.nan`` and this method will raise a ``TypeError`` while
-            unpacking, so callers should ensure the device is measuring
-            correctly.
-        """
-        # reads tristimulus values X, Y, Z.
-        _, lum, _ = self.readTristimulus(n=n, slp=slp, verbose=verbose)
-
-        # returns Y, which is luminance by definition.
-        return lum
