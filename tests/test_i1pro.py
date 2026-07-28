@@ -18,7 +18,8 @@ def test_alias():
 
 def test_read_luminance():
     device = i1Pro(timeout=1)
-    device.readLuminance(n=1, slp=5)
+    lum = device.readLuminance(n=1, slp=5)
+    assert isinstance(lum, float)
 
 
 def test_read_tristimulus():
