@@ -1,5 +1,7 @@
 import pygame
 import pytest
+
+import hrl.photometer
 from hrl.photometer.i1pro import i1Pro
 
 pytestmark = [pytest.mark.photometer]
@@ -8,6 +10,10 @@ pygame.init()
 
 def test_initialization():
     i1Pro(timeout=1)
+
+
+def test_alias():
+    hrl.photometer.new_photometer("i1pro", timeout=1)
 
 
 def test_read_luminance():

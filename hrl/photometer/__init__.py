@@ -8,7 +8,7 @@ __all__ = [
 ALIASES = {
     "optical": "optical.OptiCAL",
     "minolta": "minolta.Minolta",
-    "i1pro": "i1pro.I1Pro",
+    "i1pro": "i1pro.i1Pro",
 }
 
 
@@ -47,4 +47,4 @@ def new_photometer(photometer_alias, device="/dev/ttyUSB0", timeout=10):
             f"{', '.join(list(ALIASES.keys()))}"
         )
 
-    return photometer_class(device, timeout=timeout)
+    return photometer_class(device=device, timeout=timeout)

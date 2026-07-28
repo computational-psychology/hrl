@@ -65,7 +65,7 @@ class i1Pro(Photometer):
         The underlying VPixx device handle used for all hardware operations.
     """
 
-    def __init__(self, timeout=0):
+    def __init__(self, device=None, timeout=0):
         """Connect to the i1Pro, set the colour space and calibrate it.
 
         Opens a connection to the device, prints its revision and serial
