@@ -65,7 +65,7 @@ class i1Pro(Photometer):
         The underlying VPixx device handle used for all hardware operations.
     """
 
-    def __init__(self, timeout=5):
+    def __init__(self, timeout=0):
         """Connect to the i1Pro, set the colour space and calibrate it.
 
         Opens a connection to the device, prints its revision and serial
@@ -85,9 +85,9 @@ class i1Pro(Photometer):
         self.phtm.setColorSpace("CIEXYZ")
 
         # calibrate always at the start
-        self.calibrate()
+        self.calibrate(timeout=timeout)
 
-    def calibrate(self):
+    def calibrate(self, timeout=0):
         """Run a calibration of the device.
 
         Prompts the experimenter to place the i1Pro on its calibration nest
@@ -117,7 +117,7 @@ class i1Pro(Photometer):
         print(
             "Put the device on the screen to be measured and press any key to start / continue the measurements"
         )
-        wait_any_button(timeout=0)
+        wait_any_button(timeout=timeout)
 
     def readTristimulus(self, n=3, slp=1, verbose=False):
         """Read CIE XYZ tristimulus values from the device.
