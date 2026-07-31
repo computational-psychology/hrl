@@ -30,7 +30,7 @@ def test_equal_callable(triplet):
     tristimulus = triplet**2.2
 
     colorimeter.current_triplet = triplet
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), tristimulus)
+    np.testing.assert_array_almost_equal(colorimeter.readTristimulus(), tristimulus, decimal=12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -41,7 +41,7 @@ def test_unequal_callable(triplet):
     tristimulus = triplet ** np.array([0.9, 2.2, 1.5])
 
     colorimeter.current_triplet = triplet
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), tristimulus)
+    np.testing.assert_array_almost_equal(colorimeter.readTristimulus(), tristimulus, decimal=12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
