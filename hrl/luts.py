@@ -53,6 +53,76 @@ def gamma_correct_grey(img, LUT):
     return np.interp(img, LUT[:, 0], LUT[:, 1])
 
 
+def lum_conversion_from_LUT(LUT):
+    """Extract conversion factor and dark luminance from a provided LUT.
+
+    Parameters
+    ----------
+    LUT : Array[float]
+        Lookup Table with shape (N, 3), where
+        the first column is the linearlized input intensities,
+        the second column is the output intensities,
+        and the third column is the luminance values.
+        First row must correspond to zero input intensity (0.0), zero output intensity (0.0),
+        and luminance equal to the dark luminance (cd/m2).
+        This function reads `dark_lum` from the first row
+        and computes the linear conversion using subsequent rows.
+
+    Returns
+    -------
+    conversion : float
+        conversion factor from greyscale to luminance (cd/m2).
+    dark_lum : float
+        luminance value corresponding to zero greyscale (cd/m2).
+    """
+    dark_lum = LUT[0, 2]
+    conversion = (LUT[-1, 2] - dark_lum) / LUT[-1, 0]
+
+    return conversion, dark_lum
+
+
+def grey_to_lum(img, conversion, dark_lum=0.0):
+    """Convert greyscale value(s) to luminance using a provided conversion factor.
+
+    Parameters
+    ----------
+    img : Array[float] or float
+        input greyscale image with values between [0.0, 1.0].
+        Can be a scalar, 1D array, or 2D array.
+    conversion : float
+        conversion factor from greyscale to luminance (cd/m2).
+    dark_lum : float, optional
+        luminance value corresponding to zero greyscale (cd/m2), by default: 0.0 cd/m2
+
+    Returns
+    -------
+    Array[float]
+        output luminance image in cd/m2 with the same shape as input.
+    """
+    return conversion * img + dark_lum
+
+
+def lum_to_grey(lum, conversion, dark_lum=0.0):
+    """Convert luminance value(s) to greyscale using a provided conversion factor.
+
+    Parameters
+    ----------
+    lum : Array[float] or float
+        input luminance value(s) in cd/m2. Can be scalar or any-shaped array.
+    conversion : float
+        conversion factor from greyscale to luminance (cd/m2).
+    dark_lum : float, optional
+        luminance corresponding to zero greyscale (cd/m2), by default: 0.0 cd/m2.
+
+    Returns
+    -------
+    Array[float]
+        greyscale intensity value(s) between [0.0, 1.0] with the same shape as ``lum``.
+    """
+    lum = np.asarray(lum)
+    return (lum - dark_lum) / conversion
+
+
 def create_lut(
     n=256,
     gamma=1.0,
