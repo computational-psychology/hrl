@@ -10,7 +10,7 @@ N_TRIPLETS = 20
 rng = np.random.default_rng(0)
 random_triplets = [rng.random(3) for _ in range(N_TRIPLETS)]
 
-from conftest import COLOR_MATRIX, DARK_CHROMATICITY, DEFAULT_GAMMA
+from tests.conftest import COLOR_MATRIX, DARK_CHROMATICITY, DEFAULT_GAMMA
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
