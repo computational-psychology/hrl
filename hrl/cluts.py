@@ -46,6 +46,8 @@ remove_outliers(measurements, abs_tol=0.075, rel_tol=0.0075)
     Remove outlier tristimulus measurements within repeated RGB triplets.
 average(measurements)
     Average repeated tristimulus measurements per RGB triplet.
+linearize(measurements, bit_depth=8)
+    Build a linearized CLUT from averaged channel-isolated measurements.
 create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=None)
     Create a parametric CLUT with gamma correction and color conversion.
 
@@ -760,3 +762,108 @@ def average(measurements):
     )
 
     return np.column_stack([unique_rgb, xyz_avg])
+
+
+def _channel_subset(measurements, channel, atol=1e-10):
+    """Extract channel-isolated rows for a given RGB channel index."""
+    other = [idx for idx in range(3) if idx != channel]
+    mask = np.isclose(measurements[:, other[0]], 0.0, atol=atol) & np.isclose(
+        measurements[:, other[1]], 0.0, atol=atol
+    )
+    subset = measurements[mask]
+    subset = subset[np.argsort(subset[:, channel])]
+    return subset
+
+
+def linearize(measurements, bit_depth=8):
+    """Linearize channel-isolated XYZ measurements into a 13-column CLUT.
+
+    Parameters
+    ----------
+    measurements : array-like
+        averaged measurements with columns ``R, G, B, X, Y, Z``
+    bit_depth : int, optional
+        target CLUT input resolution, by default 8
+
+    Returns
+    -------
+    numpy.ndarray
+        CLUT with columns
+        ``[intensity_in, R_out, G_out, B_out, X_R, X_G, X_B, Y_R, Y_G, Y_B, Z_R, Z_G, Z_B]``
+    """
+    measurements = np.asarray(measurements, dtype=float)
+    if measurements.ndim != 2 or measurements.shape[1] != 6:
+        raise ValueError("measurements must be a 2D array with 6 columns: R,G,B,X,Y,Z")
+
+    n_samples = 2**bit_depth
+    intensity_in = np.linspace(0.0, 1.0, n_samples)
+
+    # Determine dark tristimulus from explicit black triplet if available.
+    black_mask = np.isclose(measurements[:, :3], 0.0, atol=1e-10).all(axis=1)
+    if np.any(black_mask):
+        dark_xyz = np.mean(measurements[black_mask, 3:], axis=0)
+    else:
+        dark_idx = np.argmin(np.sum(measurements[:, :3], axis=1))
+        dark_xyz = measurements[dark_idx, 3:]
+
+    channel_out = []
+    channel_xyz = []
+
+    for channel in range(3):
+        subset = _channel_subset(measurements, channel)
+        if len(subset) < 2:
+            raise RuntimeError(
+                "linearize requires at least two measurements per isolated channel "
+                f"for channel index {channel}"
+            )
+
+        ch_input = subset[:, channel]
+        ch_xyz = subset[:, 3:]
+
+        # Collapse repeated measurements at identical channel input before interpolation.
+        unique_input, inverse = np.unique(ch_input, return_inverse=True)
+        counts = np.bincount(inverse)
+        ch_xyz = np.column_stack(
+            [
+                np.bincount(inverse, weights=ch_xyz[:, 0]) / counts,
+                np.bincount(inverse, weights=ch_xyz[:, 1]) / counts,
+                np.bincount(inverse, weights=ch_xyz[:, 2]) / counts,
+            ]
+        )
+        ch_input = unique_input
+
+        # Linearize using Y (luminance) progression per channel.
+        # Enforce non-decreasing Y to make interpolation stable under measurement noise.
+        y_vals = np.maximum.accumulate(ch_xyz[:, 1])
+        desired_y = np.linspace(np.min(y_vals), np.max(y_vals), n_samples)
+
+        channel_out.append(np.interp(desired_y, y_vals, ch_input))
+        channel_xyz.append(
+            np.column_stack(
+                [
+                    np.interp(desired_y, y_vals, ch_xyz[:, 0]),
+                    np.interp(desired_y, y_vals, ch_xyz[:, 1]),
+                    np.interp(desired_y, y_vals, ch_xyz[:, 2]),
+                ]
+            )
+        )
+
+    rgb_out = np.column_stack(channel_out)
+
+    matrices = np.zeros((n_samples, 3, 3), dtype=float)
+    for i in range(n_samples):
+        for channel in range(3):
+            out_val = rgb_out[i, channel]
+            if out_val > 0.0:
+                matrices[i, :, channel] = (channel_xyz[channel][i] - dark_xyz) / out_val
+
+    # Forward-fill zero rows where out_val == 0 (typically the first row).
+    for i in range(1, n_samples):
+        zero_cols = np.isclose(matrices[i], 0.0).all(axis=0)
+        matrices[i, :, zero_cols] = matrices[i - 1, :, zero_cols]
+
+    # Encode dark chromaticity in the first row, consistent with create_clut.
+    matrices[0] = np.diag(dark_xyz)
+
+    matrices_flat = matrices.reshape(n_samples, -1)
+    return np.column_stack([intensity_in, rgb_out, matrices_flat])
