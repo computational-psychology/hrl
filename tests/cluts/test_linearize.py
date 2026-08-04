@@ -1,8 +1,12 @@
 """Tests for hrl.cluts.linearize."""
 
+from pathlib import Path
+
 import numpy as np
 
 from hrl.cluts import _setup_rgb_triplets, linearize
+
+TEST_DIR = Path(__file__).parent
 
 GAMMA_PHYS = np.array([2.0, 2.2, 1.8])
 COLOR_MATRIX = np.array(
@@ -62,3 +66,19 @@ def test_linearize_recovers_dark_and_color_matrix():
 
     np.testing.assert_allclose(np.diag(clut[0, 4:13].reshape(3, 3)), DARK_XYZ, atol=1e-12)
     np.testing.assert_allclose(clut[-1, 4:13].reshape(3, 3), COLOR_MATRIX, atol=5e-3)
+
+
+def test_linearize_8bit_regression():
+    """Regression: 8-bit CLUT matches known-good fixture."""
+    measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=8)
+    expected = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)
+
+
+def test_linearize_10bit_regression():
+    """Regression: 10-bit CLUT matches known-good fixture."""
+    measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=10)
+    expected = np.genfromtxt(TEST_DIR / "clut_10bit.csv", skip_header=1, delimiter=",")
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)

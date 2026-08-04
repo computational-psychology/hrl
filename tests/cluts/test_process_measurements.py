@@ -1,8 +1,12 @@
 """Tests for processing colorimetric measurements (remove_outliers, average)."""
 
+from pathlib import Path
+
 import numpy as np
 
 from hrl.cluts import average, remove_outliers
+
+TEST_DIR = Path(__file__).parent
 
 
 def _base_measurements(n=16):
@@ -81,3 +85,31 @@ def test_average_ignores_nan_rows():
 
     np.testing.assert_allclose(result[:, :3], expected[:, :3], atol=1e-12)
     np.testing.assert_allclose(result[:, 3:], expected[:, 3:], atol=1e-12)
+
+
+def test_averaging_duplicates_regression():
+    """Regression: duplicate measurements average to the known-good table."""
+    measurements = np.genfromtxt(
+        TEST_DIR / "measurements_duplicates.csv", skip_header=1, delimiter=","
+    )
+
+    result = average(measurements)
+    expected = np.genfromtxt(
+        TEST_DIR / "averaged_measurements_duplicates.csv", skip_header=1, delimiter=","
+    )
+
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)
+
+
+def test_averaging_filters_outliers_regression():
+    """Regression: outlier removal + averaging matches known-good output."""
+    measurements = np.genfromtxt(
+        TEST_DIR / "measurements_outliers.csv", skip_header=1, delimiter=","
+    )
+
+    result = average(remove_outliers(measurements))
+    expected = np.genfromtxt(
+        TEST_DIR / "averaged_measurements_outliers.csv", skip_header=1, delimiter=","
+    )
+
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)
