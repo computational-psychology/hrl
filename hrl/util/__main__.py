@@ -5,6 +5,7 @@ import argparse
 
 def main():
     """Main entry point for hrl-util CLI."""
+    from hrl.util.clut import register_clut_commands
     from hrl.util.lut import register_lut_commands
 
     toplevel_parser = argparse.ArgumentParser(
@@ -21,6 +22,7 @@ def main():
     )
 
     register_lut_commands(toplevel_subparsers)
+    register_clut_commands(toplevel_subparsers)
 
     args = toplevel_parser.parse_args()
     args.func(args)

@@ -46,9 +46,7 @@ The key fixture groups are:
 - `clut_*.csv`: expected CLUT outputs at different resolutions
 
 Coverage includes core `hrl.cluts` operations, CSV fixture-based regressions,
-end-to-end pipeline checks, and fixture drift checks.
-
-CLUT calibration CLI tests are not included yet.
+end-to-end pipeline checks, `hrl-util clut` CLI behavior, and fixture drift checks.
 
 ## Fixture Maintenance
 
