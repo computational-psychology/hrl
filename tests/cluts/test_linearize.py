@@ -1,9 +1,13 @@
 """Tests for hrl.cluts.linearize."""
 
+from pathlib import Path
+
 import numpy as np
 
 from hrl.cluts.calibrate import channel_sweeps, linearize
 from tests.cluts.conftest import BLACK_POINT, DISPLAY_GAMMA, PRIMARIES_MATRIX, display_xyz
+
+TEST_DIR = Path(__file__).parent
 
 
 def _make_measurements(n_steps=256):
@@ -62,3 +66,19 @@ def test_linearize_records_each_channel_measured_alone():
         np.testing.assert_allclose(alone[0], BLACK_POINT, atol=1e-12)
         expected = BLACK_POINT + x[:, None] * PRIMARIES_MATRIX[:, channel]
         np.testing.assert_allclose(alone, expected, atol=5e-3)
+
+
+def test_linearize_8bit_regression():
+    """Regression: 8-bit CLUT matches known-good fixture."""
+    measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=8)
+    expected = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)
+
+
+def test_linearize_10bit_regression():
+    """Regression: 10-bit CLUT matches known-good fixture."""
+    measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
+    result = linearize(measurements, bit_depth=10)
+    expected = np.genfromtxt(TEST_DIR / "clut_10bit.csv", skip_header=1, delimiter=",")
+    np.testing.assert_array_almost_equal(result, expected, decimal=10)
