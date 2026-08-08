@@ -130,7 +130,6 @@ class HRL:
             self.photometer = hrl.photometer.new_photometer(
                 photometer_alias=photometer,
                 device="/dev/ttyUSB0",
-                timeout=10,
             )
 
         ## Results file ##

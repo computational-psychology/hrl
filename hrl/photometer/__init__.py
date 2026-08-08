@@ -12,7 +12,7 @@ ALIASES = {
 }
 
 
-def new_photometer(photometer_alias, device="/dev/ttyUSB0", timeout=10):
+def new_photometer(photometer_alias, device="/dev/ttyUSB0", timeout=0):
     """Factory function to create a new photometer instance based on the provided name.
 
     Parameters
