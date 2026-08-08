@@ -112,12 +112,13 @@ class i1Pro(Colorimeter):
         print(f"Current measurement mode is {self.phtm.getMeasurementMode()}")
         print(f"Current illumination mode is {self.phtm.getIlluminationMode()}")
         print("... Calibration done.")
-        print("****************************************************")
-        print("")
-        print(
-            "Put the device on the screen to be measured and press any key to start / continue the measurements"
-        )
-        wait_any_button(timeout=timeout)
+        print("****************************************************\n")
+        print("Put the device on the screen to be measured.\n")
+
+        # wait_any_button(timeout=timeout)
+        user_input = None
+        while user_input is not "Y":
+            user_input = input("Ready to continue measurement? [Y/n]") or "Y"
 
     def readTristimulus(self, n=3, slp=1, verbose=False):
         """Read CIE XYZ tristimulus values from the device.
