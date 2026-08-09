@@ -25,6 +25,11 @@ Functions
 ---------
 gamma_correct_RGB(img, CLUT)
     Apply gamma correction to an RGB array using a provided color LUT.
+RGB_to_XYZ(rgb, CLUT, gamma_correct=True) / XYZ_to_RGB(xyz, CLUT)
+    **Recommended default** for predicting/solving RGB<->XYZ. Uses the full
+    per-level CLUT forward model (the level-dependent 3x3 matrix stored in
+    every CLUT row), not a single fixed matrix. `XYZ_to_RGB` has no closed
+    form and refines numerically.
 RGB_to_XYZ_single_matrix(rgb, CLUT) / XYZ_to_RGB_single_matrix(xyz, CLUT)
     Cheap, closed-form single-matrix approximation. Assumes the display's
     RGB->XYZ transform doesn't change with intensity level, which is untrue
@@ -49,6 +54,27 @@ def _as_triplets(arr):
     if arr.ndim != 2 or arr.shape[1] != 3:
         raise ValueError("Expected shape (N, 3) or (3,)")
     return arr
+
+
+def _interp_unique(x, xp, fp):
+    """`np.interp` wrapper that averages duplicate `xp` values before interpolating.
+
+    CLUT rows can have repeated intensity/drive values (e.g. a clipped
+    channel), which would otherwise make interpolation ill-defined.
+    """
+    order = np.argsort(xp)
+    xp_sorted = xp[order]
+    fp_sorted = fp[order]
+
+    uniq_xp, inverse = np.unique(xp_sorted, return_inverse=True)
+    if len(uniq_xp) == len(xp_sorted):
+        uniq_fp = fp_sorted
+    else:
+        sums = np.bincount(inverse, weights=fp_sorted)
+        counts = np.bincount(inverse)
+        uniq_fp = sums / counts
+
+    return np.interp(x, uniq_xp, uniq_fp)
 
 
 def gamma_correct_RGB(img, CLUT):
@@ -257,6 +283,61 @@ def XYZ_to_RGB_single_matrix(xyz, CLUT):
         dark_chromaticity=dark_chromaticity,
     )
     return rgb.reshape(-1, 3)
+
+
+def RGB_to_XYZ(rgb, CLUT, gamma_correct=True):
+    """Predict XYZ from RGB using the full per-level CLUT forward model.
+
+    **Recommended default** for predicting what a CLUT-characterized display
+    shows. `RGB_to_XYZ_single_matrix` approximates the display with a single
+    fixed RGB->XYZ matrix (typically the full-scale CLUT row), which is only
+    correct if the display's effective color transform does not change with
+    intensity level. Real displays often violate this, sometimes
+    substantially at low/mid levels. This function instead uses the
+    level-dependent 3x3 matrix stored in *every* CLUT row: for each channel,
+    it interpolates the drive level and then the per-level XYZ contribution
+    curve, summing contributions across channels plus the dark-level offset.
+
+    Parameters
+    ----------
+    rgb : array-like
+        RGB input(s) with values in [0.0, 1.0]. Shape (3,) or (N, 3).
+    CLUT : Array[float]
+        Color Lookup Table with shape (N, 13), see module docstring.
+    gamma_correct : bool, optional
+        If True (default), first map `rgb` through the CLUT's input->drive
+        gamma correction (columns 0-3), matching `gamma_correct_RGB`. If
+        False, `rgb` is treated as already being in drive space.
+
+    Returns
+    -------
+    Array[float]
+        XYZ values with shape (N, 3).
+    """
+    rgb = _as_triplets(rgb)
+
+    intensity_in = np.asarray(CLUT[:, 0], dtype=float)
+    rgb_out = np.asarray(CLUT[:, 1:4], dtype=float)
+    matrices = np.asarray(CLUT[:, 4:13], dtype=float).reshape(-1, 3, 3)
+
+    # First row stores dark chromaticity on the diagonal.
+    dark_xyz = matrices[0].sum(axis=0)
+
+    xyz = np.tile(dark_xyz, (len(rgb), 1))
+
+    for channel in range(3):
+        out_curve = rgb_out[:, channel]
+        contrib_curve = out_curve[:, None] * matrices[:, :, channel]
+
+        if gamma_correct:
+            drive = _interp_unique(rgb[:, channel], intensity_in, out_curve)
+        else:
+            drive = rgb[:, channel]
+
+        for dim in range(3):
+            xyz[:, dim] += _interp_unique(drive, out_curve, contrib_curve[:, dim])
+
+    return xyz
 
 
 def create_clut(
