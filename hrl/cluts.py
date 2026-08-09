@@ -25,6 +25,9 @@ Functions
 ---------
 gamma_correct_RGB(img, CLUT)
     Apply gamma correction to an RGB array using a provided color LUT.
+apply_color_matrix(img, color_matrix, dark_chromaticity) / apply_inverse_color_matrix(...)
+    Low-level: apply a color matrix you already have (not derived from a
+    CLUT) to an image. `invert_color_matrix` inverts one.
 create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=None)
     Create a parametric CLUT with gamma correction and color conversion.
 
@@ -67,30 +70,28 @@ def gamma_correct_RGB(img, CLUT):
     return linearized_RGB
 
 
-def XYZ_from_CLUT(CLUT):
-    """Extract CIE 1931 XYZ color matching functions from a provided Color LUT.
+def _single_matrix_from_CLUT(CLUT):
+    """Extract the single-matrix RGB->XYZ approximation from a CLUT.
 
-    Parameters
-    ----------
-    CLUT : Array[float]
-        Color Lookup Table with shape (N, 13), where
-        the first column is linear input intensities between [0.0, 1.0],
-        the next three columns are the corrected R, G, B values [0.0, 1.0],
-        and the last 3x3 columns are the CIE 1931 X, Y, Z values for each channel.
-
-    Returns
-    -------
-    Array[float]
-        color matrix (XYZ CIE 1931 from RGB) with shape (3, 3).
+    Calibrated against raw input RGB directly (no gamma correction needed):
+    scales the full-scale-row matrix so it's relative to input level
+    (column 0) rather than drive (columns 1-3) -- see
+    `RGB_to_XYZ_single_matrix` for why that distinction matters.
     """
-    color_matrix = CLUT[-1, 4:13].reshape(3, 3)
+    drive_at_full_scale = CLUT[-1, 1:4]
+    intensity_in_at_full_scale = CLUT[-1, 0]
+    color_matrix = CLUT[-1, 4:13].reshape(3, 3) * drive_at_full_scale / intensity_in_at_full_scale
     dark_chromaticity = CLUT[0, 4:13].reshape((3, 3))
-
     return color_matrix, dark_chromaticity
 
 
-def RGB_to_XYZ(img, color_matrix, dark_chromaticity=np.zeros((3, 3))):
-    """Convert RGB image to CIE 1931 XYZ color space using provided color matching functions.
+def apply_color_matrix(img, color_matrix, dark_chromaticity=np.zeros((3, 3))):
+    """Convert an RGB image to CIE 1931 XYZ using an explicit color matrix.
+
+    Low-level: `XYZ = img @ color_matrix.T + dark_chromaticity.sum(axis=0)`.
+    Use this when you already have a color matrix from somewhere else. To
+    predict what a specific, measured display shows, prefer `RGB_to_XYZ` or
+    `RGB_to_XYZ_single_matrix`, which get the matrix from a CLUT for you.
 
     Parameters
     ----------
@@ -139,8 +140,13 @@ def invert_color_matrix(XYZ_from_RGB_matrix):
     return np.linalg.inv(XYZ_from_RGB_matrix)
 
 
-def XYZ_to_RGB(XYZ, inv_color_matrix, dark_chromaticity=np.zeros((3, 3))):
-    """Convert CIE 1931 XYZ image to RGB color space using provided inverse color matching functions.
+def apply_inverse_color_matrix(XYZ, inv_color_matrix, dark_chromaticity=np.zeros((3, 3))):
+    """Convert a CIE 1931 XYZ image to RGB using an explicit inverse color matrix.
+
+    Low-level: the inverse of `apply_color_matrix`. Use this when you
+    already have an (inverse) color matrix from somewhere else. To solve
+    for the RGB a specific, measured display needs, prefer `XYZ_to_RGB` or
+    `XYZ_to_RGB_single_matrix`, which get the matrix from a CLUT for you.
 
     Parameters
     ----------
