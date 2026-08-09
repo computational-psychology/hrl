@@ -116,7 +116,7 @@ def apply_color_matrix(img, color_matrix, dark_chromaticity=np.zeros((3, 3))):
     XYZ_reshaped = img_reshaped @ color_matrix.T
 
     # Add dark chromaticity
-    XYZ_reshaped += dark_chromaticity.sum(axis=0)
+    XYZ_reshaped = XYZ_reshaped + dark_chromaticity.sum(axis=0)
 
     # Reshape back to (H, W, 3)
     XYZ = XYZ_reshaped.reshape(H, W, 3)
@@ -166,8 +166,9 @@ def apply_inverse_color_matrix(XYZ, inv_color_matrix, dark_chromaticity=np.zeros
     H, W, _ = XYZ.shape
     XYZ_reshaped = XYZ.reshape(-1, 3)
 
-    # Subtract dark chromaticity
-    XYZ_reshaped -= dark_chromaticity.sum(axis=0)
+    # Subtract dark chromaticity (avoid -=: reshape can return a view, and an
+    # in-place op would then silently mutate the caller's XYZ array).
+    XYZ_reshaped = XYZ_reshaped - dark_chromaticity.sum(axis=0)
 
     # Convert XYZ to RGB
     RGB_reshaped = XYZ_reshaped @ inv_color_matrix.T
