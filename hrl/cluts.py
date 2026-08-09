@@ -40,10 +40,21 @@ RGB_to_XYZ_single_matrix(rgb, CLUT) / XYZ_to_RGB_single_matrix(xyz, CLUT)
 apply_color_matrix(img, color_matrix, dark_chromaticity) / apply_inverse_color_matrix(...)
     Low-level: apply a color matrix you already have (not derived from a
     CLUT) to an image. `invert_color_matrix` inverts one.
+measure(ihrl, triplets, stim_draw_func, out_file, sleep_time)
+    Measure CIE XYZ tristimulus values for channel-isolated RGB triplets.
+remove_outliers(measurements, abs_tol=0.075, rel_tol=0.0075)
+    Remove outlier tristimulus measurements within repeated RGB triplets.
+average(measurements)
+    Average repeated tristimulus measurements per RGB triplet.
+linearize(measurements, bit_depth=8)
+    Build a linearized CLUT from averaged channel-isolated measurements.
 create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=None)
     Create a parametric CLUT with gamma correction and color conversion.
 
 """
+
+from functools import partial
+from pathlib import Path
 
 import numpy as np
 
@@ -509,3 +520,350 @@ def create_clut(
 
     # Combine all columns
     return np.column_stack([x, rgb, matrices_flat])
+
+
+def _setup_rgb_triplets(
+    i_min=0.0, i_max=1.0, n_steps=2**8, n_samples=1, shuffle=False, reverse=False
+):
+    """Set up channel-isolated RGB triplets for CLUT measurements.
+
+    Generates triplets for red-only, green-only, and blue-only stimulation,
+    each sweeping intensity from ``i_min`` to ``i_max``.
+
+    Parameters
+    ----------
+    i_min : float, optional
+        minimum channel intensity, by default 0.0
+    i_max : float, optional
+        maximum channel intensity, by default 1.0
+    n_steps : int, optional
+        number of intensity values per channel, by default 2**8
+    n_samples : int, optional
+        number of repeated measurements per RGB triplet, by default 1
+    shuffle : bool, optional
+        shuffle triplet order, by default False
+    reverse : bool, optional
+        reverse triplet order, by default False
+
+    Returns
+    -------
+    numpy.ndarray
+        array with shape ``(3 * n_steps * n_samples, 3)`` and columns ``R, G, B``
+    """
+    intensities = np.linspace(i_min, i_max, n_steps)
+
+    r_triplets = np.column_stack(
+        [intensities, np.zeros_like(intensities), np.zeros_like(intensities)]
+    )
+    g_triplets = np.column_stack(
+        [np.zeros_like(intensities), intensities, np.zeros_like(intensities)]
+    )
+    b_triplets = np.column_stack(
+        [np.zeros_like(intensities), np.zeros_like(intensities), intensities]
+    )
+
+    triplets = np.vstack([r_triplets, g_triplets, b_triplets])
+    triplets = np.repeat(triplets, n_samples, axis=0)
+
+    if shuffle:
+        np.random.shuffle(triplets)
+    elif reverse:
+        triplets = triplets[::-1]
+
+    return triplets
+
+
+def _draw_uniform_rgb_square(ihrl, triplet, patch_size=0.5):
+    """Draw a centered RGB square patch for CLUT measurements.
+
+    Parameters
+    ----------
+    ihrl : HRL
+        HRL instance used for drawing and flipping
+    triplet : array-like
+        RGB triplet in [0.0, 1.0]
+    patch_size : float, optional
+        size of patch as fraction of the screen, by default 0.5
+    """
+    screen_width, screen_height = ihrl.graphics.width, ihrl.graphics.height
+    patch_width = screen_width * patch_size
+    patch_height = screen_height * patch_size
+    patch_position = (
+        (screen_width - patch_width) / 2,
+        (screen_height - patch_height) / 2,
+    )
+    patch = ihrl.graphics.newTexture(np.array([[triplet]], dtype=float))
+    patch.draw(patch_position, (patch_width, patch_height))
+    ihrl.graphics.flip()
+
+
+def measure(
+    ihrl,
+    triplets=_setup_rgb_triplets(),
+    stim_draw_func=partial(_draw_uniform_rgb_square, patch_size=0.5),
+    out_file=None,
+    sleep_time=200,
+):
+    """Measure CIE XYZ tristimulus values for a sequence of RGB triplets.
+
+    Parameters
+    ----------
+    ihrl : HRL
+        HRL instance with a configured colorimeter.
+    triplets : array-like, optional
+        RGB triplets to measure, shape ``(N, 3)``.
+        Defaults to channel-isolated 8-bit sweep via ``_setup_rgb_triplets()``.
+    stim_draw_func : callable, optional
+        function with signature ``(ihrl, triplet)`` that draws the stimulus,
+        by default a centered uniform square patch.
+    out_file : str or Path, optional
+        output CSV path, by default None (no file output).
+    sleep_time : float, optional
+        delay in ms passed to the colorimeter, by default 200.
+
+    Returns
+    -------
+    numpy.ndarray
+        table with columns ``R, G, B, X, Y, Z``.
+    """
+    triplets = np.asarray(triplets, dtype=float)
+    if triplets.ndim != 2 or triplets.shape[1] != 3:
+        raise ValueError("triplets must be a 2D array with shape (N, 3)")
+
+    if out_file is not None:
+        out_file = Path(out_file).expanduser().resolve()
+
+    measurements = np.full((len(triplets), 6), np.nan, dtype=float)
+
+    for idx_triplet, triplet in enumerate(triplets):
+        print(
+            "Current Triplet: "
+            f"({triplet[0]:.3f}, {triplet[1]:.3f}, {triplet[2]:.3f}) "
+            f"[{idx_triplet:d} of {len(triplets)} "
+            f"({idx_triplet / len(triplets):.2%}%)]"
+        )
+
+        measurements[idx_triplet, :3] = triplet
+
+        # Draw (update) stimulus
+        stim_draw_func(ihrl, triplet)
+
+        # Measure tristimulus
+        xyz = ihrl.photometer.readTristimulus(5, int(sleep_time))
+        measurements[idx_triplet, 3:] = xyz
+
+        # Write measured samples to file
+        if out_file is not None:
+            np.savetxt(
+                out_file,
+                measurements,
+                delimiter=",",
+                header="R,G,B,X,Y,Z",
+                comments="",
+            )
+
+        if ihrl.inputs is not None and ihrl.inputs.checkEscape():
+            break
+
+    return measurements
+
+
+def remove_outliers(measurements, abs_tol=0.075, rel_tol=0.0075):
+    """Remove outlier tristimulus measurements within repeated RGB triplets.
+
+    Outliers are identified within each repeated RGB triplet group based on
+    nearest-neighbor distance in XYZ space.
+
+    Parameters
+    ----------
+    measurements : array-like
+        table with columns ``R, G, B, X, Y, Z``
+    abs_tol : float, optional
+        absolute tolerance in XYZ Euclidean distance, by default 0.075
+    rel_tol : float, optional
+        relative tolerance vs. XYZ norm, by default 0.0075
+
+    Returns
+    -------
+    numpy.ndarray
+        measurements with outlier XYZ rows set to NaN
+    """
+    measurements = np.asarray(measurements, dtype=float)
+
+    # Sort by triplet and then by XYZ norm so nearest neighbors are adjacent per triplet.
+    xyz_norm = np.linalg.norm(measurements[:, 3:], axis=1)
+    sort_idx = np.lexsort(
+        (
+            xyz_norm,
+            measurements[:, 2],
+            measurements[:, 1],
+            measurements[:, 0],
+        )
+    )
+    measurements = measurements[sort_idx].copy()
+
+    rgb = measurements[:, :3]
+    xyz = measurements[:, 3:]
+    xyz_norm = np.linalg.norm(xyz, axis=1)
+
+    _, starts = np.unique(rgb, axis=0, return_index=True)
+    ends = np.concatenate([starts[1:] - 1, [len(measurements) - 1]])
+
+    diff_prev = np.linalg.norm(np.diff(xyz, axis=0, prepend=np.full((1, 3), np.inf)), axis=1)
+    diff_next = np.linalg.norm(np.diff(xyz, axis=0, append=np.full((1, 3), np.inf)), axis=1)
+    diff_prev[starts] = np.inf
+    diff_next[ends] = np.inf
+
+    min_diff = np.minimum(diff_prev, diff_next)
+
+    # Singletons have no neighbors in their triplet group and cannot be outliers.
+    min_diff[np.isinf(diff_prev) & np.isinf(diff_next)] = 0.0
+
+    rel_denom = np.where(xyz_norm > 0.0, xyz_norm, np.inf)
+    outliers = (min_diff > abs_tol) & ((min_diff / rel_denom) > rel_tol)
+
+    measurements[outliers, 3:] = np.nan
+
+    return measurements
+
+
+def average(measurements):
+    """Average repeated tristimulus measurements per RGB triplet.
+
+    Parameters
+    ----------
+    measurements : array-like
+        table with columns ``R, G, B, X, Y, Z``
+
+    Returns
+    -------
+    numpy.ndarray
+        averaged table with one row per unique triplet and columns
+        ``R, G, B, X, Y, Z``
+    """
+    measurements = np.asarray(measurements, dtype=float)
+
+    # Drop rows where at least one tristimulus value is NaN.
+    valid = ~np.isnan(measurements[:, 3:]).any(axis=1)
+    measurements = measurements[valid]
+
+    rgb = measurements[:, :3]
+    xyz = measurements[:, 3:]
+
+    unique_rgb, inverse = np.unique(rgb, axis=0, return_inverse=True)
+    counts = np.bincount(inverse)
+
+    xyz_avg = np.column_stack(
+        [
+            np.bincount(inverse, weights=xyz[:, 0]) / counts,
+            np.bincount(inverse, weights=xyz[:, 1]) / counts,
+            np.bincount(inverse, weights=xyz[:, 2]) / counts,
+        ]
+    )
+
+    return np.column_stack([unique_rgb, xyz_avg])
+
+
+def _channel_subset(measurements, channel, atol=1e-10):
+    """Extract channel-isolated rows for a given RGB channel index."""
+    other = [idx for idx in range(3) if idx != channel]
+    mask = np.isclose(measurements[:, other[0]], 0.0, atol=atol) & np.isclose(
+        measurements[:, other[1]], 0.0, atol=atol
+    )
+    subset = measurements[mask]
+    subset = subset[np.argsort(subset[:, channel])]
+    return subset
+
+
+def linearize(measurements, bit_depth=8):
+    """Linearize channel-isolated XYZ measurements into a 13-column CLUT.
+
+    Parameters
+    ----------
+    measurements : array-like
+        averaged measurements with columns ``R, G, B, X, Y, Z``
+    bit_depth : int, optional
+        target CLUT input resolution, by default 8
+
+    Returns
+    -------
+    numpy.ndarray
+        CLUT with columns
+        ``[intensity_in, R_out, G_out, B_out, X_R, X_G, X_B, Y_R, Y_G, Y_B, Z_R, Z_G, Z_B]``
+    """
+    measurements = np.asarray(measurements, dtype=float)
+    if measurements.ndim != 2 or measurements.shape[1] != 6:
+        raise ValueError("measurements must be a 2D array with 6 columns: R,G,B,X,Y,Z")
+
+    n_samples = 2**bit_depth
+    intensity_in = np.linspace(0.0, 1.0, n_samples)
+
+    # Determine dark tristimulus from explicit black triplet if available.
+    black_mask = np.isclose(measurements[:, :3], 0.0, atol=1e-10).all(axis=1)
+    if np.any(black_mask):
+        dark_xyz = np.mean(measurements[black_mask, 3:], axis=0)
+    else:
+        dark_idx = np.argmin(np.sum(measurements[:, :3], axis=1))
+        dark_xyz = measurements[dark_idx, 3:]
+
+    channel_out = []
+    channel_xyz = []
+
+    for channel in range(3):
+        subset = _channel_subset(measurements, channel)
+        if len(subset) < 2:
+            raise RuntimeError(
+                "linearize requires at least two measurements per isolated channel "
+                f"for channel index {channel}"
+            )
+
+        ch_input = subset[:, channel]
+        ch_xyz = subset[:, 3:]
+
+        # Collapse repeated measurements at identical channel input before interpolation.
+        unique_input, inverse = np.unique(ch_input, return_inverse=True)
+        counts = np.bincount(inverse)
+        ch_xyz = np.column_stack(
+            [
+                np.bincount(inverse, weights=ch_xyz[:, 0]) / counts,
+                np.bincount(inverse, weights=ch_xyz[:, 1]) / counts,
+                np.bincount(inverse, weights=ch_xyz[:, 2]) / counts,
+            ]
+        )
+        ch_input = unique_input
+
+        # Linearize using Y (luminance) progression per channel.
+        # Enforce non-decreasing Y to make interpolation stable under measurement noise.
+        y_vals = np.maximum.accumulate(ch_xyz[:, 1])
+        desired_y = np.linspace(np.min(y_vals), np.max(y_vals), n_samples)
+
+        channel_out.append(np.interp(desired_y, y_vals, ch_input))
+        channel_xyz.append(
+            np.column_stack(
+                [
+                    np.interp(desired_y, y_vals, ch_xyz[:, 0]),
+                    np.interp(desired_y, y_vals, ch_xyz[:, 1]),
+                    np.interp(desired_y, y_vals, ch_xyz[:, 2]),
+                ]
+            )
+        )
+
+    rgb_out = np.column_stack(channel_out)
+
+    matrices = np.zeros((n_samples, 3, 3), dtype=float)
+    for i in range(n_samples):
+        for channel in range(3):
+            out_val = rgb_out[i, channel]
+            if out_val > 0.0:
+                matrices[i, :, channel] = (channel_xyz[channel][i] - dark_xyz) / out_val
+
+    # Forward-fill zero rows where out_val == 0 (typically the first row).
+    for i in range(1, n_samples):
+        zero_cols = np.isclose(matrices[i], 0.0).all(axis=0)
+        matrices[i, :, zero_cols] = matrices[i - 1, :, zero_cols]
+
+    # Encode dark chromaticity in the first row, consistent with create_clut.
+    matrices[0] = np.diag(dark_xyz)
+
+    matrices_flat = matrices.reshape(n_samples, -1)
+    return np.column_stack([intensity_in, rgb_out, matrices_flat])

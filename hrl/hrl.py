@@ -107,7 +107,7 @@ class HRL:
 
         ## Setup screen and graphics ##
         self.graphics = hrl.graphics.new_graphics(
-            graphics_alias=graphics.lower(),
+            graphics_alias=graphics,
             width=wdth,
             height=hght,
             background=bg,
