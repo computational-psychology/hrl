@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from conftest import DEFAULT_GAMMA
 
-from hrl.luts import gamma_correct_RGB
+from hrl.cluts import gamma_correct_RGB
 
 
 @pytest.mark.parametrize(
