@@ -25,6 +25,8 @@ Functions
 ---------
 gamma_correct_RGB(img, CLUT)
     Apply gamma correction to an RGB array using a provided color LUT.
+invert_gamma_correct_RGB(img, CLUT)
+    Invert `gamma_correct_RGB`: recover raw input RGB from drive RGB.
 RGB_to_XYZ(rgb, CLUT, gamma_correct=True) / XYZ_to_RGB(xyz, CLUT)
     **Recommended default** for predicting/solving RGB<->XYZ. Uses the full
     per-level CLUT forward model (the level-dependent 3x3 matrix stored in
@@ -109,6 +111,41 @@ def gamma_correct_RGB(img, CLUT):
     linearized_RGB = np.moveaxis(linearized_RGB, 0, -1)
 
     return linearized_RGB
+
+
+def invert_gamma_correct_RGB(img, CLUT):
+    """Invert `gamma_correct_RGB`: recover raw input RGB from drive RGB.
+
+    Given RGB already mapped through a CLUT's input->drive gamma correction
+    (columns 0-3), this recovers the original input RGB. Drive values can
+    repeat across rows (e.g. a clipped/saturated channel), so this
+    interpolates against a duplicate-safe version of the drive curve.
+
+    Parameters
+    ----------
+    img : Array[float]
+        drive RGB array with values between [0.0, 1.0].
+        Can be a single RGB triplet (shape: (1, 1, 3)) or an RGB image (shape: (H, W, 3)).
+    CLUT : Array[float]
+        Color LookUp Table with at least shape (N, 4), where the first column is
+        input intensities and the next three columns are the corrected R, G, B values.
+        Can have more columns, which will be ignored.
+
+    Returns
+    -------
+    Array[float]
+        input RGB array with the same shape as input.
+    """
+    input_RGB = np.array(
+        [
+            _interp_unique(img[..., channel], CLUT[:, channel + 1], CLUT[:, 0])
+            for channel in range(img.shape[-1])
+        ]
+    )
+
+    input_RGB = np.moveaxis(input_RGB, 0, -1)
+
+    return input_RGB
 
 
 def _single_matrix_from_CLUT(CLUT):
