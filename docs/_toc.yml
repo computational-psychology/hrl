@@ -29,6 +29,7 @@ parts:
     chapters:
     - file: calibration/how-high-resolution-lum-is-achieved
     - file: calibration/gamma-correction-linearization
+    - file: calibration/xyz_from_clut
     - file: calibration/refresh-rate
     - file: calibration/minimal-lum-step
     - file: calibration/others
