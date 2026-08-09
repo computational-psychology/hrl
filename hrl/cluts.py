@@ -25,6 +25,11 @@ Functions
 ---------
 gamma_correct_RGB(img, CLUT)
     Apply gamma correction to an RGB array using a provided color LUT.
+RGB_to_XYZ_single_matrix(rgb, CLUT) / XYZ_to_RGB_single_matrix(xyz, CLUT)
+    Cheap, closed-form single-matrix approximation. Assumes the display's
+    RGB->XYZ transform doesn't change with intensity level, which is untrue
+    in general -- prefer `RGB_to_XYZ` / `XYZ_to_RGB` unless you have a
+    specific reason to want the cheaper approximation.
 apply_color_matrix(img, color_matrix, dark_chromaticity) / apply_inverse_color_matrix(...)
     Low-level: apply a color matrix you already have (not derived from a
     CLUT) to an image. `invert_color_matrix` inverts one.
@@ -34,6 +39,16 @@ create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=N
 """
 
 import numpy as np
+
+
+def _as_triplets(arr):
+    """Return an array with shape (N, 3)."""
+    arr = np.asarray(arr, dtype=float)
+    if arr.ndim == 1:
+        arr = arr.reshape(1, 3)
+    if arr.ndim != 2 or arr.shape[1] != 3:
+        raise ValueError("Expected shape (N, 3) or (3,)")
+    return arr
 
 
 def gamma_correct_RGB(img, CLUT):
@@ -177,6 +192,71 @@ def apply_inverse_color_matrix(XYZ, inv_color_matrix, dark_chromaticity=np.zeros
     RGB = RGB_reshaped.reshape(H, W, 3)
 
     return RGB
+
+
+def RGB_to_XYZ_single_matrix(rgb, CLUT):
+    """Predict XYZ from input-level RGB using a single-matrix approximation.
+
+    Cheap and closed-form, and a solid approximation on a well-calibrated
+    real CLUT -- but it assumes the display's RGB->XYZ transform doesn't
+    change with intensity level, which is untrue in general. **Prefer
+    `RGB_to_XYZ`** (the full per-level model) unless you specifically want
+    the cheaper approximation.
+
+    The matrix is calibrated against raw input RGB (CLUT column 0) directly,
+    with no separate gamma-correction step needed: `linearize` constructs
+    that coordinate specifically so per-channel luminance is close to linear
+    in it, which is what makes a single matrix a reasonable approximation at
+    all.
+
+    Parameters
+    ----------
+    rgb : array-like
+        Input-level RGB, shape (3,) or (N, 3).
+    CLUT : Array[float]
+        Color Lookup Table with shape (N, 13), see module docstring.
+
+    Returns
+    -------
+    Array[float]
+        XYZ values with shape (N, 3).
+    """
+    rgb = _as_triplets(rgb)
+    color_matrix, dark_chromaticity = _single_matrix_from_CLUT(CLUT)
+    xyz = apply_color_matrix(
+        rgb.reshape(-1, 1, 3), color_matrix=color_matrix, dark_chromaticity=dark_chromaticity
+    )
+    return xyz.reshape(-1, 3)
+
+
+def XYZ_to_RGB_single_matrix(xyz, CLUT):
+    """Invert `RGB_to_XYZ_single_matrix` via a direct matrix inverse.
+
+    Instant (closed-form), but inherits the single-matrix approximation's
+    error -- it's what `XYZ_to_RGB` uses internally as a fast starting point
+    before refining against the full model. **Prefer `XYZ_to_RGB`** unless
+    you specifically want the cheaper approximation.
+
+    Parameters
+    ----------
+    xyz : array-like
+        Target XYZ, shape (3,) or (N, 3).
+    CLUT : Array[float]
+        Color Lookup Table with shape (N, 13), see module docstring.
+
+    Returns
+    -------
+    Array[float]
+        Input-level RGB with shape (N, 3). Not clipped to [0, 1].
+    """
+    xyz = _as_triplets(xyz)
+    color_matrix, dark_chromaticity = _single_matrix_from_CLUT(CLUT)
+    rgb = apply_inverse_color_matrix(
+        xyz.reshape(-1, 1, 3),
+        inv_color_matrix=invert_color_matrix(color_matrix),
+        dark_chromaticity=dark_chromaticity,
+    )
+    return rgb.reshape(-1, 3)
 
 
 def create_clut(
