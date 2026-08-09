@@ -3,14 +3,14 @@
 import numpy as np
 import pytest
 
-from hrl.cluts import RGB_to_XYZ, gamma_correct_RGB
+from hrl.cluts import apply_color_matrix, gamma_correct_RGB
 from hrl.photometer.photometer import MockColorimeter
 
 N_TRIPLETS = 20
 rng = np.random.default_rng(0)
 random_triplets = [rng.random(3) for _ in range(N_TRIPLETS)]
 
-from conftest import COLOR_MATRIX, DARK_CHROMATICITY, DEFAULT_GAMMA
+from tests.conftest import COLOR_MATRIX, DARK_CHROMATICITY, DEFAULT_GAMMA
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -71,7 +71,7 @@ def test_linear_clut(linear_clut, triplet):
 
     colorimeter.current_triplet = triplet
 
-    desired_tristimulus = RGB_to_XYZ(
+    desired_tristimulus = apply_color_matrix(
         triplet.reshape((1, 1, 3)),
         color_matrix=np.eye(3),
         dark_chromaticity=np.diag(DARK_CHROMATICITY),
@@ -88,7 +88,7 @@ def test_linear_conversion_clut(linear_conversion_clut, triplet):
 
     colorimeter.current_triplet = triplet
 
-    desired_tristimulus = RGB_to_XYZ(
+    desired_tristimulus = apply_color_matrix(
         triplet.reshape((1, 1, 3)), color_matrix=COLOR_MATRIX, dark_chromaticity=np.zeros(3)
     ).flatten()
 
@@ -105,7 +105,7 @@ def test_nonlinear_clut(nonlinear_clut, triplet):
 
     # compute desired tristimulus using the nonlinear CLUT
     gamma_corrected = gamma_correct_RGB(triplet.reshape((1, 1, 3)), nonlinear_clut)
-    desired_tristimulus = RGB_to_XYZ(
+    desired_tristimulus = apply_color_matrix(
         gamma_corrected,
         color_matrix=COLOR_MATRIX,
         dark_chromaticity=np.diag(DARK_CHROMATICITY),

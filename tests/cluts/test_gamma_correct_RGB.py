@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
-from conftest import DEFAULT_GAMMA
 
 from hrl.cluts import gamma_correct_RGB
+from tests.conftest import DEFAULT_GAMMA
 
 
 @pytest.mark.parametrize(

@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from hrl.cluts import RGB_to_XYZ, XYZ_from_CLUT, gamma_correct_RGB
+from hrl.cluts import apply_color_matrix, gamma_correct_RGB
 
 
 class Photometer(ABC):
@@ -195,9 +195,17 @@ class MockColorimeter(Colorimeter):
             ).flatten()
         elif color_mapping.shape[1] == 13:
             # Full 13-column LUT (intensity_in, R_out, G_out, B_out, and 9 columns for color matrix):
+            # simulates a display whose true RGB->XYZ transform is exactly the CLUT's
+            # full-scale-row matrix applied to gamma-corrected (drive) RGB -- i.e. this
+            # models a display for which the single-matrix assumption is exactly correct,
+            # which is what `create_clut`-style parametric/synthetic CLUTs are built as.
+            # Real measured CLUTs generally do *not* satisfy this -- see
+            # `RGB_to_XYZ_single_matrix` and `docs/calibration/xyz_from_clut` for why
+            # that distinction matters.
             clut = np.asarray(color_mapping)
-            color_matrix, dark_chromaticity = XYZ_from_CLUT(clut)
-            self._clut_func = lambda r, g, b: RGB_to_XYZ(
+            color_matrix = clut[-1, 4:13].reshape(3, 3)
+            dark_chromaticity = clut[0, 4:13].reshape(3, 3)
+            self._clut_func = lambda r, g, b: apply_color_matrix(
                 gamma_correct_RGB(np.array([r, g, b]).reshape(1, 1, 3), clut),
                 color_matrix=color_matrix,
                 dark_chromaticity=dark_chromaticity,
