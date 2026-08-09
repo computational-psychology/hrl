@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 import hrl.graphics
-from hrl.cluts import RGB_to_XYZ, XYZ_from_CLUT
+from hrl.cluts import RGB_to_XYZ
 from hrl.photometer.photometer import MockColorimeter
 
 
@@ -41,9 +41,12 @@ def test_clut_applied(clut):
 def test_clut_verified_via_mock_colorimeter_measurement(clut):
     """Verify CLUT use by graphics via MockColorimeter XYZ measurements.
 
-    The mock colorimeter measures emitted RGB -> XYZ using the CLUT's color matrix.
-    If graphics applies the CLUT correctly, measured XYZ should match the XYZ from
-    CLUT-corrected RGB and deviate from the uncorrected (raw RGB) prediction.
+    The mock colorimeter measures emitted RGB -> XYZ using the full
+    per-level CLUT forward model, treating its input as an already-driven
+    signal (`gamma_correct=False`) -- that's what a real colorimeter would
+    be pointed at. If graphics applies the CLUT correctly, measured XYZ
+    should match the XYZ predicted from the CLUT-corrected RGB, and deviate
+    from the uncorrected (raw RGB) prediction.
     """
     clut_path = Path(__file__).parent / clut
     clut_table = np.genfromtxt(clut_path, skip_header=1, delimiter=",")
@@ -52,15 +55,10 @@ def test_clut_verified_via_mock_colorimeter_measurement(clut):
         graphics_alias="RGB", width=64, height=64, background=[0.5, 0.5, 0.5], lut=clut_path
     )
 
-    color_matrix, dark_chromaticity = XYZ_from_CLUT(clut_table)
-
     def emitted_rgb_to_xyz(r, g, b):
-        xyz = RGB_to_XYZ(
-            np.array([r, g, b], dtype=float).reshape(1, 1, 3),
-            color_matrix=color_matrix,
-            dark_chromaticity=dark_chromaticity,
-        )
-        return tuple(xyz.flatten())
+        triplet = np.array([r, g, b], dtype=float)
+        xyz = RGB_to_XYZ(triplet, clut_table, gamma_correct=False)
+        return tuple(xyz[0])
 
     colorimeter = MockColorimeter(color_mapping=emitted_rgb_to_xyz)
 
@@ -76,16 +74,10 @@ def test_clut_verified_via_mock_colorimeter_measurement(clut):
     measured_xyz = np.array(measured_xyz)
 
     expected_xyz_with_clut = RGB_to_XYZ(
-        corrected_triplets.reshape(-1, 1, 3),
-        color_matrix=color_matrix,
-        dark_chromaticity=dark_chromaticity,
-    ).reshape(-1, 3)
+        corrected_triplets, clut_table, gamma_correct=False
+    )
 
-    expected_xyz_without_clut = RGB_to_XYZ(
-        raw_triplets.reshape(-1, 1, 3),
-        color_matrix=color_matrix,
-        dark_chromaticity=dark_chromaticity,
-    ).reshape(-1, 3)
+    expected_xyz_without_clut = RGB_to_XYZ(raw_triplets, clut_table, gamma_correct=False)
 
     np.testing.assert_allclose(measured_xyz, expected_xyz_with_clut, atol=1e-7)
 
