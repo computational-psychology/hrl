@@ -377,6 +377,90 @@ def RGB_to_XYZ(rgb, CLUT, gamma_correct=True):
     return xyz
 
 
+def XYZ_to_RGB(xyz, CLUT, tol=1e-3, max_iter=40):
+    """Invert `RGB_to_XYZ`: solve for input-level RGB that reproduces a target XYZ.
+
+    **Recommended default** for solving what RGB a CLUT-characterized
+    display needs to show a target XYZ. There's no closed form for this
+    (the full per-level model isn't a fixed linear map), so this refines
+    numerically: seed from the instant `XYZ_to_RGB_single_matrix`
+    approximation, then run Gauss-Newton steps against the exact model
+    (`RGB_to_XYZ`) until the residual drops below `tol` or `max_iter` is
+    reached.
+
+    Parameters
+    ----------
+    xyz : array-like
+        Target XYZ, shape (3,) or (N, 3).
+    CLUT : Array[float]
+        Color Lookup Table with shape (N, 13), see module docstring.
+    tol : float, optional
+        Stop refining a point once its XYZ error norm drops below this, by default 1e-3.
+    max_iter : int, optional
+        Maximum Gauss-Newton iterations per point, by default 40.
+
+    Returns
+    -------
+    Array[float]
+        Input-level RGB with shape (N, 3), each row clipped to [0, 1]. Not
+        every target is reachable (the display gamut is finite) -- to check
+        how well a target was actually hit, compare `RGB_to_XYZ` of the
+        result against `xyz`.
+    """
+    xyz = _as_triplets(xyz)
+    x = XYZ_to_RGB_single_matrix(xyz, CLUT)
+    x = np.clip(np.nan_to_num(x, nan=0.5, posinf=1.0, neginf=0.0), 0.0, 1.0)
+
+    for i in range(len(xyz)):
+        target = xyz[i]
+        xi = x[i]
+        pred = RGB_to_XYZ(xi, CLUT)[0]
+        err = pred - target
+        err_norm = float(np.linalg.norm(err))
+
+        for _ in range(max_iter):
+            if err_norm <= tol:
+                break
+
+            eps = 1e-4
+            J = np.zeros((3, 3))
+            for j in range(3):
+                x_up, x_dn = xi.copy(), xi.copy()
+                x_up[j] = min(1.0, x_up[j] + eps)
+                x_dn[j] = max(0.0, x_dn[j] - eps)
+                denom = x_up[j] - x_dn[j]
+                if denom == 0.0:
+                    continue
+                J[:, j] = (RGB_to_XYZ(x_up, CLUT)[0] - RGB_to_XYZ(x_dn, CLUT)[0]) / denom
+
+            try:
+                step = np.linalg.lstsq(J, -err, rcond=None)[0]
+            except np.linalg.LinAlgError:
+                break
+
+            improved = False
+            for alpha in (1.0, 0.5, 0.25, 0.125, 0.0625):
+                x_candidate = np.clip(xi + alpha * step, 0.0, 1.0)
+                pred_candidate = RGB_to_XYZ(x_candidate, CLUT)[0]
+                err_candidate = pred_candidate - target
+                err_norm_candidate = float(np.linalg.norm(err_candidate))
+                if err_norm_candidate < err_norm:
+                    xi, pred, err, err_norm = (
+                        x_candidate,
+                        pred_candidate,
+                        err_candidate,
+                        err_norm_candidate,
+                    )
+                    improved = True
+                    break
+            if not improved:
+                break
+
+        x[i] = xi
+
+    return x
+
+
 def create_clut(
     n=256,
     gamma=[1.0, 1.0, 1.0],
