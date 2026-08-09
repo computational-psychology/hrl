@@ -16,12 +16,12 @@ from hrl.cluts import gamma_correct_RGB
     ],
     ids=["black", "low_grey", "mid_grey", "high_grey", "white"],
 )
-def test_gamma_correct_RGB_triplet_no_clut(input_RGB, no_clut):
+def test_gamma_correct_RGB_triplet_no_clut(input_RGB, identity_clut):
     """Test gamma correction on RGB triplet with no_clut (gamma=1.0)."""
     rgb_triplet = np.reshape(input_RGB, (1, 1, 3))
 
     # Linearize RGB triplet using CLUT
-    linearized_RGB = gamma_correct_RGB(rgb_triplet, no_clut)
+    linearized_RGB = gamma_correct_RGB(rgb_triplet, identity_clut)
 
     # Test output shape
     assert linearized_RGB.shape == (1, 1, 3)
@@ -93,15 +93,15 @@ def test_gamma_correct_RGB_triplet_nonlinear_clut(input_RGB, nonlinear_clut):
     ],
     ids=["small_square", "rectangular", "single_pixel", "large_square"],
 )
-def test_gamma_correct_RGB_img_no_clut(shape, no_clut):
-    """Test gamma correction on 3D RGB image arrays with no_clut (gamma=1.0)."""
+def test_gamma_correct_RGB_img_no_clut(shape, identity_clut):
+    """Test gamma correction on 3D RGB image arrays with identity_clut (gamma=1.0)."""
     # Generate a test RGB image array with deterministic seed
     seed = hash(shape) % (2**32)
     rng = np.random.default_rng(seed)
     rgb_img = rng.uniform(0, 1, size=(*shape, 3))
 
     # Linearize RGB image array using CLUT
-    linearized_img = gamma_correct_RGB(rgb_img, no_clut)
+    linearized_img = gamma_correct_RGB(rgb_img, identity_clut)
 
     # Test output shape
     assert linearized_img.shape == (*shape, 3)

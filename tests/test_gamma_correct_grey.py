@@ -16,9 +16,9 @@ from hrl.luts import gamma_correct_grey
     ],
     ids=["black", "low_grey", "mid_grey", "high_grey", "white"],
 )
-def test_gamma_correct_grey_no_lut(input_intensity, no_lut):
-    """Test gamma correction with no_lut (gamma=1.0, k=1.0, dark=0.0)."""
-    linearized_intensity = gamma_correct_grey(input_intensity, no_lut)
+def test_gamma_correct_grey_identity(input_intensity, identity_lut):
+    """Test gamma correction with identity_lut (gamma=1.0, k=1.0, dark=0.0)."""
+    linearized_intensity = gamma_correct_grey(input_intensity, identity_lut)
 
     # Test output is scalar
     assert np.isscalar(linearized_intensity)
@@ -27,7 +27,7 @@ def test_gamma_correct_grey_no_lut(input_intensity, no_lut):
     assert np.array_equal(linearized_intensity, input_intensity)
 
     # Check expected luminance
-    actual_luminance = np.interp(input_intensity, no_lut[:, 0], no_lut[:, 2])
+    actual_luminance = np.interp(input_intensity, identity_lut[:, 0], identity_lut[:, 2])
     assert np.array_equal(actual_luminance, input_intensity)
 
 
@@ -90,15 +90,15 @@ def test_gamma_correct_grey_nonlinear_lut(
     [(5, 5), (10, 8), (1, 1), (50, 50)],
     ids=["small_square", "rectangular", "single_pixel", "large_square"],
 )
-def test_gamma_correct_grey_img_no_lut(shape, no_lut):
-    """Test gamma correction on 2D greyscale image arrays with no_lut (gamma=1.0, k=1.0, dark=0.0)."""
+def test_gamma_correct_grey_img_identity(shape, identity_lut):
+    """Test gamma correction on 2D greyscale image arrays with identity_lut (gamma=1.0, k=1.0, dark=0.0)."""
     # Generate a test greyscale image array with deterministic seed
     seed = hash(shape) % (2**32)
     rng = np.random.default_rng(seed)
     grey_img = rng.uniform(0, 1, size=shape)
 
     # Linearize grey image array using LUT
-    linearized_img = gamma_correct_grey(grey_img, no_lut)
+    linearized_img = gamma_correct_grey(grey_img, identity_lut)
 
     # Test output shape
     assert linearized_img.shape == shape
