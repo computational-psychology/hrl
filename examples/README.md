@@ -42,7 +42,9 @@ In each template, `run_experiment.py` is the entry point. To run one:
 python run_experiment.py
 ```
 
-and type `demo` as the observer name.
+and press Enter when asked for the observer initials, to accept the default
+`DEMO`. The `asymmetric_matching/` template ships its demo stimuli under
+`stimuli/DEMO/`, so that name in particular has to match.
 
 The templates are written to run in the lab, so they select a graphics device
 based on the hostname and load a `lut.csv` calibration file. On a machine
