@@ -72,7 +72,14 @@ The direct check is to look at the LUT you actually have:
 ```{code-block} python
 import numpy as np
 
-lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+# LUT files come in two flavours: comma-delimited (written by
+# `hrl-util lut linearize`) and whitespace-delimited (older files).
+# This is the same fallback `HRL` itself uses when loading a LUT.
+try:
+    lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=",")
+    lut[:, 2]
+except IndexError:
+    lut = np.genfromtxt("lut.csv", skip_header=1, delimiter=" ")
 
 print(f"{len(lut)} addressable levels")
 
@@ -86,6 +93,22 @@ The number of rows is how many distinct luminances the display can actually
 produce, and the differences of the third column are the steps between them. If
 the largest step is much bigger than the median, the linearization has gaps and
 the measurement is worth repeating with denser sampling in that region.
+
+Run against the example `lut.csv` shipped in this repository, that gives:
+
+```
+237 addressable levels
+smallest step: 0.09800 cd/m2
+largest step:  7.78000 cd/m2
+median step:   1.93300 cd/m2
+```
+
+Note how far this is from the nominal figures above. The LUT holds 237 levels,
+not 65536, and the median step of 1.93 $cdm^{-2}$ is close to the 8-bit nominal
+step of 1.96 $cdm^{-2}$ rather than to the 16-bit one of 0.0077 $cdm^{-2}$. The
+largest step is four times the median, which is exactly the gappiness described
+above. This is a coarsely sampled measurement, and it is worth keeping in mind
+that the file is an example rather than a current calibration.
 
 The independent check is to measure it: run
 
