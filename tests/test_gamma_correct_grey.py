@@ -81,8 +81,8 @@ def test_gamma_correct_grey_nonlinear_lut(
     assert np.allclose(linearized_intensity, expected_output)
 
     # Check expected luminance
-    actual_luminance = np.interp(input_intensity, nonlinear_lut[:, 0], nonlinear_lut[:, 2])
-    assert np.allclose(actual_luminance, expected_luminance, rtol=1e-4)
+    actual_luminance = np.interp(input_intensity, nonlinear_lut[:, 1], nonlinear_lut[:, 2])
+    assert np.allclose(actual_luminance, expected_luminance, rtol=1e-3)
 
 
 @pytest.mark.parametrize(

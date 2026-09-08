@@ -202,7 +202,13 @@ class Graphics(ABC):
         if lut is not None:
             # Load specified LUT
             print(f"..using look-up table: {lut}")
-            self._lut = np.genfromtxt(lut, skip_header=1, delimiter=',')
+            try:
+                lut_table = np.genfromtxt(lut, skip_header=1, delimiter=",")
+                lut_table[:, 2]
+            except IndexError:
+                lut_table = np.genfromtxt(lut, skip_header=1, delimiter=" ")
+                lut_table[:, 2]
+            self._lut = lut_table
         else:  # No LUT provided
             self._lut = None
             self._gamma_correct = lambda x: x  # By default, no gamma correction: identity function

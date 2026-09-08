@@ -43,8 +43,6 @@ def command(parsed_args):
     start = timer()
 
     # Initializing HRL
-    headers = ["Intensity"] + ["Luminance" + str(i) for i in range(parsed_args.n_samples)]
-
     ihrl = HRL(
         graphics=parsed_args.graphics,
         lut=parsed_args.lut,  # Apply the LUT that needs to be verified
@@ -57,8 +55,6 @@ def command(parsed_args):
         wdth_offset=parsed_args.width_offset,
         db=True,
         scrn=parsed_args.screen,
-        rfl=parsed_args.out_file,
-        rhds=headers,
     )
 
     # Set up intensity values to be measured
@@ -77,6 +73,7 @@ def command(parsed_args):
         stim_draw_func=partial(draw_uniform_square, patch_size=parsed_args.patch_size),
         n_samples=parsed_args.n_samples,
         sleep_time=parsed_args.sleep_time,
+        out_file=parsed_args.out_file,
     )
 
     # Measurement is over!
