@@ -17,6 +17,13 @@ experiment with `HRL`. If this is your first time using `HRL`, start with
 
 Each folder contains a markdown file explaining the logic of that step.
 
+`tutorials/standalone/` holds self-contained versions of the first three steps
+that need only `HRL`, `numpy` and `Pillow`. Those are the scripts narrated in
+the "Getting started" and "Useful examples" pages of the documentation. The
+numbered folders above are the lab-realistic counterparts: they use `stimupy`
+for stimuli and text, and load a `lut.csv`. See
+`tutorials/standalone/README.md`.
+
 ## Experiment templates
 
 `templates/` contains ready-to-use experiment templates, one per paradigm:
@@ -40,6 +47,26 @@ and type `demo` as the observer name.
 The templates are written to run in the lab, so they select a graphics device
 based on the hostname and load a `lut.csv` calibration file. On a machine
 without the lab hardware they fall back to the standard GPU backend.
+
+## Utilities and older examples
+
+Besides the two trees above, `examples/` holds a few standalone scripts that
+predate the migration:
+
+- `check_monitor_rate/` measures the refresh rate of the experimental monitor,
+  in software (`check_monitor_rate.py`) or with a photodiode
+  (`check_monitor_rate_photodiode.py`). Narrated in the "Refresh rate"
+  documentation page.
+- `luminance_to_intensity.py` converts a desired luminance in candela per
+  square metre into the input intensity to put in a stimulus array, using a
+  measured `lut.csv`.
+- `templates/show_maxmin.py` displays a folder of stimulus images on the
+  experimental monitor, with their minimum and maximum luminance, so that they
+  can be checked before an experiment is run.
+- `minimal_example_mouse.py` reads the mouse instead of the keyboard.
+- `template_experiment_stimuli.py` is unrelated to `templates/` despite its
+  name: it is a standalone script using the external `stimuli` package.
+- `sacha/` and `lut.csv` are older lab material, kept for reference.
 
 ## Provenance and license
 
