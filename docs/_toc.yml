@@ -25,6 +25,7 @@ parts:
     - file: templates/MLDS-MLCM
     - file: templates/2-AFC-2-IFC
     - file: templates/likert-responses  
+    - file: templates/eyetracking
     
   - caption: Monitor calibration 
     chapters:
