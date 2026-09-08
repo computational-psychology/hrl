@@ -177,7 +177,7 @@ Before running participants it is worth putting the actual images on the actual
 screen.
 [`examples/templates/show_maxmin.py`](https://github.com/computational-psychology/hrl/blob/master/examples/templates/show_maxmin.py)
 displays a folder of stimulus images one at a time on the experimental monitor,
-labelled with their minimum and maximum values, so you can check size, position
+labeled with their minimum and maximum values, so you can check size, position
 and whether anything clips. The
 [show stimuli](../useful-examples/show-stimuli) example is the same idea for
 stimuli you generate in code, and `asymmetric_matching/experiment/show_stimuli.py`

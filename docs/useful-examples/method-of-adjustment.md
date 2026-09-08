@@ -148,7 +148,7 @@ reusable across the templates.
 ```{note}
 The buttons accepted during adjustment are Up, Down, Left, Right, Space and
 Escape. Space accepts the current value; Escape terminates the experiment by
-raising `SystemExit`, which the main loop catches in order to close `HRL`
+raising `SystemExit`, which the main loop catches so that `HRL` closes
 cleanly.
 ```
 
@@ -227,10 +227,11 @@ def experiment_main(ihrl):
             raise e
 ```
 
-The starting value is drawn at random on every trial. This is deliberate: if
+The starting value is drawn at random on every trial. This is deliberate. If
 adjustment always started from the same value, the participant could learn how
-many presses it takes to get to their answer, and the number of presses rather
-than the appearance of the stimulus would determine the result.
+many presses it takes to reach their answer. The result would then be
+determined by the number of presses rather than by the appearance of the
+stimulus.
 
 `display_stim` is the usual `HRL` sequence, wrapped in a function so that the
 loop above stays readable. The stimulus is a White's illusion display generated

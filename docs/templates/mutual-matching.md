@@ -219,9 +219,9 @@ only call `newTexture` and `draw` in the loop, as
 [asymmetric matching](asymmetric-matching) does for its scene.
 ```
 
-Note also that `display_stim` takes the window centre from `ihrl.height` and
+Note also that `display_stim` takes the window center from `ihrl.height` and
 `ihrl.width` rather than from a module constant. The stimulus is therefore
-centred correctly whichever of the setups in `run_experiment.py` was selected,
+centered correctly whichever of the setups in `run_experiment.py` was selected,
 without the geometry being repeated per setup.
 
 

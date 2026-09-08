@@ -3,9 +3,9 @@
 This page covers two related scaling paradigms, each with its own template:
 
 - **MLDS**, Maximum Likelihood Difference Scaling, recovers a perceptual scale
-  from judgements about *differences* between stimuli along one dimension.
+  from judgments about *differences* between stimuli along one dimension.
 - **MLCM**, Maximum Likelihood Conjoint Measurement, recovers how *two*
-  dimensions jointly determine appearance, from judgements comparing stimuli
+  dimensions jointly determine appearance, from judgments comparing stimuli
   that differ on both.
 
 Both are forced choice: on every trial the participant presses one of two
@@ -99,7 +99,7 @@ def generate_block(shuffle=True):
 triads, each an ordered ascending triple. Presenting them all in ascending order
 would mean the middle stimulus is always the middle luminance, so each triple is
 randomly either kept or reversed. The ordering *within* the triple is preserved
-in both cases, which is what the difference judgement requires; only the
+in both cases, which is what the difference judgment requires; only the
 direction flips.
 
 `generate_block` takes a `shuffle` argument because `design.py` is also runnable
@@ -181,7 +181,7 @@ offset_x = int(ppd * R * 0.866) # cos(30) = 0.866
 offset_y = int(ppd * R * 0.5)   # sin(30) = 0.5
 ```
 
-The three stimuli sit on a circle of radius 4 degrees around the centre of the
+The three stimuli sit on a circle of radius 4 degrees around the center of the
 screen, at 90, 210 and 330 degrees. Expressing the offsets in degrees times
 pixels-per-degree, rather than in pixels, means the geometry stays correct if
 the same experiment is run on a monitor with a different pixel density.

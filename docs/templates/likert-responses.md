@@ -2,11 +2,11 @@
 
 In the templates so far, a response is either a choice between alternatives or a
 value the participant adjusts. This template collects a **rating**: the
-participant places the stimulus on an ordered scale of five labelled options,
+participant places the stimulus on an ordered scale of five labeled options,
 from "Left target is definitely brighter" through "Targets are equally bright"
 to "Right target is definitely brighter".
 
-A rating scale is the right instrument when you want a graded judgement rather
+A rating scale is the right instrument when you want a graded judgment rather
 than a binary one, and when an "equal" response is a meaningful answer rather
 than a failure to choose. Note the difference from
 [2-AFC](2-AFC-2-IFC): there, forcing a choice is the whole design; here, the
@@ -42,7 +42,7 @@ RESPONSE_OPTIONS = [
 FONTSIZE = 25
 ```
 
-To change the scale, edit this list. Five options with a labelled midpoint is a
+To change the scale, edit this list. Five options with a labeled midpoint is a
 common choice, but the code below works for any odd or even number.
 
 
@@ -146,7 +146,7 @@ Two layout details worth reusing:
 
 **The labels are laid out by division, not by hard-coded coordinates.** The
 screen width is divided into as many columns as there are options, and each
-label is centred within its column. Adding a sixth option requires no other
+label is centered within its column. Adding a sixth option requires no other
 change.
 
 **The baseline is aligned across labels.** The tallest of the rendered text
@@ -222,7 +222,7 @@ selection happened to begin, and where the number of presses is not itself
 informative.
 
 The recorded result is the integer position on the scale. What that integer
-means lives in `RESPONSE_OPTIONS`, so keep the two together when you analyse the
+means lives in `RESPONSE_OPTIONS`, so keep the two together when you analyze the
 data, and record the option list along with your results if you ever change it.
 
 

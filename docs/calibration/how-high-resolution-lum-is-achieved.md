@@ -6,7 +6,7 @@ means and how it is done.
 
 ## The problem with 8 bits
 
-A standard graphics card drives a monitor with 8 bits per colour channel. For a
+A standard graphics card drives a monitor with 8 bits per color channel. For a
 greyscale image, where red, green and blue all carry the same value, that gives
 `2**8 = 256` distinguishable intensity levels between black and white.
 
@@ -14,16 +14,15 @@ For many purposes 256 levels are plenty. For psychophysics they often are not.
 Two problems appear:
 
 **The steps are visible.** On a smooth luminance gradient, 256 levels produce
-visible banding. The eye is very good at detecting an edge, even one of a
-fraction of a percent in luminance, and a quantized gradient is a series of
-edges.
+visible banding. The eye detects luminance edges of well under one percent,
+and a quantized gradient is a series of edges.
 
 **The steps are unevenly useful.** After [gamma
 correction](gamma-correction-linearization), the intensities are chosen to give
 equal *luminance* steps. But the correction can only pick from the 256 values
-the hardware can produce, and near the dark end of the range, where the gamma
-curve is steepest, several of the original levels collapse onto the same
-corrected value. You end up with fewer than 256 usable levels, and the loss is
+the hardware can produce. Near the dark end of the range, where the gamma curve
+is steepest, several of the original levels collapse onto the same corrected
+value. You end up with fewer than 256 usable levels, and the loss is
 worst exactly where you often care most. See
 [minimal luminance step](minimal-lum-step).
 
@@ -35,7 +34,7 @@ you cannot measure it at all.
 
 VPixx hardware (DataPixx and ViewPixx) provides a video mode called **M16** for
 this. In M16 mode the device stops treating the red and green channels as
-colours. Instead it reads them as the two halves of a single 16-bit number:
+colors. Instead it reads them as the two halves of a single 16-bit number:
 
 - the **red** channel carries the high byte, bits 8 to 15
 - the **green** channel carries the low byte, bits 0 to 7
@@ -46,9 +45,9 @@ three of the monitor's guns with it. The result is `2**16 = 65536` levels
 instead of 256, a factor of 256 more resolution, over the same ordinary
 8-bit-per-channel video link.
 
-This trick costs colour: an M16 display is greyscale only. That is the trade
+This trick costs color: an M16 display is greyscale only. That is the trade
 `HRL` was built around, and it is why the library's core is greyscale and
-colour support came later, in a different device mode.
+color support came later, in a different device mode.
 
 
 ## Where it happens in the code
@@ -152,7 +151,7 @@ add it the same way.
 ```
 
 The ViewPixx can also be driven in **C24** mode, as `VIEWPixx_RGB`, which is
-ordinary 8-bit-per-channel colour. High-resolution greyscale and colour are
+ordinary 8-bit-per-channel color. High-resolution greyscale and color are
 mutually exclusive on this hardware: you pick one per session.
 
 

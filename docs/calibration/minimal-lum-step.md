@@ -32,9 +32,9 @@ The difference is a factor of 256, which is
 
 Whether those numbers are small enough depends on where in the range you are
 working, because vision is roughly a ratio detector. At a background of 100
-$cdm^{-2}$, the 8-bit step of 1.96 $cdm^{-2}$ is a contrast of about 2 percent,
-which is comfortably above the detection threshold: it will be visible as
-banding, and it is too coarse to sample a threshold function. The same step at
+$cdm^{-2}$, the 8-bit step of 1.96 $cdm^{-2}$ is a contrast of about 2 percent.
+That is comfortably above the detection threshold: it will show as banding, and
+it is too coarse to sample a threshold function. The same step at
 500 $cdm^{-2}$ is about 0.4 percent, near threshold. The 16-bit step of 0.0077
 $cdm^{-2}$ is 0.008 percent at 100 $cdm^{-2}$, and stays below 1 percent all the
 way down to about 1 $cdm^{-2}$.

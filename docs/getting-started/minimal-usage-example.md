@@ -2,7 +2,7 @@
 
 Here we show a basic example of how to show a stimulus
 and collect responses. 
-First we go step by step explaning on how to use HRL,
+First we go step by step explaining how to use HRL,
 at the bottom you can find the code for the full working example.
 
 The script is in this repository, at
@@ -47,7 +47,7 @@ we will show how to deploy it in the lab.
 
 ### Define a stimulus
 
-In order to display a stimulus,
+To display a stimulus,
 we first have to define/load/create a stimulus.
 There are many ways to do so, e.g., load an image from a file.
 Here, create an image-matrix ({py:class}`numpy.ndarray`) with 256x256 random values
@@ -119,7 +119,7 @@ By default, `readButton` waits until one of the following buttons is pressed:
 ihrl.inputs.readButton()
 print("Participant pressed a button")
 ```
-"Up", "Down", "Left" and "Right" refers to the arrows in the keyboard,
+"Up", "Down", "Left" and "Right" refer to the arrow keys on the keyboard.
 
 
 You can also ask `readButton`to wait for only some buttons
@@ -149,7 +149,7 @@ storing the response (and additional information) as results data;
 deciding what the next trial and stimulus will be.
 
 ```{code-block} python
-# Assign responses to correct/incorreect
+# Assign responses to correct/incorrect
 response_correct = {"Right": True, "Left": False, "Escape": False}
 
 if response_correct[button]:

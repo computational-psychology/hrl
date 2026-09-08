@@ -9,7 +9,7 @@ layout and the design and results machinery they share.
 
 This template is the [MLCM experiment](MLDS-MLCM) extended with eye tracking. It
 records where the participant looked while they made each conjoint measurement
-judgement, so that the choices can afterwards be related to fixation behaviour.
+judgment, so that the choices can afterwards be related to fixation behavior.
 
 The full example is at
 [`examples/templates/eyetracking_example/`](https://github.com/computational-psychology/hrl/tree/master/examples/templates/eyetracking_example).
@@ -168,7 +168,7 @@ if not dummy_mode:
         el_tracker.exitCalibration()
 ```
 
-The colours here are intensities in the same `[0.0, 1.0]` scale as everywhere
+The colors here are intensities in the same `[0.0, 1.0]` scale as everywhere
 else in `HRL`, so the calibration targets go through the same gamma correction
 as the stimuli. That is the payoff of routing them through `HRL` instead of
 letting `pylink` draw directly.
@@ -197,8 +197,8 @@ el_tracker.sendMessage('TRIALID %d' % trl)
 ```
 
 A **drift check** is done at the start of every trial, which is the recommended
-practice: it measures how far the calibration has drifted since the last one and
-corrects for it, and lets the experimenter recalibrate by pressing Escape.
+practice. It measures how far the calibration has drifted since the last one and
+corrects for it, and it lets the experimenter recalibrate by pressing Escape.
 
 Recording then starts, and the display goes up:
 
@@ -254,7 +254,7 @@ el_tracker.sendMessage('TRIAL_RESULT %d' % pylink.TRIAL_OK)
 ```
 
 The same values are also written to the results `.csv`. Duplicating them is
-deliberate: it means the behavioural data can be analysed without the EDF files,
+deliberate: it means the behavioral data can be analyzed without the EDF files,
 and the EDF files can be inspected without the CSVs.
 
 

@@ -3,7 +3,7 @@
 The previous pages ([minimal example](../getting-started/minimal-usage-example) 
  and [deploying your code in the lab](../getting-started/deploying-in-lab))
 shows you all the **core functionality of HRL**. 
-Starting from there you can (if you wish) develop you own python code to create 
+Starting from there you can (if you wish) develop your own python code to create 
 your stimuli, save your data, etc.
 
 However, over the years we have developed various useful utilities

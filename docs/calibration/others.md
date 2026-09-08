@@ -68,9 +68,9 @@ current `HRL` API.
 A monitor is not equally bright everywhere. Luminance typically falls off
 towards the edges and corners, and the fall-off can be several percent. The
 [LUT](gamma-correction-linearization) is measured at one place on the screen,
-normally a patch at the centre, so it describes the centre and nowhere else.
+normally a patch at the center, so it describes the center and nowhere else.
 
-This matters whenever a stimulus is not centred, and in particular for any
+This matters whenever a stimulus is not centered, and in particular for any
 experiment that compares two patches at different screen positions, such as
 [mutual matching](../templates/mutual-matching) or the two-sided displays in
 [MLCM](../templates/MLDS-MLCM). An apparent difference between left and right
@@ -88,7 +88,7 @@ There are two ways around it, neither of which is currently automated here:
 
 ```{note}
 **Status.** There is no homogeneity measurement utility in this repository. The
-`hrl-util lut measure` command draws its patch at the centre of the screen
+`hrl-util lut measure` command draws its patch at the center of the screen
 (`draw_uniform_square`), with a `--patch_size` option but no position argument,
 so it cannot currently be pointed at a corner without modification. Documenting
 a homogeneity protocol, and a utility to support it, is open work.

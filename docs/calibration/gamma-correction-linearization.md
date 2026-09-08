@@ -6,8 +6,8 @@ In vision research we usually want to be sure about exactly what light the
 monitor is putting out. To know that, we take careful measurements and
 *calibrate* the display. Specifically, we measure the **luminance** (in
 $cdm^{-2}$) of the light coming from the monitor, as a function of the
-**intensity** value we asked for: a float between `0.0` and `1.0`, which is what
-the values in your stimulus array are.
+**intensity** value we asked for. That intensity is a float between `0.0` and
+`1.0`, which is what the values in your stimulus array are.
 
 The two are not the same thing, and it is worth keeping the words apart:
 
@@ -22,10 +22,9 @@ as the **gamma** of the device. It differs between monitors, and it changes over
 time, so it has to be measured on the machine you are actually going to use, and
 re-measured periodically.
 
-To correct for the gamma we measure the whole function, and then work out what
-the intensity steps *should be* in order to get a linear relationship between
-the input intensity and the emitted luminance. The result is stored in a
-**LookUp Table** (LUT).
+To correct for the gamma we measure the whole function. We then work out what
+the intensity steps *should be* to make luminance rise linearly with input
+intensity. The result is stored in a **LookUp Table** (LUT).
 
 ### The LUT format
 
@@ -77,7 +76,7 @@ With `lut=None`, which is the default, no correction is applied and the
 intensities go to the monitor unchanged.
 
 ```{note}
-For colour displays there is a second format, the CLUT, with thirteen columns:
+For color displays there is a second format, the CLUT, with thirteen columns:
 `intensity_in`, then `R_out`, `G_out`, `B_out`, then a flattened 3 by 3
 RGB to XYZ matrix. It is applied per channel by `gamma_correct_RGB`. The module
 docstring of `hrl/luts.py` is the authority on both formats.
@@ -190,9 +189,9 @@ Options:
 | `-k`, `--kernel` | The kernel, by default `0.2 0.2 0.2 0.2 0.2`, a five-point moving average. |
 
 Start with the default of no smoothing. Smooth only if the measured curve is
-visibly noisy, and check the result with `plot`: smoothing a gamma curve too
-aggressively flattens exactly the low-intensity region where the curve is
-steepest and where you can least afford the error.
+visibly noisy, and check the result with `plot`. Smoothing too aggressively
+flattens the low-intensity region, which is where the curve is steepest and
+where you can least afford the error.
 
 ### Step 3: linearize
 

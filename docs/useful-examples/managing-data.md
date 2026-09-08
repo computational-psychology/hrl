@@ -546,7 +546,7 @@ def experiment_main(ihrl):
 
 Note that the first thing the experiment does is look for existing design files,
 not generate new ones. Generation only happens when nothing is found. This is
-what makes resuming the default behaviour rather than an option.
+what makes resuming the default behavior rather than an option.
 
 `run_block` is the trial loop. Each row of the block dataframe is converted to a
 dictionary, handed to `run_trial` as keyword arguments, updated with whatever
