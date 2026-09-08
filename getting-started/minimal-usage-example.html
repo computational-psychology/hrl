@@ -441,8 +441,8 @@ at the bottom you can find the code for the full working example.</p>
 
 <span class="c1"># Create HRL interface object</span>
 <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
-    <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>     <span class="c1"># Use the default GPU as graphics device driver</span>
-    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+    <span class="n">graphics</span><span class="o">=</span><span class="s2">"gpu"</span><span class="p">,</span>     <span class="c1"># Use the default GPU as graphics device driver</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">"keyboard"</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
     <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>      <span class="c1"># Height of the window, in pixels</span>
     <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>      <span class="c1"># Width of the window, in pixels</span>
     <span class="n">scrn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>             <span class="c1"># Which screen (monitor) to use</span>
@@ -519,20 +519,20 @@ it waits for a (single) button press.</p>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">readButton</span></code> waits until one of the following buttons is pressed:
 “Up”, “Down”, “Right”, “Left”, “Space”, “Escape”</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Participant pressed a button&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Participant pressed a button"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>“Up”, “Down”, “Left” and “Right” refers to the arrows in the keyboard,</p>
 <p>You can also ask <code class="docutils literal notranslate"><span class="pre">readButton</span></code>to wait for only some buttons
 and ignore all others:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Participant pressed a button&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">"Right"</span><span class="p">,</span> <span class="s2">"Space"</span><span class="p">,</span> <span class="s2">"Left"</span><span class="p">,</span> <span class="s2">"Escape"</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Participant pressed a button"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The method <code class="docutils literal notranslate"><span class="pre">readButton</span></code> also returns the time passed
 since it was called.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">button</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -544,12 +544,12 @@ deciding if the response is “correct” or not (in tasks where this is possibl
 storing the response (and additional information) as results data;
 deciding what the next trial and stimulus will be.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign responses to correct/incorreect</span>
-<span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Right"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"Left"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"Escape"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
 <span class="k">if</span> <span class="n">response_correct</span><span class="p">[</span><span class="n">button</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is correct&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is correct"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is incorrect&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is incorrect"</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>How exactly the response is mapped to some action
@@ -593,8 +593,8 @@ and waits for any allowed key press. Finally it closes the window.</p>
 
 <span class="c1"># Create HRL interface object</span>
 <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
-    <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
-    <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+    <span class="n">graphics</span><span class="o">=</span><span class="s2">"gpu"</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="s2">"keyboard"</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
     <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="c1"># Height of the window, in pixels</span>
     <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># Width of the window, in pixels</span>
     <span class="n">scrn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>   <span class="c1"># Which screen (monitor) to use</span>
@@ -624,17 +624,17 @@ and waits for any allowed key press. Finally it closes the window.</p>
 
 <span class="c1"># 3. COLLECT A  RESPONSE  </span>
 <span class="n">button</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">s"</span><span class="p">)</span>
 
 
 <span class="c1"># 4. PROCESS RESPONSE</span>
 <span class="c1"># Assign responses to correct/incorrect</span>
-<span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Right&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+<span class="n">response_correct</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"Right"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"Left"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"Escape"</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
 <span class="k">if</span> <span class="n">response_correct</span><span class="p">[</span><span class="n">button</span><span class="p">]:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is correct&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is correct"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is incorrect&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Participant pressed </span><span class="si">{</span><span class="n">button</span><span class="si">}</span><span class="s2">, which is incorrect"</span><span class="p">)</span>
 
 <span class="c1"># CLEANUP </span>
 <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>

@@ -488,13 +488,13 @@ everything</p></li>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
    <span class="o">...</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="c1"># Create HRL interface object</span>
     <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
-        <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
-        <span class="c1"># graphics=&#39;datapixx&#39;,    # In the lab, we use the datapixx device driver</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
-        <span class="c1"># inputs=&quot;responsepixx&quot;,  # In the lab, we use the responsepixx input device</span>
+        <span class="n">graphics</span><span class="o">=</span><span class="s2">"gpu"</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+        <span class="c1"># graphics='datapixx',    # In the lab, we use the datapixx device driver</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="s2">"keyboard"</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+        <span class="c1"># inputs="responsepixx",  # In the lab, we use the responsepixx input device</span>
         <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="n">scrn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Which screen (monitor) to use</span>
@@ -527,7 +527,7 @@ a system exit call (see <code class="docutils literal notranslate"><span class="
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
     <span class="n">stims</span> <span class="o">=</span> <span class="n">stimuli</span><span class="p">()</span>
     <span class="n">stim_names</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">stims</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stimuli available: </span><span class="si">{</span><span class="n">stim_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stimuli available: </span><span class="si">{</span><span class="n">stim_names</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">stim_idx</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -535,7 +535,7 @@ a system exit call (see <code class="docutils literal notranslate"><span class="
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Display stimulus</span>
             <span class="n">stim_name</span> <span class="o">=</span> <span class="n">stim_names</span><span class="p">[</span><span class="n">stim_idx</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Showing </span><span class="si">{</span><span class="n">stim_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Showing </span><span class="si">{</span><span class="n">stim_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             
             <span class="n">stim_image</span> <span class="o">=</span> <span class="n">stims</span><span class="p">[</span><span class="n">stim_name</span><span class="p">]</span>
             <span class="n">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">)</span>
@@ -545,7 +545,7 @@ a system exit call (see <code class="docutils literal notranslate"><span class="
             
         <span class="k">except</span> <span class="ne">SystemExit</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Cleanup</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Exiting..."</span><span class="p">)</span>
             <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="n">e</span>
             
@@ -557,15 +557,15 @@ a system exit call (see <code class="docutils literal notranslate"><span class="
 <p>Defines all stimuli, returning a dictionary with its name as key,
 and the stimulus itself as a numpy array as value</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">stimuli</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Defines three random textures with low, mid and high contrast&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Defines three random textures with low, mid and high contrast"""</span>
     
     <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span> 
     <span class="n">mid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
     <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
         
-    <span class="n">stims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;low contrast &#39;</span><span class="p">:</span> <span class="n">low</span><span class="p">,</span>
-             <span class="s1">&#39;mid contrast &#39;</span><span class="p">:</span> <span class="n">mid</span><span class="p">,</span>
-             <span class="s1">&#39;high contrast &#39;</span><span class="p">:</span> <span class="n">high</span><span class="p">}</span>
+    <span class="n">stims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'low contrast '</span><span class="p">:</span> <span class="n">low</span><span class="p">,</span>
+             <span class="s1">'mid contrast '</span><span class="p">:</span> <span class="n">mid</span><span class="p">,</span>
+             <span class="s1">'high contrast '</span><span class="p">:</span> <span class="n">high</span><span class="p">}</span>
              
     <span class="k">return</span> <span class="n">stims</span> 
 </pre></div>
@@ -574,10 +574,10 @@ and the stimulus itself as a numpy array as value</p>
 <section id="function-display-stim">
 <h3>Function <code class="docutils literal notranslate"><span class="pre">display_stim</span></code><a class="headerlink" href="#function-display-stim" title="Link to this heading">#</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    In this &quot;experiment&quot;, we just display a collection of stimuli, one at a time.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    In this "experiment", we just display a collection of stimuli, one at a time.</span>
 <span class="sd">    Here we define a function to display a single stimulus image centrally on the screen.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># Convert the stimulus image(matrix) to an OpenGL texture</span>
     <span class="n">stim_texture</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">newTexture</span><span class="p">(</span><span class="n">stim_image</span><span class="p">)</span>
@@ -605,7 +605,7 @@ On Left/Right, it decreases/increases the index
 into the list of stimuli by 1.
 To prevent <em>IndexErrors</em>, make sure that the index cannot be &lt;0 or &gt;max</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow participant to select a value from a range of options</span>
+<span class="w">    </span><span class="sd">"""Allow participant to select a value from a range of options</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -627,7 +627,7 @@ To prevent <em>IndexErrors</em>, make sure that the index cannot be &lt;0 or &gt
 <span class="sd">    ------</span>
 <span class="sd">    SystemExit</span>
 <span class="sd">        if participant/experimenter terminated by pressing Escape</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
@@ -635,18 +635,18 @@ To prevent <em>IndexErrors</em>, make sure that the index cannot be &lt;0 or &gt
 
     <span class="n">accept</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">))</span>
+    <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">"Left"</span><span class="p">,</span> <span class="s2">"Right"</span><span class="p">,</span> <span class="s2">"Escape"</span><span class="p">,</span> <span class="s2">"Space"</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Escape"</span><span class="p">:</span>
         <span class="c1"># Raise SystemExit Exception</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Participant terminated experiment.&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">"Participant terminated experiment."</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Left"</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Right&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Right"</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Space&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Space"</span><span class="p">:</span>
         <span class="n">accept</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="n">value</span><span class="p">,</span> <span class="n">accept</span>
@@ -669,23 +669,23 @@ button you can switch which texture to show.</p>
 <span class="n">CENTER</span> <span class="o">=</span> <span class="p">(</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Center of the drawing window</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">stimuli</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Defines three random textures with low, mid and high contrast&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">""" Defines three random textures with low, mid and high contrast"""</span>
     
     <span class="n">high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span> 
     <span class="n">mid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
     <span class="n">low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">0.65</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">))</span>
         
-    <span class="n">stims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;low contrast &#39;</span><span class="p">:</span> <span class="n">low</span><span class="p">,</span>
-             <span class="s1">&#39;mid contrast &#39;</span><span class="p">:</span> <span class="n">mid</span><span class="p">,</span>
-             <span class="s1">&#39;high contrast &#39;</span><span class="p">:</span> <span class="n">high</span><span class="p">}</span>
+    <span class="n">stims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'low contrast '</span><span class="p">:</span> <span class="n">low</span><span class="p">,</span>
+             <span class="s1">'mid contrast '</span><span class="p">:</span> <span class="n">mid</span><span class="p">,</span>
+             <span class="s1">'high contrast '</span><span class="p">:</span> <span class="n">high</span><span class="p">}</span>
              
     <span class="k">return</span> <span class="n">stims</span> 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    In this &quot;experiment&quot;, we just display a collection of stimuli, one at a time.</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    In this "experiment", we just display a collection of stimuli, one at a time.</span>
 <span class="sd">    Here we define a function to display a single stimulus image centrally on the screen.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="c1"># Convert the stimulus image(matrix) to an OpenGL texture</span>
     <span class="n">stim_texture</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">newTexture</span><span class="p">(</span><span class="n">stim_image</span><span class="p">)</span>
@@ -702,7 +702,7 @@ button you can switch which texture to show.</p>
     <span class="k">return</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Allow participant to select a value from a range of options</span>
+<span class="w">    </span><span class="sd">"""Allow participant to select a value from a range of options</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -724,7 +724,7 @@ button you can switch which texture to show.</p>
 <span class="sd">    ------</span>
 <span class="sd">    SystemExit</span>
 <span class="sd">        if participant/experimenter terminated by pressing Escape</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">rng</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
@@ -732,18 +732,18 @@ button you can switch which texture to show.</p>
 
     <span class="n">accept</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Escape&quot;</span><span class="p">,</span> <span class="s2">&quot;Space&quot;</span><span class="p">))</span>
+    <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">"Left"</span><span class="p">,</span> <span class="s2">"Right"</span><span class="p">,</span> <span class="s2">"Escape"</span><span class="p">,</span> <span class="s2">"Space"</span><span class="p">))</span>
 
-    <span class="k">if</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Escape&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Escape"</span><span class="p">:</span>
         <span class="c1"># Raise SystemExit Exception</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Participant terminated experiment.&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">"Participant terminated experiment."</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Left"</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Right&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Right"</span><span class="p">:</span>
         <span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rng</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">&quot;Space&quot;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="s2">"Space"</span><span class="p">:</span>
         <span class="n">accept</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="n">value</span><span class="p">,</span> <span class="n">accept</span>
@@ -752,7 +752,7 @@ button you can switch which texture to show.</p>
 <span class="k">def</span><span class="w"> </span><span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
     <span class="n">stims</span> <span class="o">=</span> <span class="n">stimuli</span><span class="p">()</span>
     <span class="n">stim_names</span> <span class="o">=</span> <span class="p">[</span><span class="o">*</span><span class="n">stims</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stimuli available: </span><span class="si">{</span><span class="n">stim_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Stimuli available: </span><span class="si">{</span><span class="n">stim_names</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="n">stim_idx</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
@@ -760,7 +760,7 @@ button you can switch which texture to show.</p>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Display stimulus</span>
             <span class="n">stim_name</span> <span class="o">=</span> <span class="n">stim_names</span><span class="p">[</span><span class="n">stim_idx</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Showing </span><span class="si">{</span><span class="n">stim_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Showing </span><span class="si">{</span><span class="n">stim_name</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             
             <span class="n">stim_image</span> <span class="o">=</span> <span class="n">stims</span><span class="p">[</span><span class="n">stim_name</span><span class="p">]</span>
             <span class="n">display_stim</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">stim_image</span><span class="p">)</span>
@@ -770,18 +770,18 @@ button you can switch which texture to show.</p>
             
         <span class="k">except</span> <span class="ne">SystemExit</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Cleanup</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Exiting..."</span><span class="p">)</span>
             <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="n">e</span>    
     
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="c1"># Create HRL interface object</span>
     <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
-        <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
-        <span class="c1"># graphics=&#39;datapixx&#39;,    # In the lab, we use the datapixx device driver</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
-        <span class="c1"># inputs=&quot;responsepixx&quot;,  # In the lab, we use the responsepixx input device</span>
+        <span class="n">graphics</span><span class="o">=</span><span class="s2">"gpu"</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+        <span class="c1"># graphics='datapixx',    # In the lab, we use the datapixx device driver</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="s2">"keyboard"</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+        <span class="c1"># inputs="responsepixx",  # In the lab, we use the responsepixx input device</span>
         <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="n">scrn</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># Which screen (monitor) to use</span>

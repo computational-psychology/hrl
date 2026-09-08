@@ -446,13 +446,13 @@ You need to install this library in your python environment, for example with <c
 <span class="n">CENTER</span> <span class="o">=</span> <span class="p">(</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Center of the drawing window</span>
 <span class="n">BACKGROUND</span> <span class="o">=</span> <span class="mf">0.5</span>
 
-<span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Left&quot;</span><span class="p">,</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span> <span class="s2">&quot;Up&quot;</span><span class="p">,</span> <span class="s2">&quot;Down&quot;</span><span class="p">]</span>
+<span class="n">DIRECTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"Left"</span><span class="p">,</span> <span class="s2">"Right"</span><span class="p">,</span> <span class="s2">"Up"</span><span class="p">,</span> <span class="s2">"Down"</span><span class="p">]</span>
 
 <span class="c1"># random generator</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">show_instructions</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display instructions to the participant</span>
+<span class="w">    </span><span class="sd">"""Display instructions to the participant</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -460,14 +460,14 @@ You need to install this library in your python environment, for example with <c
 <span class="sd">        hrl-interface object to use for display</span>
 <span class="sd">    direction : str</span>
 <span class="sd">        which key the participant should press</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;Here&#39;s what you need to do.&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;It&#39;s very simple.&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="sa">f</span><span class="s2">&quot;Press </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Do it now.&quot;</span><span class="p">,</span>
+        <span class="s2">"Here's what you need to do."</span><span class="p">,</span>
+        <span class="s2">"It's very simple."</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">"Press </span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"Do it now."</span><span class="p">,</span>
     <span class="p">]</span>
 
     <span class="n">display_text</span><span class="p">(</span><span class="n">ihrl</span><span class="o">=</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">lines</span><span class="p">)</span>
@@ -476,23 +476,23 @@ You need to install this library in your python environment, for example with <c
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">show_correct</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display message that participant pressed the correct button</span>
+<span class="w">    </span><span class="sd">"""Display message that participant pressed the correct button</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    ihrl : hrl-object</span>
 <span class="sd">        hrl-interface object to use for display</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;Yes, that was correct!&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Press SPACE to continue.&quot;</span><span class="p">,</span>
+        <span class="s2">"Yes, that was correct!"</span><span class="p">,</span>
+        <span class="s2">""</span><span class="p">,</span>
+        <span class="s2">"Press SPACE to continue."</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">display_text</span><span class="p">(</span><span class="n">ihrl</span><span class="o">=</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="n">lines</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">process_response</span><span class="p">(</span><span class="n">ihrl</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process participant&#39;s keypress</span>
+<span class="w">    </span><span class="sd">"""Process participant's keypress</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -509,13 +509,13 @@ You need to install this library in your python environment, for example with <c
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    SystemExit</span>
-<span class="sd">        if participant/experimenter terminates experiment by pressing &quot;Escape&quot;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        if participant/experimenter terminates experiment by pressing "Escape"</span>
+<span class="sd">    """</span>
     <span class="n">press</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">press</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Escape&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">press</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"Escape"</span><span class="p">):</span>
         <span class="c1"># Raise SystemExit Exception</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Participant terminated experiment.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">"Participant terminated experiment."</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">press</span> <span class="o">==</span> <span class="n">direction</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
@@ -523,7 +523,7 @@ You need to install this library in your python environment, for example with <c
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">experiment_main</span><span class="p">(</span><span class="n">ihrl</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Run adjustment experiment on specified display</span>
+<span class="w">    </span><span class="sd">"""Run adjustment experiment on specified display</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -534,7 +534,7 @@ You need to install this library in your python environment, for example with <c
 <span class="sd">    ------</span>
 <span class="sd">    SystemExit</span>
 <span class="sd">        if participant/experimenter terminates experiment</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="c1"># Main loop</span>
         <span class="k">try</span><span class="p">:</span>
@@ -552,22 +552,22 @@ You need to install this library in your python environment, for example with <c
 
             <span class="c1"># Show correct response screen</span>
             <span class="n">show_correct</span><span class="p">(</span><span class="n">ihrl</span><span class="p">)</span>
-            <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="s2">&quot;Space&quot;</span><span class="p">)</span>
+            <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="s2">"Space"</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="ne">SystemExit</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Cleanup</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exiting...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"Exiting..."</span><span class="p">)</span>
             <span class="n">ihrl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">raise</span> <span class="n">e</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="c1"># Create HRL interface object</span>
     <span class="n">ihrl</span> <span class="o">=</span> <span class="n">HRL</span><span class="p">(</span>
-        <span class="n">graphics</span><span class="o">=</span><span class="s2">&quot;gpu&quot;</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
-        <span class="c1"># graphics=&#39;datapixx&#39;,    # In the lab, we use the datapixx device driver</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="s2">&quot;keyboard&quot;</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
-        <span class="c1"># inputs=&quot;responsepixx&quot;,  # In the lab, we use the responsepixx input device</span>
+        <span class="n">graphics</span><span class="o">=</span><span class="s2">"gpu"</span><span class="p">,</span>  <span class="c1"># Use the default GPU as graphics device driver</span>
+        <span class="c1"># graphics='datapixx',    # In the lab, we use the datapixx device driver</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="s2">"keyboard"</span><span class="p">,</span>  <span class="c1"># Use the keyboard as input device driver</span>
+        <span class="c1"># inputs="responsepixx",  # In the lab, we use the responsepixx input device</span>
         <span class="n">hght</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
         <span class="n">wdth</span><span class="o">=</span><span class="n">SHAPE</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
         <span class="n">scrn</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Which screen (monitor) to use</span>
@@ -588,11 +588,11 @@ You need to install this library in your python environment, for example with <c
                         <span class="n">intensity_text</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                         <span class="n">intensity_background</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                         <span class="n">fontsize</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span>
-                        <span class="n">align</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+                        <span class="n">align</span><span class="o">=</span><span class="s2">"center"</span><span class="p">,</span>
                         <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Draw given text into a (numpy) image-array </span>
+<span class="w">    </span><span class="sd">""" Draw given text into a (numpy) image-array </span>
 <span class="sd">    </span>
-<span class="sd">    It uses Pillow in mode &quot;F&quot;, that is, a mode using floating point</span>
+<span class="sd">    It uses Pillow in mode "F", that is, a mode using floating point</span>
 <span class="sd">    values and only one channel (grayscale).</span>
 <span class="sd">    </span>
 
@@ -606,32 +606,32 @@ You need to install this library in your python environment, for example with <c
 <span class="sd">        intensity value of background in range (0.0; 1.0), by default 0.5</span>
 <span class="sd">    fontsize : int, optional</span>
 <span class="sd">        font size, by default 36</span>
-<span class="sd">    align : &quot;left&quot;, &quot;center&quot; (default), &quot;right&quot;</span>
-<span class="sd">        alignment of text, by default &quot;center&quot;</span>
+<span class="sd">    align : "left", "center" (default), "right"</span>
+<span class="sd">        alignment of text, by default "center"</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    numpy array </span>
 <span class="sd">       containing the text as an image</span>
 <span class="sd">        </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Get font</span>
     <span class="n">font</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">ImageDraw</span><span class="o">.</span><span class="n">font</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">font</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Not all machines will have Arial installed...</span>
             <span class="n">font</span> <span class="o">=</span> <span class="n">ImageFont</span><span class="o">.</span><span class="n">truetype</span><span class="p">(</span>
-                <span class="s2">&quot;arial.ttf&quot;</span><span class="p">,</span>
+                <span class="s2">"arial.ttf"</span><span class="p">,</span>
                 <span class="n">fontsize</span><span class="p">,</span>
-                <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;unic&quot;</span><span class="p">,</span>
+                <span class="n">encoding</span><span class="o">=</span><span class="s2">"unic"</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
             <span class="n">font</span> <span class="o">=</span> <span class="n">ImageFont</span><span class="o">.</span><span class="n">load_default</span><span class="p">()</span>
     
     <span class="c1"># Determine dimensions of total text</span>
-    <span class="n">n_lines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">n_lines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">))</span>
     <span class="n">max_length</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">):</span>
         <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">font</span><span class="o">.</span><span class="n">getlength</span><span class="p">(</span><span class="n">line</span><span class="p">)),</span> <span class="n">max_length</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">top</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">bottom</span> <span class="o">=</span> <span class="n">font</span><span class="o">.</span><span class="n">getbbox</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
     <span class="n">text_width</span> <span class="o">=</span> <span class="n">max_length</span>
@@ -639,7 +639,7 @@ You need to install this library in your python environment, for example with <c
     <span class="n">text_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">text_height</span><span class="p">,</span> <span class="n">text_width</span><span class="p">)</span>
 
     <span class="c1"># Instantiate grayscale image of correct shape (in pixels)</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">text_width</span><span class="p">,</span> <span class="n">text_height</span><span class="p">),</span> <span class="n">intensity_background</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">"F"</span><span class="p">,</span> <span class="p">(</span><span class="n">text_width</span><span class="p">,</span> <span class="n">text_height</span><span class="p">),</span> <span class="n">intensity_background</span><span class="p">)</span>
     <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
     <span class="c1"># Draw text into this image</span>
@@ -661,7 +661,7 @@ You need to install this library in your python environment, for example with <c
     <span class="n">intensity_text</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">intensity_background</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display a screen with given text, waiting for participant to press button</span>
+<span class="w">    </span><span class="sd">"""Display a screen with given text, waiting for participant to press button</span>
 
 <span class="sd">    Text will be center horizontally.</span>
 
@@ -677,7 +677,7 @@ You need to install this library in your python environment, for example with <c
 <span class="sd">        intensity of the text in range (0.0; 1.0), by default 0.0</span>
 <span class="sd">    intensity_background : float, optional</span>
 <span class="sd">        intensity of the background in range (0.0; 1.0), if None (default): ihrl.background</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">bg</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">background</span> <span class="k">if</span> <span class="p">(</span><span class="n">intensity_background</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">intensity_background</span>
        
@@ -689,8 +689,8 @@ You need to install this library in your python environment, for example with <c
     <span class="k">for</span> <span class="n">line_nr</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
         
         <span class="c1"># Generate image-array, OpenGL texture</span>
-        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="o">==</span> <span class="s2">""</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="s2">" "</span>
 
         <span class="n">text_arr</span> <span class="o">=</span> <span class="n">create_text_texture</span><span class="p">(</span>
             <span class="n">text</span><span class="o">=</span><span class="n">line</span><span class="p">,</span>
