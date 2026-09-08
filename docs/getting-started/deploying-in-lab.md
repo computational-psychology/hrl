@@ -91,9 +91,45 @@ then you need to go back to your stimulus generation code and
 calculate which input value (first column in `lut.csv`) you
 need to set for a desired luminance (third column in `lut.csv`)
 
-(TODO) We provide an example script that help you do that (link)
+```
+
+## Specifying stimuli in luminance
+
+[`examples/luminance_to_intensity.py`](https://github.com/computational-psychology/hrl/blob/master/examples/luminance_to_intensity.py)
+does that conversion. From the command line it reports the intensity for each
+luminance you ask for:
 
 ```
+python luminance_to_intensity.py lut.csv 50 100 200
+```
+
+```
+LUT lut.csv: 237 levels, 0.0034 to 501.9000 cd/m2
+   50.0000 cd/m2  -->  intensity 0.097082
+  100.0000 cd/m2  -->  intensity 0.195465
+  200.0000 cd/m2  -->  intensity 0.392598
+```
+
+and the same functions can be imported into your stimulus generation code:
+
+```{code-block} python
+from luminance_to_intensity import load_lut, intensity_for_luminance
+
+lut = load_lut("lut.csv")
+intensity = intensity_for_luminance(lut, 100.0)  # 100 cd/m2
+```
+
+The conversion is an interpolation between the third and the first column of
+the LUT, which is the inverse of what `HRL` does at display time.
+
+```{important}
+Luminances outside the range the monitor was measured over are clipped to the
+nearest end of that range, silently, because that is what
+{py:func}`numpy.interp` does. Use `luminance_range(lut)` to check what your
+monitor can actually produce before asking for a value. The command line
+version marks out-of-range requests in its output.
+```
+
 
 ## Done
 
