@@ -9,6 +9,12 @@ It demonstrates also modularity: stimuli generation, display, and processing of 
 responses are separated in functions. 
 This makes our code clearer and easy to read and reuse later.
 
+The script is in this repository, at
+[`examples/tutorials/standalone/show_stimuli.py`](https://github.com/computational-psychology/hrl/blob/master/examples/tutorials/standalone/show_stimuli.py).
+It needs only `HRL` and `numpy`. For a version that generates its stimuli with
+`stimupy`, as the experiments in the lab do, see
+[`examples/tutorials/1_show_stimuli/`](https://github.com/computational-psychology/hrl/tree/master/examples/tutorials/1_show_stimuli).
+
 
 ## Set-up
 
