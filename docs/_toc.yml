@@ -14,6 +14,7 @@ parts:
     - file: useful-examples/useful-examples-intro
     - file: useful-examples/show-stimuli
     - file: useful-examples/text-displays
+    - file: useful-examples/method-of-adjustment
     - file: useful-examples/managing-data
     
   - caption: Experiment templates
@@ -24,6 +25,7 @@ parts:
     - file: templates/MLDS-MLCM
     - file: templates/2-AFC-2-IFC
     - file: templates/likert-responses  
+    - file: templates/eyetracking
     
   - caption: Monitor calibration 
     chapters:

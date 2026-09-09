@@ -1,15 +1,15 @@
 # Deploying your code in the lab
 
-This page explain the steps needed to deploy your experiment in 
-a machine where the actual experiments will be carried out.
-This machine is normally in a vision laboratory, it has specific hardware
-that allows high resolution luminance, and it has a monitor has been
+This page explains the steps needed to deploy your experiment on the machine
+where the actual experiments will be run.
+That machine is normally in a vision laboratory. It has specific hardware
+that allows high-resolution luminance, and a monitor that has been
 *previously calibrated*.
 
 
 ## Install libraries required for high-resolution luminance
 
-Ensure that the libraries required for high-resolution luminace are
+Ensure that the libraries required for high-resolution luminance are
 installed. See the [installation page](install-inlab) for details.
 
 
@@ -46,17 +46,17 @@ This mapping is determined by the *first* and *third* columns of the file.
 
 ## Change HRL parameters
 
-When initializing HRL, you used `graphics="gpu"` and `inputs="keyboard`.
+When initializing HRL, you used `graphics="gpu"` and `inputs="keyboard"`.
 These are the default values and so `HRL` will run in any machine. 
 
 To run the same experiment in the lab, you need to change the `graphics`
-and `input` parameters as follows: 
+and `inputs` parameters as follows: 
 
 - `graphics`:
 	- `graphics="datapixx"` (for the Datapixx 1 device)
 	- `graphics="viewpixx"` (for the Viewpixx 3D device).
 
-- `input`:
+- `inputs`:
     - `inputs="responsepixx"` to use the ResponsePixx button board.
     
 You also need to
@@ -65,7 +65,7 @@ You also need to
   As mentioned above this file needs to be created
   with HRL during [calibration](../calibration/gamma-correction-linearization).
 
-- change the parameter `scr` to match the experimental display (in the 
+- change the parameter `scrn` to match the experimental display (in the 
   case of multiple monitors. Normally it is either 0, 1 or 2.)
 
 - adjust the window resolution (parameters `wdth` and `hght`) to match
@@ -91,9 +91,45 @@ then you need to go back to your stimulus generation code and
 calculate which input value (first column in `lut.csv`) you
 need to set for a desired luminance (third column in `lut.csv`)
 
-(TODO) We provide an example script that help you do that (link)
+```
+
+## Specifying stimuli in luminance
+
+[`examples/luminance_to_intensity.py`](https://github.com/computational-psychology/hrl/blob/master/examples/luminance_to_intensity.py)
+does that conversion. From the command line it reports the intensity for each
+luminance you ask for:
 
 ```
+python luminance_to_intensity.py lut.csv 50 100 200
+```
+
+```
+LUT lut.csv: 237 levels, 0.0034 to 501.9000 cd/m2
+   50.0000 cd/m2  -->  intensity 0.097082
+  100.0000 cd/m2  -->  intensity 0.195465
+  200.0000 cd/m2  -->  intensity 0.392598
+```
+
+and the same functions can be imported into your stimulus generation code:
+
+```{code-block} python
+from luminance_to_intensity import load_lut, intensity_for_luminance
+
+lut = load_lut("lut.csv")
+intensity = intensity_for_luminance(lut, 100.0)  # 100 cd/m2
+```
+
+The conversion is an interpolation between the third and the first column of
+the LUT, which is the inverse of what `HRL` does at display time.
+
+```{important}
+Luminances outside the range the monitor was measured over are clipped to the
+nearest end of that range, silently, because that is what
+{py:func}`numpy.interp` does. Use `luminance_range(lut)` to check what your
+monitor can actually produce before asking for a value. The command line
+version marks out-of-range requests in its output.
+```
+
 
 ## Done
 

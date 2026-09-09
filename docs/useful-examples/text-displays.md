@@ -2,12 +2,20 @@
 
 In this example we show text to the observer, asking him to 
 press a button. When pressed, the observer gets feedback.
-Which button to press is determind randomly.
+Which button to press is determined randomly.
 
 In the code we have separated the functions related to displaying 
 text into a module called `text_displays.py`. 
 The function `display_text` is imported from this module.
 In later examples and templates this module will be included as well.
+
+The scripts are in this repository, at
+[`examples/tutorials/standalone/`](https://github.com/computational-psychology/hrl/tree/master/examples/tutorials/standalone):
+`text_displays_experiment.py` and the `text_displays.py` module it imports.
+They need only `HRL`, `numpy` and `Pillow`. The version in
+[`examples/tutorials/2_display_text/`](https://github.com/computational-psychology/hrl/tree/master/examples/tutorials/2_display_text)
+draws its text with `stimupy.components.texts` instead, which is what the
+experiment templates use.
 
 
 ## Install requirements

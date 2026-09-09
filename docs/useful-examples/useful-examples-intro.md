@@ -3,7 +3,7 @@
 The previous pages ([minimal example](../getting-started/minimal-usage-example) 
  and [deploying your code in the lab](../getting-started/deploying-in-lab))
 shows you all the **core functionality of HRL**. 
-Starting from there you can (if you wish) develop you own python code to create 
+Starting from there you can (if you wish) develop your own python code to create 
 your stimuli, save your data, etc.
 
 However, over the years we have developed various useful utilities
@@ -19,6 +19,9 @@ adapt as needed. These are:
   its size, etc.
 - [text displays](text-displays): how to show text, for example for 
    giving instructions to the participant
+- [method of adjustment](method-of-adjustment): how to let the participant
+  adjust a stimulus value until they accept it, the building block behind
+  matching experiments
 - [managing data](managing-data): how to set up and read experimental 
   design files, and how to save your acquired data, all in a neat format.
   
