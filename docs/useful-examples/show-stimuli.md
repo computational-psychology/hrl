@@ -35,8 +35,8 @@ CENTER = (SHAPE[0] // 2, SHAPE[1] // 2)  # Center of the drawing window
 ## Modularizing the code
 
 In the [minimal example](../getting-started/minimal-usage-example) 
-we coded all steps in a linear fashion, in order to explain better `HRL`
-usage. 
+we coded all steps in a linear fashion, to explain `HRL` usage
+more clearly. 
 
 In practice, it is better to modularize your code. This means, to define
 functions that do one and only one job, and are called multiple times during 
@@ -95,7 +95,7 @@ if __name__ == "__main__":
 ```
 
 The last part of the code, which starts with `if __name__ == "__main__"`,
-is the python-way to ensure that that enclosed code (our experiment)
+is the python-way to ensure that the enclosed code (our experiment)
 is executed only when the code is run as a script, from the command-line.
 This is good practice in python, as all python files are also 
 importable. This bit ensures that the experiment code is not 
@@ -258,7 +258,7 @@ def select(ihrl, value, rng):
 
 ## Full example
 
-Putting everything together, we have an script that initializes HRL,
+Putting everything together, we have a script that initializes HRL,
 generates three random textures of different contrast, and presents one
 at the time in the center of the screen. By pressing the left and right
 button you can switch which texture to show.
