@@ -400,9 +400,18 @@ if __name__ == "__main__":
 
 ### Screenshots
 
-At mid contrast
+## Screenshots
+
+First screen shows
+![screenshot texture low contrast](show_stimuli_low.png)
+
+After pressing 'Right' we see the texture at mid contrast...
 ![screenshot texture mid contrast](show_stimuli_mid.png)
 
-At high contrast
+After pressing 'Right' again we see the texture with high contrast.
 ![screenshot texture high contrast](show_stimuli_high.png)
+
+
+Pressing 'Left' goes in the opposite direction.
+
 
