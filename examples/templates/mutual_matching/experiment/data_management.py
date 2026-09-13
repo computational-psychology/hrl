@@ -177,7 +177,7 @@ def save_block(block, block_id):
     block_id : str
         string-identifier for this block
     """
-    filepath = results_filepath(participant, block_id)
+    filepath = results_filepath(block_id)
     with filepath.open(mode="a") as results_file:
         writer = csv.DictWriter(results_file, fieldnames=block[0].keys())
         writer.writeheader()

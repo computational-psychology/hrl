@@ -240,7 +240,7 @@ storing the response (and additional information) as results data;
 deciding what the next trial & stimulus will be.
 
 ```python
-# Assign responses to correct/incorreect
+# Assign responses to correct/incorrect
 response_correct = {"Right": True, "Left": False, "Escape": False}
 
 if response_correct[button]:
