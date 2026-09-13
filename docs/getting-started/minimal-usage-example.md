@@ -5,6 +5,10 @@ and collect responses.
 First we go step by step explaning on how to use HRL,
 at the bottom you can find the code for the full working example.
 
+The script is in this repository, at
+[`examples/tutorials/standalone/minimal_usage_example.py`](https://github.com/computational-psychology/hrl/blob/master/examples/tutorials/standalone/minimal_usage_example.py).
+It needs only `HRL` and `numpy`.
+
 
 ## Step-by-step
 
