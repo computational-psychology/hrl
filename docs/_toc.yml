@@ -16,6 +16,7 @@ parts:
     - file: useful-examples/text-displays
     - file: useful-examples/method-of-adjustment
     - file: useful-examples/managing-data
+    - file: useful-examples/experiment-structure
     
   - caption: Experiment templates
     chapters:
