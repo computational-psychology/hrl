@@ -19,6 +19,9 @@ adapt as needed. These are:
   its size, etc.
 - [text displays](text-displays): how to show text, for example for 
    giving instructions to the participant
+- [method of adjustment](method-of-adjustment): how to let the participant
+  adjust a stimulus value until they accept it, the building block behind
+  matching experiments
 - [managing data](managing-data): how to set up and read experimental 
   design files, and how to save your acquired data, all in a neat format.
   
