@@ -79,7 +79,7 @@ base Python module `hrl`. The scripts can be accessed by running `hrl-util` at t
   documentation.
 - Running `hrl-util` at the command line without any arguments will display another
   introductory help file, overviewing the various scripts that can be run via `hrl-util`.
-- Example experiments using HRL can be found in the [templates repository](https://github.com/computational-psychology/template_experiment). This is a good place to start for beginners using HRL.
+- Example experiments using HRL can be found in the [`examples/`](examples/) folder of this repository. This is a good place to start for beginners using HRL.
 - A heavily documented example experiment is available under examples/sacha.
 
 ### Calibration ###
