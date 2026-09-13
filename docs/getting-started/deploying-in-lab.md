@@ -1,15 +1,15 @@
 # Deploying your code in the lab
 
-This page explain the steps needed to deploy your experiment in 
-a machine where the actual experiments will be carried out.
-This machine is normally in a vision laboratory, it has specific hardware
-that allows high resolution luminance, and it has a monitor has been
+This page explains the steps needed to deploy your experiment on the machine
+where the actual experiments will be run.
+That machine is normally in a vision laboratory. It has specific hardware
+that allows high-resolution luminance, and a monitor that has been
 *previously calibrated*.
 
 
 ## Install libraries required for high-resolution luminance
 
-Ensure that the libraries required for high-resolution luminace are
+Ensure that the libraries required for high-resolution luminance are
 installed. See the [installation page](install-inlab) for details.
 
 

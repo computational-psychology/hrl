@@ -15,13 +15,13 @@ library for you.
 HRL does not provide tools for generating stimuli, nor is it designed to deal
 with colour in any way. HRL is not designed to handle complex, dynamic stimuli, and
 if a stimulus cannot be easily broken down into a series of static images, HRL
-may be ill suited to the task. If any of these capabilites are essential, than
+may be ill suited to the task. If any of these capabilities are essential, then
 other libraries may be called for.
 
 HRL is designed to work with a number of optional hardware components. The
 inclusion of these hardware components is handled in a modular fashion, and HRL
 is designed so that experiments could be written on a home computer, and then
-transfered to a lab computer with scientific hardware as required.
+transferred to a lab computer with scientific hardware as required.
 
 The most important component to achieving HRL's full functionality is a
 DATAPixx device or ViewPixx device. The first version of HRL was designed to 
@@ -62,7 +62,7 @@ for an editable installation.
 ### Dependencies ###
 
 - Required: `pygame`, `pyopengl`, `numpy`, `matplotlib`
-- Optional: `pyoptical`, `pyserial`, and `pypixxlib`, [the propertary library from VPixx Technologies](https://www.vpixx.com/manuals/python/html/index.html).
+- Optional: `pyoptical`, `pyserial`, and `pypixxlib`, [the proprietary library from VPixx Technologies](https://www.vpixx.com/manuals/python/html/index.html).
 
 ```pip install .``` will automatically install the *required* dependencies.
 
