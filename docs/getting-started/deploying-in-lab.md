@@ -46,17 +46,17 @@ This mapping is determined by the *first* and *third* columns of the file.
 
 ## Change HRL parameters
 
-When initializing HRL, you used `graphics="gpu"` and `inputs="keyboard`.
+When initializing HRL, you used `graphics="gpu"` and `inputs="keyboard"`.
 These are the default values and so `HRL` will run in any machine. 
 
 To run the same experiment in the lab, you need to change the `graphics`
-and `input` parameters as follows: 
+and `inputs` parameters as follows: 
 
 - `graphics`:
 	- `graphics="datapixx"` (for the Datapixx 1 device)
 	- `graphics="viewpixx"` (for the Viewpixx 3D device).
 
-- `input`:
+- `inputs`:
     - `inputs="responsepixx"` to use the ResponsePixx button board.
     
 You also need to
@@ -65,7 +65,7 @@ You also need to
   As mentioned above this file needs to be created
   with HRL during [calibration](../calibration/gamma-correction-linearization).
 
-- change the parameter `scr` to match the experimental display (in the 
+- change the parameter `scrn` to match the experimental display (in the 
   case of multiple monitors. Normally it is either 0, 1 or 2.)
 
 - adjust the window resolution (parameters `wdth` and `hght`) to match
