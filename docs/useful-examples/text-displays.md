@@ -29,6 +29,18 @@ pip install Pillow
 
 ## Main script
 
+The main script has the function `experiment_main` which is the entry
+point of execution. First, this function picks one direction at random 
+(up, down, left or right), then displays a text asking the
+observer to press that button by calling function `show_instructions`,
+and then waits for a keyboard response by calling function `process_response`.
+If the button was correctly pressed, it show again some text saying so
+by calling function `show_correct`. 
+All these steps occur in a infinite loop until "Escape" is pressed.
+
+Notice that we have further modularized the code into several functions.
+
+
 ```{code-block} python
 import sys
 import numpy as np
