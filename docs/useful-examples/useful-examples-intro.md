@@ -24,6 +24,9 @@ adapt as needed. These are:
   matching experiments
 - [managing data](managing-data): how to set up and read experimental 
   design files, and how to save your acquired data, all in a neat format.
+- [structure of an experiment](experiment-structure): how a complete
+  experiment is split into modules, and how they run together. Every experiment
+  template uses this structure.
   
 
   
