@@ -117,6 +117,15 @@ print("Participant pressed a button")
 ```
 "Up", "Down", "Left" and "Right" refers to the arrows in the keyboard,
 
+When using the keyboard, the digits "0" to "9" are also available as buttons,
+both on the top row and on the numeric keypad. They are returned as strings,
+so they can be used for numerical responses such as ratings:
+
+```{code-block} python
+btn, t = ihrl.inputs.readButton(btns=("1", "2", "3", "4", "5"))
+rating = int(btn)
+```
+
 
 You can also ask `readButton`to wait for only some buttons
 and ignore all others:
