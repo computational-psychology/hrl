@@ -9,7 +9,9 @@ debug = False
 class Keyboard(Input):
     """
     A Input implementation for a standard PC keyboard. Permitted keys are 'Up',
-    'Down', 'Left', 'Right', 'Space', and 'Escape'.
+    'Down', 'Left', 'Right', 'Space', 'Escape', and the digits '0' to '9'.
+    Digits are recognized both on the top row and on the numeric keypad, and
+    are returned as strings.
     """
 
     def readButton(self, btns=None, to=0):
