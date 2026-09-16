@@ -6,6 +6,7 @@ import platform
 
 __all__ = [
     "new_graphics",
+    "resolve_alias",
     "ALIASES",
     "GREY_ALIASES",
     "RGB_ALIASES",
@@ -37,6 +38,39 @@ RGB_ALIASES = {
 ALIASES = {**GREY_ALIASES, **RGB_ALIASES}
 
 
+def resolve_alias(graphics_alias):
+    """Look up the graphics class path for an alias, ignoring upper and lower case.
+
+    The keys of ALIASES keep their documented spelling (e.g. "gpu_RGB"), but the
+    lookup compares lowercased strings, so "gpu_RGB", "gpu_rgb" and "GPU_RGB"
+    all resolve to the same device.
+
+    Parameters
+    ----------
+    graphics_alias : str
+        alias for the desired graphics device, in any case. Valid options can be
+        found in hrl.graphics.ALIASES.keys().
+
+    Returns
+    -------
+    str
+        dotted path "module.ClassName" of the graphics class, relative to hrl.graphics.
+
+    Raises
+    ------
+    ValueError
+        if the provided graphics_alias does not match any known device
+    """
+    requested = graphics_alias.lower()
+    for alias, target in ALIASES.items():
+        if alias.lower() == requested:
+            return target
+    raise ValueError(
+        f"Unknown graphics device '{graphics_alias}'. Valid options are: "
+        f"{', '.join(list(ALIASES.keys()))} (case insensitive)"
+    )
+
+
 def new_graphics(
     graphics_alias,
     width,
@@ -58,7 +92,7 @@ def new_graphics(
     ----------
     graphics_alias : str
         alias for the desired graphics device. Valid options can be found in the
-        hrl.graphics.ALIASES.keys().
+        hrl.graphics.ALIASES.keys(). The lookup is case insensitive.
     width : int
         width of the screen in pixels.
     height : int
@@ -94,15 +128,9 @@ def new_graphics(
         if the provided graphics_alias does not match any known device
     """
     # Lazy import the graphics class based on alias
-    if graphics_alias in ALIASES:
-        module_name, class_name = ALIASES[graphics_alias].rsplit(".", 1)
-        module = importlib.import_module(f".{module_name}", package=__name__)
-        graphics_class = getattr(module, class_name)
-    else:
-        raise ValueError(
-            f"Unknown graphics device '{graphics_alias}'. Valid options are: "
-            f"{', '.join(list(ALIASES.keys()))}"
-        )
+    module_name, class_name = resolve_alias(graphics_alias).rsplit(".", 1)
+    module = importlib.import_module(f".{module_name}", package=__name__)
+    graphics_class = getattr(module, class_name)
 
     # Run screen setup for multiple monitor support
     screen_setup(screen=screen, window_width_offset=width_offset)

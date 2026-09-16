@@ -59,7 +59,7 @@ class HRL:
         ----------
         graphics : str
             alias for the desired graphics device, by default "gpu".
-            Valid options are defined in hrl.graphics.ALIAS_MAP.
+            Valid options are defined in hrl.graphics.ALIASES (case insensitive).
         inputs : str
             alias for the desired input device, by default "keyboard".
         photometer : str or None
@@ -107,7 +107,7 @@ class HRL:
 
         ## Setup screen and graphics ##
         self.graphics = hrl.graphics.new_graphics(
-            graphics_alias=graphics.lower(),
+            graphics_alias=graphics,
             width=wdth,
             height=hght,
             background=bg,
