@@ -16,7 +16,7 @@ requires-python = ">=3.8"
 dependencies = ["numpy", "matplotlib", "pygame", "pyopengl"]
 
 [dependency-groups]
-test = ["pytest>=8.3.5"]
+test = ["pytest>=8.3.5", "pytest-cov>=7.0.0; python_version >= '3.9'"]
 docs = [
     "jupyter-book<2",
     "jupytext>=1.13.3",
@@ -57,3 +57,12 @@ markers = [
     "pixx: mark test as requiring DataPixx or ViewPixx hardware.",
     "photometer: mark test as requiring a photometer.",
 ]
+
+[tool.coverage.run]
+source = ["hrl"]
+branch = true
+patch = ["subprocess"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

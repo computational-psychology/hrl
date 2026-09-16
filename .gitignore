@@ -25,3 +25,9 @@ uv.lock
 
 # Settings for VSCode editor
 .vscode/
+
+# Coverage
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
