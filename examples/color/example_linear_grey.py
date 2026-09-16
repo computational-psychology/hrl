@@ -27,7 +27,7 @@ def show_stim(igraphics):
 
 
 def instantiate_hrl():
-    lut = Path(__file__).parent / "example_clut.csv"
+    lut = Path(__file__).parent / "example_lut.csv"
 
     if "viewpixx" in gethostname():
         ihrl = HRL(
