@@ -5,7 +5,7 @@ The first step is to install `HRL` in your machine.
 It is recommended that you install HRL in a *python environment*. 
 Using your favorite environment manager (*venv*, *pyenv*, *conda*, etc), 
 run the following commands when *inside* the environment.
-Make sure your enviroment runs **python 3**
+Make sure your environment runs **python 3**
 
 
 ## HRL for end-users
@@ -20,6 +20,7 @@ This will also install the required dependencies:
 - [PyOpenGL](https://pyopengl.sourceforge.net/) (`pyopengl`)
 - [PyGame](https://www.pygame.org/) (`pygame`)
 - [NumPy](https://numpy.org/) (`numpy`)
+- [Matplotlib](https://matplotlib.org/) (`matplotlib`)
 
 
 ## HRL for developers
@@ -48,7 +49,7 @@ machine where you run your experiments in the lab.
 
 ### `pypixxlib` 
 
-This propetary library is provided by Vpixx and it makes possible
+This proprietary library is provided by Vpixx and it makes possible
 to communicate with all Vpixx devices (Datapixx, ViewPixx, etc)
 
 ```{margin}
