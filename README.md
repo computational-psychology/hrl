@@ -1,3 +1,6 @@
+[![Tests](https://github.com/computational-psychology/hrl/actions/workflows/test.yml/badge.svg)](https://github.com/computational-psychology/hrl/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/computational-psychology/hrl/graph/badge.svg)](https://codecov.io/gh/computational-psychology/hrl)
+
 # **HRL**: **H**igh **R**esolution **L**uminance #
 
 (Python 3 version)

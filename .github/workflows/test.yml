@@ -31,4 +31,13 @@ jobs:
         # Run testing through pytest for the current version
         # uv automatically install all required dependencies from pyproject.toml
       - name: Test, for py==${{ matrix.python_version }}
-        run: uv run pytest tests/ -m "not graphics and not photometer"
+        run: uv run pytest tests/ -m "not graphics and not photometer" --cov --cov-report=term --cov-report=xml
+
+        # Upload coverage once, from a single matrix entry
+      - name: Upload coverage to Codecov
+        if: matrix.python_version == '3.13'
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
