@@ -523,6 +523,22 @@ it waits for a (single) button press.</p>
 </pre></div>
 </div>
 <p>“Up”, “Down”, “Left” and “Right” refers to the arrows in the keyboard,</p>
+<p>When using the keyboard, the digits “0” to “9” are also available as buttons,
+both on the top row and on the numeric keypad. They are returned as strings,
+so they can be used for numerical responses such as ratings:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">btn</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">"1"</span><span class="p">,</span> <span class="s2">"2"</span><span class="p">,</span> <span class="s2">"3"</span><span class="p">,</span> <span class="s2">"4"</span><span class="p">,</span> <span class="s2">"5"</span><span class="p">))</span>
+<span class="n">rating</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">btn</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The other keys of the numeric keypad are available as well: “+”, “-”, “*”,
+“/”, “.” and “=” are returned as the character they represent, and the keypad
+enter key as “Enter”. Their counterparts on the main keyboard (including the
+“Return” key, which is also returned as “Enter”) give the same result:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">btn</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">"+"</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">,</span> <span class="s2">"Enter"</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>The “Backspace” key is also available, for example to let participants
+correct a response before confirming it with “Enter”.</p>
 <p>You can also ask <code class="docutils literal notranslate"><span class="pre">readButton</span></code>to wait for only some buttons
 and ignore all others:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ihrl</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">readButton</span><span class="p">(</span><span class="n">btns</span><span class="o">=</span><span class="p">(</span><span class="s2">"Right"</span><span class="p">,</span> <span class="s2">"Space"</span><span class="p">,</span> <span class="s2">"Left"</span><span class="p">,</span> <span class="s2">"Escape"</span><span class="p">))</span>
