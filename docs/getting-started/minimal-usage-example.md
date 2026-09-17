@@ -126,6 +126,18 @@ btn, t = ihrl.inputs.readButton(btns=("1", "2", "3", "4", "5"))
 rating = int(btn)
 ```
 
+The other keys of the numeric keypad are available as well: "+", "-", "*",
+"/", "." and "=" are returned as the character they represent, and the keypad
+enter key as "Enter". Their counterparts on the main keyboard (including the
+"Return" key, which is also returned as "Enter") give the same result:
+
+```{code-block} python
+btn, t = ihrl.inputs.readButton(btns=("+", "-", "Enter"))
+```
+
+The "Backspace" key is also available, for example to let participants
+correct a response before confirming it with "Enter".
+
 
 You can also ask `readButton`to wait for only some buttons
 and ignore all others:
