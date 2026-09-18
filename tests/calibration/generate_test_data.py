@@ -28,16 +28,15 @@ from pathlib import Path
 
 import numpy as np
 
-from hrl.calibration.measurement import (
+from hrl.luts import (
     average,
-    combine,
+    create_lut,
     linearize,
-    measure_lut,
+    measure,
     remove_outliers,
     smooth,
 )
-from hrl.luts import create_lut
-from hrl.photometer.mock import MockPhotometer
+from hrl.photometer.photometer import MockPhotometer
 
 TEST_DIR = Path(__file__).parent
 
@@ -92,9 +91,7 @@ np.savetxt(
 # intensity_out values (256 points). Noiseless so linearize() reproduces lut_8bit.csv exactly.
 print("Generating measurements_8bit.csv ...")
 ihrl = _make_ihrl(LUT_8BIT, noise=0.0)
-measurements_8bit = measure_lut(
-    ihrl, intensities=LUT_8BIT[:, 1], stim_draw_func=_draw, n_samples=1
-)
+measurements_8bit = measure(ihrl, intensities=LUT_8BIT[:, 1], stim_draw_func=_draw)
 np.savetxt(
     TEST_DIR / "measurements_8bit.csv",
     measurements_8bit,
@@ -107,9 +104,7 @@ np.savetxt(
 # measurements_16bit.csv: same idea as measurements_8bit.csv, but for LUT_16BIT (65 536 points).
 print("Generating measurements_16bit.csv ...")
 ihrl = _make_ihrl(LUT_16BIT, noise=0.0)
-measurements_16bit = measure_lut(
-    ihrl, intensities=LUT_16BIT[:, 1], stim_draw_func=_draw, n_samples=1
-)
+measurements_16bit = measure(ihrl, intensities=LUT_16BIT[:, 1], stim_draw_func=_draw)
 np.savetxt(
     TEST_DIR / "measurements_16bit.csv",
     measurements_16bit,
@@ -129,13 +124,15 @@ np.savetxt(
 # exercises pure averaging logic.
 print("Generating measurements with duplicates ...")
 ihrl = _make_ihrl(LUT_8BIT, noise=0.01, rng=42)
-measurements_duplicates = measure_lut(
-    ihrl, intensities=LUT_8BIT[:, 1], stim_draw_func=_draw, n_samples=3
+measurements_duplicates = measure(
+    ihrl,
+    intensities=np.repeat(LUT_8BIT[:, 1], repeats=3),
+    stim_draw_func=_draw,
 )
 np.savetxt(
     TEST_DIR / "measurements_duplicates.csv",
     measurements_duplicates,
-    header="intensity,luminance0,luminance1,luminance2",
+    header="intensity,luminance",
     delimiter=",",
     comments="",
     fmt="%.18e",
@@ -159,15 +156,17 @@ np.savetxt(
 # (never flagged), while the 30 % spike exceeds both abs_tol and rel_tol=0.0075.
 print("Generating measurements with outliers ...")
 ihrl = _make_ihrl(LUT_8BIT, noise=0.005, rng=42)
-measurements_outliers = measure_lut(
-    ihrl, intensities=LUT_8BIT[:, 1], stim_draw_func=_draw, n_samples=3
+measurements_outliers = measure(
+    ihrl,
+    intensities=np.repeat(LUT_8BIT[:, 1], repeats=3),
+    stim_draw_func=_draw,
 )
 for i in range(0, len(measurements_outliers), 5):
     measurements_outliers[i, 1] *= 1.30
 np.savetxt(
     TEST_DIR / "measurements_outliers.csv",
     measurements_outliers,
-    header="intensity,luminance0,luminance1,luminance2",
+    header="intensity,luminance",
     delimiter=",",
     comments="",
     fmt="%.18e",
@@ -242,9 +241,7 @@ LUT_LUMRANGE = create_lut(n=1024, gamma=2.0, k=147.5, dark=2.5)
 # LUT_LUMRANGE's intensity_out values (1024 points).
 print("Generating measurements_lumrange.csv ...")
 ihrl = _make_ihrl(LUT_LUMRANGE, noise=0.0)
-measurements_lumrange = measure_lut(
-    ihrl, intensities=LUT_LUMRANGE[:, 1], stim_draw_func=_draw, n_samples=1
-)
+measurements_lumrange = measure(ihrl, intensities=LUT_LUMRANGE[:, 1], stim_draw_func=_draw)
 np.savetxt(
     TEST_DIR / "measurements_lumrange.csv",
     measurements_lumrange,

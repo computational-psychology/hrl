@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-import hrl.calibration.measurement
+import hrl.luts
 from hrl.util.lut import intensities_argparser
 
 parser = argparse.ArgumentParser(
@@ -44,9 +44,7 @@ def command(parsed_args):
     measurements = np.genfromtxt(in_file, delimiter=",", skip_header=1)
 
     # Linearize LUT
-    linearized_lut = hrl.calibration.measurement.linearize(
-        measurements, bit_depth=parsed_args.bit_depth
-    )
+    linearized_lut = hrl.luts.linearize(measurements, bit_depth=parsed_args.bit_depth)
 
     # Write to file
     out_file = parsed_args.out_file.expanduser().resolve()

@@ -1,4 +1,4 @@
-"""Tests for calibration.measurement.measure_lut using MockPhotometer."""
+"""Tests for hrl.lut.measure using MockPhotometer."""
 
 import types
 from pathlib import Path
@@ -6,8 +6,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from hrl.calibration.measurement import measure_lut
-from hrl.luts import create_lut
+from hrl.luts import create_lut, measure
 from hrl.photometer.photometer import MockPhotometer
 
 TEST_DIR = Path(__file__).parent
@@ -49,20 +48,19 @@ _LUT_CASES = [
 
 @pytest.mark.parametrize("n_samples", [1, 3, 5])
 @pytest.mark.parametrize("n,gamma,k,dark", _LUT_CASES)
-def test_measure_lut(n, gamma, k, dark, n_samples, mock_hrl):
+def test_measure(n, gamma, k, dark, n_samples, mock_hrl):
     lut = create_lut(n=n, gamma=gamma, k=k, dark=dark)
     ihrl = mock_hrl(lut)
 
-    measurements = measure_lut(
-        ihrl, intensities=lut[:, 1], stim_draw_func=mock_draw, n_samples=n_samples
+    measurements = measure(
+        ihrl, intensities=np.repeat(lut[:, 1], n_samples), stim_draw_func=mock_draw
     )
 
-    assert len(measurements) == len(lut)
-    np.testing.assert_array_equal(measurements[:, 0], lut[:, 1])
+    assert len(measurements) == len(lut) * n_samples
+    np.testing.assert_array_equal(measurements[:, 0], np.repeat(lut[:, 1], n_samples))
 
     # Each luminance sample should match the LUT value for that intensity
-    for i in range(n_samples):
-        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+    np.testing.assert_array_equal(measurements[:, 1], np.repeat(lut[:, -1], n_samples))
 
 
 @pytest.mark.parametrize("n_samples", [1, 3])  # skip large n_samples for speed
@@ -72,19 +70,17 @@ def test_csv_output(n, gamma, k, dark, n_samples, mock_hrl, tmp_path):
     ihrl = mock_hrl(lut)
     out_file = tmp_path / "measurements.csv"
 
-    measure_lut(
+    measure(
         ihrl,
-        intensities=lut[:, 1],
+        intensities=np.repeat(lut[:, 1], n_samples),
         stim_draw_func=mock_draw,
-        n_samples=n_samples,
         out_file=out_file,
     )
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
 
-    assert len(measurements) == len(lut)
-    np.testing.assert_array_equal(measurements[:, 0], lut[:, 1])
+    assert len(measurements) == len(lut) * n_samples
+    np.testing.assert_array_equal(measurements[:, 0], np.repeat(lut[:, 1], n_samples))
 
     # Each luminance sample should match the LUT value for that intensity
-    for i in range(n_samples):
-        np.testing.assert_array_equal(measurements[:, i + 1], lut[:, -1])
+    np.testing.assert_array_equal(measurements[:, 1], np.repeat(lut[:, -1], n_samples))

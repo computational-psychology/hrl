@@ -44,7 +44,7 @@ intensity_in,luminance
 
 ## Linearization Tests (`test_linearize.py`)
 
-The linearization routine (`hrl.calibration.measurement.linearize`)
+The linearization routine (`hrl.luts.linearize`)
 takes measured intensity-luminance pairs from a monitor
 and creates a LUT that maps input intensities to output intensities,
 such that the resulting luminance progression is approximately linear.
@@ -72,7 +72,7 @@ Against pre-computed CSV files generated from known input measurements, validati
 
 Before linearization, we often first combine several sets of raw measurements (from different measurement sessions),
 remove outliers, and average them to create a cleaner dataset for linearization.
-These functions are in `hrl.calibration.measurement`.
+These functions are in `hrl.luts`.
 
 ### Unit tests
 Testing combine, remove_outliers, and average in isolation with small in-memory arrays:
@@ -96,7 +96,7 @@ Against pre-computed CSV files, validating the full combine → remove_outliers 
 
 If the measurements are noisy, we often first smooth the data
 to create a cleaner dataset for LUT generation.
-This is done using the `smooth` function in `hrl.calibration.measurement`,
+This is done using the `smooth` function in `hrl.luts`,
 which applies a simple moving average kernel to the measurements,
 reducing luminance differences between neighboring intensity steps.
 
@@ -161,7 +161,7 @@ These mirror the integration tests but validate the command-line interface and f
 Run `generate_test_data.py` to regenerate all test data files:
 ```bash
 cd tests/calibration
-uv run python generate_test_data.py
+python generate_test_data.py
 ```
 
 This will create all measurement files,
