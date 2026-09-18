@@ -486,15 +486,19 @@ This mapping is determined by the <em>first</em> and <em>third</em> columns of t
 These are the default values and so <code class="docutils literal notranslate"><span class="pre">HRL</span></code> will run in any machine.</p>
 <p>To run the same experiment in the lab, you need to change the <code class="docutils literal notranslate"><span class="pre">graphics</span></code>
 and <code class="docutils literal notranslate"><span class="pre">input</span></code> parameters as follows:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">graphics</span></code>:</p>
 <ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">graphics</span></code>:</p>
+<ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">graphics=&quot;datapixx&quot;</span></code> (for the Datapixx 1 device)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">graphics=&quot;viewpixx&quot;</span></code> (for the Viewpixx 3D device).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">graphics=&quot;viewpixx_RGB&quot;</span></code> (for the Viewpixx 3D device in color mode;
+<code class="docutils literal notranslate"><span class="pre">graphics=&quot;gpu_RGB&quot;</span></code> is the color counterpart of <code class="docutils literal notranslate"><span class="pre">graphics=&quot;gpu&quot;</span></code>).</p></li>
 </ul>
+<p>All valid names are listed in <code class="docutils literal notranslate"><span class="pre">hrl.graphics.ALIASES</span></code>.
+They are case insensitive, so <code class="docutils literal notranslate"><span class="pre">&quot;gpu_RGB&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;gpu_rgb&quot;</span></code> select the same device.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">input</span></code>:</p>
-<ul>
+<ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">inputs=&quot;responsepixx&quot;</span></code> to use the ResponsePixx button board.</p></li>
 </ul>
 </li>

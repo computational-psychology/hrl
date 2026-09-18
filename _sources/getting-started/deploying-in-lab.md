@@ -55,6 +55,11 @@ and `input` parameters as follows:
 - `graphics`:
 	- `graphics="datapixx"` (for the Datapixx 1 device)
 	- `graphics="viewpixx"` (for the Viewpixx 3D device).
+	- `graphics="viewpixx_RGB"` (for the Viewpixx 3D device in color mode;
+	  `graphics="gpu_RGB"` is the color counterpart of `graphics="gpu"`).
+
+  All valid names are listed in `hrl.graphics.ALIASES`.
+  They are case insensitive, so `"gpu_RGB"` and `"gpu_rgb"` select the same device.
 
 - `input`:
     - `inputs="responsepixx"` to use the ResponsePixx button board.
