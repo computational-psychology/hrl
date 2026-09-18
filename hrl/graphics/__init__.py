@@ -29,13 +29,14 @@ GREY_ALIASES = {
     "datapixx_gray8": "datapixx.DATAPixx",
 }
 RGB_ALIASES = {
-    "gpu_RGB": "gpu.GPU_RGB",
-    "RGB": "gpu.GPU_RGB",
-    "viewpixx_RGB": "viewpixx.VIEWPixx_RGB",
+    "gpu_rgb": "gpu.GPU_RGB",
+    "rgb": "gpu.GPU_RGB",
+    "viewpixx_rgb": "viewpixx.VIEWPixx_RGB",
     "viewpixx_color": "viewpixx.VIEWPixx_RGB",
     "viewpixx_colour": "viewpixx.VIEWPixx_RGB",
 }
 ALIASES = {**GREY_ALIASES, **RGB_ALIASES}
+ALIASES = {k.lower(): v for k, v in ALIASES.items()}  # case-insensitive lookup
 
 
 def resolve_alias(graphics_alias):
