@@ -6,6 +6,7 @@ import platform
 
 __all__ = [
     "new_graphics",
+    "resolve_alias",
     "ALIASES",
     "GREY_ALIASES",
     "RGB_ALIASES",
@@ -28,13 +29,14 @@ GREY_ALIASES = {
     "datapixx_gray8": "datapixx.DATAPixx",
 }
 RGB_ALIASES = {
-    "gpu_RGB": "gpu.GPU_RGB",
-    "RGB": "gpu.GPU_RGB",
-    "viewpixx_RGB": "viewpixx.VIEWPixx_RGB",
+    "gpu_rgb": "gpu.GPU_RGB",
+    "rgb": "gpu.GPU_RGB",
+    "viewpixx_rgb": "viewpixx.VIEWPixx_RGB",
     "viewpixx_color": "viewpixx.VIEWPixx_RGB",
     "viewpixx_colour": "viewpixx.VIEWPixx_RGB",
 }
 ALIASES = {**GREY_ALIASES, **RGB_ALIASES}
+ALIASES = {k.lower(): v for k, v in ALIASES.items()}  # case-insensitive lookup
 
 
 def new_graphics(
@@ -58,7 +60,7 @@ def new_graphics(
     ----------
     graphics_alias : str
         alias for the desired graphics device. Valid options can be found in the
-        hrl.graphics.ALIASES.keys().
+        hrl.graphics.ALIASES.keys(). The lookup is case insensitive.
     width : int
         width of the screen in pixels.
     height : int
@@ -93,16 +95,17 @@ def new_graphics(
     ValueError
         if the provided graphics_alias does not match any known device
     """
-    # Lazy import the graphics class based on alias
-    if graphics_alias in ALIASES:
-        module_name, class_name = ALIASES[graphics_alias].rsplit(".", 1)
-        module = importlib.import_module(f".{module_name}", package=__name__)
-        graphics_class = getattr(module, class_name)
-    else:
+    # Check graphics alias
+    if graphics_alias.lower() not in [alias.lower() for alias in ALIASES.keys()]:
         raise ValueError(
             f"Unknown graphics device '{graphics_alias}'. Valid options are: "
-            f"{', '.join(list(ALIASES.keys()))}"
+            f"{', '.join(list(ALIASES.keys()))} (case insensitive)"
         )
+
+    # Lazy import the graphics class based on alias
+    module_name, class_name = ALIASES[graphics_alias.lower()].rsplit(".", 1)
+    module = importlib.import_module(f".{module_name}", package=__name__)
+    graphics_class = getattr(module, class_name)
 
     # Run screen setup for multiple monitor support
     screen_setup(screen=screen, window_width_offset=width_offset)
