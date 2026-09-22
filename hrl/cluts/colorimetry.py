@@ -383,6 +383,112 @@ def achromatic_RGB(CLUT, luminance, per_level=False):
     return XYZ_to_RGB(grey, CLUT, per_level=per_level)[0]
 
 
+def max_excursion(
+    background, direction, CLUT, per_level=False, tol=1e-6, limit=1e6, samples=64, rounds=3
+):
+    """How far from `background` along `direction` the display can go, before leaving its gamut.
+
+    Returns the largest scale for which ``background + scale * direction`` is a color
+    this display can show. Use it to set the amplitude of a stimulus that modulates
+    along a color direction, rather than hard-coding one.
+
+    The two signs generally reach different distances. For a modulation that has to be
+    symmetric, ask for both and take the smaller.
+
+    Parameters
+    ----------
+    background : array-like
+        the color to modulate around, as XYZ, shape (3,)
+    direction : array-like
+        which way to go, as an XYZ difference, shape (3,). The scale counts multiples of
+        it: pass a unit vector to get a distance in XYZ, or the full excursion you want
+        to get the fraction of it that fits.
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    per_level : bool, optional
+        work per level of input, rather than with the primaries matrix (see
+        `RGB_to_XYZ`); by default False, which is faster
+    tol : float, optional
+        how closely (in XYZ) a color must be reproduced to count as reachable, by
+        default 1e-6
+    limit : float, optional
+        the largest scale returned, e.g. for a zero `direction`; by default 1e6
+    samples, rounds : int, optional
+        how precisely the edge is located, to about ``1 / samples**rounds`` of the
+        range searched; by default 64 and 3
+
+    Returns
+    -------
+    float
+        the largest reachable scale, or 0.0 if `background` itself cannot be shown. It
+        is always a scale that was tried and reproduced, so it never overstates what the
+        display can do.
+
+    Examples
+    --------
+    Around a grey of 100 cd/m2:
+
+    >>> grey = RGB_to_XYZ(achromatic_RGB(CLUT, 100.0), CLUT)
+
+    Changing only X and Z, so luminance stays that of the grey. Each sign separately;
+    a symmetric modulation can go as far as the smaller of the two:
+
+    >>> direction = np.array([1.0, 0.0, -1.0])
+    >>> up = max_excursion(grey, direction, CLUT)
+    >>> down = max_excursion(grey, -direction, CLUT)
+
+    Changing only luminance, keeping the grey's chromaticity. The direction is the grey
+    itself, so the scale is a fraction of its luminance (a Weber contrast):
+
+    >>> brighter = max_excursion(grey, grey, CLUT)
+    >>> darker = max_excursion(grey, -grey, CLUT)
+
+    Towards a particular color, changing X, Y and Z together. The direction is the whole
+    way there, so the scale is the fraction of it that fits; 1 or more means the color
+    itself can be shown:
+
+    >>> target = np.array([45.0, 110.0, 60.0])
+    >>> fits = max_excursion(grey, target - grey, CLUT)
+    """
+    background = np.asarray(background, dtype=float).reshape(3)
+    direction = np.asarray(direction, dtype=float).reshape(3)
+
+    def furthest_reachable(scales):
+        """The largest of `scales` that is reachable, and the next one up."""
+        _, error = XYZ_to_RGB(background + scales[:, None] * direction, CLUT, per_level=per_level)
+        hits = np.flatnonzero(error <= tol)
+        if len(hits) == 0:
+            return None, scales[0]
+        last = hits[-1]
+        beyond = scales[last + 1] if last + 1 < len(scales) else scales[last]
+        return scales[last], beyond
+
+    if XYZ_to_RGB(background, CLUT, per_level=per_level)[1] > tol:
+        return 0.0
+    if np.allclose(direction, 0.0):
+        return float(limit)
+
+    # Bracket the edge by doubling, so the scan does not need to know the scale
+    reach = 1.0
+    while XYZ_to_RGB(background + reach * direction, CLUT, per_level=per_level)[1] <= tol:
+        reach *= 2.0
+        if reach > limit:
+            return float(limit)
+
+    # Scan for the furthest scale that is reachable, rather than halving towards the
+    # first that is not: a color the search failed to reproduce would cut the range short
+    low, high = 0.0, reach
+    for _ in range(rounds):
+        hit, beyond = furthest_reachable(np.linspace(low, high, samples))
+        if hit is None:
+            return 0.0
+        low, high = hit, beyond
+        if high <= low:
+            break
+
+    return float(low)
+
+
 def differences(measured, expected):
     """How far measured colors are from expected ones: overall, in luminance, and in chromaticity.
 

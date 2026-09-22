@@ -50,8 +50,9 @@ submodules, one per job:
     (`RGB_to_XYZ`, `XYZ_to_RGB`, which says how close it got; the matrix itself:
     `primaries_from_CLUT`). Or, with ``per_level=True``, per level of input, following
     primaries whose color drifts more.
-    Also can give grey of a given luminance (`achromatic_RGB`).
-    How far measured colors are from expected ones: `differences`.
+    Also can give grey of a given luminance (`achromatic_RGB`),
+    and how far a color direction can go (`max_excursion`);
+    and how far measured colors are from expected ones (`differences`).
 `hrl.cluts.triplets`
     sets of RGB triplets to show and measure: each channel swept on its own
     (`channel_sweeps`), and mixtures of the channels with their parts
@@ -77,6 +78,7 @@ from .colorimetry import (
     XYZ_to_RGB,
     achromatic_RGB,
     differences,
+    max_excursion,
     primaries_from_CLUT,
 )
 
@@ -174,5 +176,6 @@ __all__ = [
     "create_clut",
     "differences",
     "gamma_correct_RGB",
+    "max_excursion",
     "primaries_from_CLUT",
 ]
