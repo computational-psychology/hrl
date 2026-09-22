@@ -3,14 +3,13 @@
 import numpy as np
 import pytest
 
-from hrl.cluts import gamma_correct_RGB
 from hrl.photometer.photometer import MockColorimeter
 
 N_TRIPLETS = 20
 rng = np.random.default_rng(0)
 random_triplets = [rng.random(3) for _ in range(N_TRIPLETS)]
 
-from tests.cluts.conftest import BLACK_POINT, PRIMARIES_MATRIX
+from tests.cluts.conftest import BLACK_POINT, DEFAULT_GAMMA, PRIMARIES_MATRIX
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -60,7 +59,7 @@ def test_identity_clut(identity_clut, triplet):
     colorimeter = MockColorimeter(color_mapping=identity_clut)
 
     colorimeter.current_triplet = triplet
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), triplet)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), triplet, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -97,11 +96,13 @@ def test_nonlinear_clut(nonlinear_clut, triplet):
 
     colorimeter.current_triplet = triplet
 
-    # compute desired tristimulus using the nonlinear CLUT
-    gamma_corrected = gamma_correct_RGB(triplet.reshape((1, 1, 3)), nonlinear_clut)
-    desired_tristimulus = PRIMARIES_MATRIX @ gamma_corrected.flatten() + BLACK_POINT
+    # The triplet is what the screen is driven with; the display's gamma turns that into
+    # light, so the matrix applies to drive ** gamma, the input the CLUT would map there
+    desired_tristimulus = PRIMARIES_MATRIX @ triplet**DEFAULT_GAMMA + BLACK_POINT
 
-    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
+    # The CLUT holds the gamma curve at 256 inputs, as straight lines in between, so the
+    # input the mock works back to is that close; most off near black, where it is steep
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=2e-3)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)

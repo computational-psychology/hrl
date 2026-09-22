@@ -8,6 +8,9 @@ that can be used to convert between RGB and XYZ color spaces.
 Additionally, the 0-intensity values for each channel capture the _black point_:
 the residual dark light when all channels are off.
 This is the XYZ tristimulus values for what "black" means on the display.
+
+The RGB here is always the *input*: the values as they are passed to Graphics
+(where the CLUT is applied).
 """
 
 import numpy as np
@@ -15,6 +18,18 @@ import numpy as np
 
 def primaries_from_CLUT(CLUT):
     """Extract XYZ primaries matrix and black point from a provided Color LUT.
+
+    The black point is the XYZ tristimulus values for what "black" means on the display
+    -- the (average) measurement of the display when all channels are off; first row of the CLUT.
+    The primaries matrix is the XYZ that each channel adds above that, per unit of input.
+
+    This primaries matrix is fitted by least squares to the CLUT's measured XYZ values;
+    since real primaries may drift somewhat with input, not single measured row fits every level.
+    For a discussion of this, see Brainard, Pelli & Robson, 2002, Display characterization.
+    (Psychtoolbox's default calibration also fits each primary over all measured levels)
+
+    Luminance is fitted exactly, since the CLUT linearizes on luminance (Y).
+    It cannot linearize on all three tristimulus values at once.
 
     Parameters
     ----------
@@ -28,10 +43,15 @@ def primaries_from_CLUT(CLUT):
     black_point : Array[float]
         shape (3,); XYZ values for what "black" means on the display.
     """
+    CLUT = np.asarray(CLUT, dtype=float)
+    inputs = CLUT[:, 0]
     black_point = CLUT[0, 4:7]
+
+    # For each channel: the line through the origin, XYZ_added = input * column, that
+    # misses its measured XYZ (above black) least, summed over all levels
     primaries_matrix = np.column_stack(
         [
-            (CLUT[-1, 4 + 3 * channel : 7 + 3 * channel] - black_point) / CLUT[-1, 1 + channel]
+            inputs @ (CLUT[:, 4 + 3 * channel : 7 + 3 * channel] - black_point) / (inputs @ inputs)
             for channel in range(3)
         ]
     )

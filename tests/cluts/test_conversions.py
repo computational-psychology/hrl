@@ -52,3 +52,33 @@ def test_XYZ_to_RGB_subtracts_black_point(dark):
     rgb = np.array([0.3, 0.2, 0.1])
 
     np.testing.assert_allclose(XYZ_to_RGB(rgb + dark, CLUT), rgb, atol=1e-12)
+
+
+def test_primaries_from_CLUT_is_per_unit_of_input_not_of_drive():
+    """Where full input does not drive a channel fully, the matrix still describes inputs."""
+    M = np.array([[0.9, 0.1, 0.0], [0.2, 0.7, 0.1], [0.0, 0.3, 0.8]])
+    CLUT = create_clut(n=256, gamma=2.2, primaries_matrix=M)
+    CLUT[:, 1] *= 0.95  # red topped out below full drive, as a measured CLUT can be
+
+    primaries_matrix, _ = primaries_from_CLUT(CLUT)
+
+    np.testing.assert_allclose(primaries_matrix, M, atol=1e-12)
+
+
+def test_primaries_from_CLUT_fits_drifting_primaries_by_least_squares():
+    """No single column fits a primary whose color drifts; it gets the one that misses least."""
+    M = np.array([[0.9, 0.1, 0.0], [0.2, 0.7, 0.1], [0.0, 0.3, 0.8]])
+    CLUT = create_clut(n=256, gamma=2.2, primaries_matrix=M)
+    inputs = CLUT[:, 0]
+    # Green gains Z, but not luminance, as its input goes up
+    CLUT[:, 9] += 0.1 * inputs**2
+
+    primaries_matrix, _ = primaries_from_CLUT(CLUT)
+
+    added = CLUT[:, 7:10] - CLUT[0, 4:7]
+    best, *_ = np.linalg.lstsq(inputs[:, None], added, rcond=None)
+    np.testing.assert_allclose(primaries_matrix[:, 1], best[0], atol=1e-12)
+    # Luminance is a straight line in the input, so it is fitted exactly
+    assert primaries_matrix[1, 1] == pytest.approx(M[1, 1])
+    # The fitted Z sits between green's Z per unit input at low and at full input
+    assert M[2, 1] < primaries_matrix[2, 1] < M[2, 1] + 0.1
