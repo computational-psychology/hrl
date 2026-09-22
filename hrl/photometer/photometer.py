@@ -194,18 +194,14 @@ class MockColorimeter(Colorimeter):
                 np.array([r, g, b]).reshape(1, 1, 3), clut
             ).flatten()
         elif color_mapping.shape[1] == 13:
-            # Full 13-column CLUT: simulates a display with the CLUT's primaries matrix.
-            # The mock is pointed at the screen, so the triplet it reads is what the
-            # screen is driven with -- graphics has already applied any CLUT. The matrix
-            # works on inputs, so look up which input each drive value belongs to.
+            # Full 13-column CLUT: simulates the display that CLUT describes, level by
+            # level. The mock is pointed at the screen, so the triplet it reads is what
+            # the screen is driven with -- graphics has already applied any CLUT --
+            # hence no gamma correction here.
             clut = np.asarray(color_mapping)
-
-            def _clut_func(r, g, b):
-                drive = np.array([r, g, b], dtype=float)
-                inputs = [np.interp(drive[c], clut[:, 1 + c], clut[:, 0]) for c in range(3)]
-                return RGB_to_XYZ(np.array(inputs), clut)
-
-            self._clut_func = _clut_func
+            self._clut_func = lambda r, g, b: RGB_to_XYZ(
+                np.array([r, g, b]), clut, gamma_correct=False, per_level=True
+            )
         else:
             raise ValueError(
                 "color_mapping must be a callable or an array-like with 4 or 13 columns."

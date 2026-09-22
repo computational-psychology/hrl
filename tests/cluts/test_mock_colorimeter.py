@@ -105,6 +105,18 @@ def test_nonlinear_clut(nonlinear_clut, triplet):
     np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=2e-3)
 
 
+def test_clut_with_drifting_primaries(nonlinear_clut):
+    # A display whose green gains Z as its input goes up: the mock shows what the CLUT
+    # records at each level, not one fixed color per channel
+    clut = nonlinear_clut.copy()
+    clut[:, 9] += 0.1 * clut[:, 0] ** 2
+    colorimeter = MockColorimeter(color_mapping=clut)
+
+    for row in clut[::17]:
+        colorimeter.current_triplet = np.array([0.0, row[2], 0.0])  # green's drive value
+        np.testing.assert_allclose(colorimeter.readTristimulus(), row[7:10], atol=1e-12)
+
+
 @pytest.mark.parametrize("triplet", random_triplets)
 def test_readLuminance(identity_clut, triplet):
     # readLuminance() should return the Y tristimulus value from readTristimulus()
