@@ -50,6 +50,7 @@ submodules, one per job:
     (`RGB_to_XYZ`, `XYZ_to_RGB`, which says how close it got; the matrix itself:
     `primaries_from_CLUT`). Or, with ``per_level=True``, per level of input, following
     primaries whose color drifts more.
+    Also can give grey of a given luminance (`achromatic_RGB`).
     How far measured colors are from expected ones: `differences`.
 `hrl.cluts.triplets`
     sets of RGB triplets to show and measure: each channel swept on its own
@@ -71,7 +72,13 @@ create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=N
 
 import numpy as np
 
-from .colorimetry import RGB_to_XYZ, XYZ_to_RGB, differences, primaries_from_CLUT
+from .colorimetry import (
+    RGB_to_XYZ,
+    XYZ_to_RGB,
+    achromatic_RGB,
+    differences,
+    primaries_from_CLUT,
+)
 
 
 def gamma_correct_RGB(img, CLUT):
@@ -163,6 +170,7 @@ def create_clut(
 __all__ = [
     "RGB_to_XYZ",
     "XYZ_to_RGB",
+    "achromatic_RGB",
     "create_clut",
     "differences",
     "gamma_correct_RGB",

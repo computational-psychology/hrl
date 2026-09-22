@@ -352,6 +352,37 @@ def XYZ_to_RGB(xyz, CLUT, per_level=False, rounds=25, halvings=10):
     return rgb.reshape(shape), error.reshape(shape[:-1])
 
 
+def achromatic_RGB(CLUT, luminance, per_level=False):
+    """Input RGB for a grey of the chosen luminance, on this display.
+
+    "Grey" means the display's own white, dimmed: the same chromaticity as all three
+    channels at full input, at a lower luminance. Equal inputs (R = G = B) do *not* give
+    this. The black point, and the slight change in each channel's color with its
+    input, both tint it.
+
+    Parameters
+    ----------
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    luminance : float
+        wanted luminance (Y), in the units the CLUT was measured in, e.g. cd/m2
+    per_level : bool, optional
+        work per level of input, rather than with the primaries matrix (see
+        `RGB_to_XYZ`); by default False, which is faster
+
+    Returns
+    -------
+    Array[float]
+        input RGB, shape (3,)
+    """
+    white = RGB_to_XYZ(np.ones(3), CLUT, per_level=per_level)
+
+    # Same chromaticity as white, scaled to the wanted luminance
+    grey = white * (luminance / white[1])
+
+    return XYZ_to_RGB(grey, CLUT, per_level=per_level)[0]
+
+
 def differences(measured, expected):
     """How far measured colors are from expected ones: overall, in luminance, and in chromaticity.
 
