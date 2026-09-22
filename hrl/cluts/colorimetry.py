@@ -25,6 +25,7 @@ However, for displays whose primaries drift more with input, no single matrix ca
 In that case, the second approach is a true LookUp Table: look up the actually measured XYZ
 per channel, per level (``per_level=True``).
 For levels between the tabulated ones, it interpolates along a straight line between them.
+Running it backwards has no formula: `XYZ_to_RGB` searches for the input.
 
 Either approach assumes that the display's channels add up:
 the color is the black point plus what each channel adds.
@@ -76,6 +77,99 @@ def primaries_from_CLUT(CLUT):
         ]
     )
     return primaries_matrix, black_point
+
+
+def _channel_curves(CLUT, gamma_correct=True):
+    """Read a CLUT as three curves: how much light each channel adds at each input.
+
+    Read once, evaluated as often as needed: `XYZ_to_RGB` (per level) evaluates the same
+    curves at every round of its search.
+
+    Parameters
+    ----------
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    gamma_correct : bool, optional
+        If True (default), the curves are tabulated at the values passed to graphics,
+        which applies this CLUT. If False, at the drive values sent to the screen
+        directly, as if no CLUT were loaded.
+
+    Returns
+    -------
+    dict
+        ``black_point``: XYZ with every channel off, shape (3,).
+        ``levels``: shape (3, L). ``levels[c]`` are the inputs at which channel c's curve
+        is tabulated, increasing.
+        ``light``: shape (3, L, 3). ``light[c]`` is the XYZ channel c adds, above the
+        black point, at each of those inputs.
+    """
+    CLUT = np.asarray(CLUT, dtype=float)
+
+    # Columns 4-12 hold, per channel, the XYZ with only that channel on: [row, channel, axis]
+    alone = CLUT[:, 4:13].reshape(-1, 3, 3)
+
+    # At input 0 every channel is off, so all three hold the black point
+    black_point = alone[0, 0]
+
+    # The inputs each channel's curve is tabulated at: what graphics is passed, or, without
+    # the CLUT, the drive values it turns them into
+    levels = np.tile(CLUT[:, 0], (3, 1)) if gamma_correct else CLUT[:, 1:4].T
+
+    # What each channel adds, above the black point: [channel, row, axis]
+    light = np.stack([alone[:, channel] - black_point for channel in range(3)])
+
+    return {"black_point": black_point, "levels": levels, "light": light}
+
+
+def _evaluate(rgb, curves):
+    """The color each input produces, and how fast that color changes with each input.
+
+    The color is worked out just as the model says: start from the black point, and
+    add each channel's light at its input. Between two tabulated inputs, a channel's
+    curve is a straight line, so its light there is read off that line. Inputs beyond
+    the table count as its ends.
+
+    That straight line is also why the second result is easy to get. How fast the color
+    changes as one channel's input goes up is simply the slope of the line that input
+    sits on. `XYZ_to_RGB` (per level) uses these slopes to work out which way to move a
+    guess.
+
+    Parameters
+    ----------
+    rgb : Array[float]
+        inputs, shape (N, 3)
+    curves : dict
+        as returned by `_channel_curves`, or laid out the same way; each channel's
+        ``levels`` and ``light`` may have a length of its own
+
+    Returns
+    -------
+    xyz : Array[float]
+        the color each input produces, shape (N, 3)
+    slopes : Array[float]
+        shape (N, 3, 3). ``slopes[n, :, c]`` is how much X, Y and Z go up per unit
+        increase of channel c's input, at input n. (This matrix is often called the
+        Jacobian.)
+    """
+    xyz = np.tile(curves["black_point"], (len(rgb), 1))
+    slopes = np.empty((len(rgb), 3, 3))
+
+    for channel in range(3):
+        levels = curves["levels"][channel]
+        light = curves["light"][channel]
+        value = np.clip(rgb[:, channel], levels[0], levels[-1])
+
+        # Find the straight piece each input falls on: between levels[i] and levels[i + 1]
+        i = np.clip(np.searchsorted(levels, value) - 1, 0, len(levels) - 2)
+
+        # Slope of that piece: how much this channel's light changes per unit of input
+        slope = (light[i + 1] - light[i]) / (levels[i + 1] - levels[i])[:, None]
+
+        # Light at the input: start of the piece, plus slope times the distance along it
+        xyz += light[i] + slope * (value - levels[i])[:, None]
+        slopes[:, :, channel] = slope
+
+    return xyz, slopes
 
 
 def RGB_to_XYZ(rgb, CLUT, per_level=False, gamma_correct=True):
@@ -130,42 +224,35 @@ def RGB_to_XYZ(rgb, CLUT, per_level=False, gamma_correct=True):
         return rgb @ primaries_matrix.T + black_point
 
     shape = rgb.shape
-    rgb = rgb.reshape(-1, 3)
-
-    # Columns 4-12 hold, per channel, the XYZ with only that channel on: [row, channel, axis]
-    alone = CLUT[:, 4:13].reshape(-1, 3, 3)
-
-    # At input 0 every channel is off, so all three hold the black point
-    black_point = alone[0, 0]
-
-    # The inputs each channel's curve is tabulated at: what graphics is passed, or, without
-    # the CLUT, the drive values it turns them into
-    levels = np.tile(CLUT[:, 0], (3, 1)) if gamma_correct else CLUT[:, 1:4].T
-
-    # Start from the black point, and add what each channel adds at its input
-    xyz = np.tile(black_point, (len(rgb), 1))
-    for channel in range(3):
-        light = alone[:, channel] - black_point
-        value = np.clip(rgb[:, channel], levels[channel, 0], levels[channel, -1])
-
-        # Find the straight piece each input falls on: between levels[i] and levels[i + 1]
-        i = np.clip(np.searchsorted(levels[channel], value) - 1, 0, len(levels[channel]) - 2)
-
-        # Slope of that piece: how much this channel's light changes per unit of input
-        slope = (light[i + 1] - light[i]) / (levels[channel, i + 1] - levels[channel, i])[:, None]
-
-        # Light at the input: start of the piece, plus slope times the distance along it
-        xyz += light[i] + slope * (value - levels[channel, i])[:, None]
-
-    return xyz.reshape(shape)
+    return _evaluate(rgb.reshape(-1, 3), _channel_curves(CLUT, gamma_correct))[0].reshape(shape)
 
 
-def XYZ_to_RGB(xyz, CLUT):
-    """The input RGB that shows a wanted color (CIE XYZ) on a display.
+def XYZ_to_RGB(xyz, CLUT, per_level=False, rounds=25, halvings=10):
+    """The input RGB that shows a wanted color (CIE XYZ) on a display, and how close it gets.
 
-    Runs the primaries matrix backwards (see `primaries_from_CLUT`): takes off the black point,
-    and multiplies by the matrix's inverse. A color the display cannot show comes out with
-    inputs outside [0, 1].
+    By default, runs the primaries matrix backwards (see `primaries_from_CLUT`): takes off the
+    black point, and multiplies by the matrix's inverse.
+
+    With ``per_level=True``, there is no formula to run backwards: each channel's curve is
+    a measured table, and all three channels add light to every one of X, Y and Z. So
+    this finds the input by improving a guess, over and over:
+
+    1. Start from the primaries matrix's answer.
+    2. Work out the color that guess produces, and how far it is from the wanted one.
+    3. Use the slopes at the guess to estimate how much each channel's input has to
+       change to close that gap. That is three equations (one each for X, Y and Z) in
+       three unknowns (the change to R, G and B), solved together.
+    4. Make that change, keeping every input within [0, 1]. If that would land further
+       from the wanted color than before, try half the change instead, then a quarter,
+       and so on, so a guess never gets worse. Then go back to step 2.
+
+    Each channel's curve is straight between tabulated inputs. So once the guess sits on
+    the right straight pieces, the estimate in step 3 is exact, and the next round lands
+    on the answer. Where two pieces meet at a sharp bend, though, the full change can
+    overshoot onto the next piece and back again; halving it is what stops that. A
+    handful of rounds is enough. (This is Newton's method, with backtracking.)
+
+    All targets are solved together, as arrays, rather than one at a time.
 
     Parameters
     ----------
@@ -173,11 +260,30 @@ def XYZ_to_RGB(xyz, CLUT):
         wanted color(s), CIE XYZ, shape (..., 3): one, a list of them, or an image
     CLUT : Array[float]
         Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    per_level : bool, optional
+        work per level of input, rather than with the primaries matrix (see
+        `RGB_to_XYZ`); by default False, which is much faster
+    rounds : int, optional
+        with ``per_level=True``: how many times to improve the guess, by default 25
+    halvings : int, optional
+        with ``per_level=True``: how many times a change that would make a guess worse is
+        halved before giving up on that round, by default 10
 
     Returns
     -------
-    Array[float]
-        input RGB, the same shape as `xyz`
+    rgb : Array[float]
+        input RGB, the same shape as `xyz`, every value within [0, 1]
+    error : Array[float]
+        shape ``xyz.shape[:-1]``: the distance, in XYZ, between the color `rgb` produces
+        and the color that was asked for
+
+    Notes
+    -----
+    **Check the error.** It is zero, to rounding, for any color the display can show.
+    For one it cannot show -- too bright, or too saturated -- some inputs end up pinned at
+    0 or 1, and the error says how far from the wanted color the result landed. Not every
+    target is reachable, so compare the error to a tolerance to find out whether this one
+    was.
     """
     # Check or reshape the input to be (..., 3)
     xyz = np.asarray(xyz, dtype=float)
@@ -186,17 +292,64 @@ def XYZ_to_RGB(xyz, CLUT):
             xyz = xyz.reshape((1, 3))
         else:
             raise ValueError("expected 3 values along the last axis, shape (..., 3)")
+    shape = xyz.shape
+    xyz = xyz.reshape(-1, 3)
 
     # Get the primaries matrix and black point from the CLUT
     primaries_matrix, black_point = primaries_from_CLUT(CLUT)
 
-    # Subtract black point
-    rgb = xyz - black_point
+    # The primaries matrix's answer, within [0, 1]: the answer by default, and the first
+    # guess per level
+    rgb = xyz - black_point  # Subtract black point
+    rgb = (
+        rgb @ np.linalg.inv(primaries_matrix).T
+    )  # multiply by the inverse of the primaries matrix
+    rgb = np.clip(rgb, 0.0, 1.0)
 
-    # Convert XYZ to RGB: multiply by the inverse of the primaries matrix
-    rgb = rgb @ np.linalg.inv(primaries_matrix).T
+    if not per_level:
+        error = np.linalg.norm(rgb @ primaries_matrix.T + black_point - xyz, axis=1)
+        return rgb.reshape(shape), error.reshape(shape[:-1])
 
-    return rgb
+    curves = _channel_curves(CLUT)
+
+    def distance(rgb, wanted):
+        """How far, in XYZ, the color each input produces is from the wanted one."""
+        return np.linalg.norm(_evaluate(rgb, curves)[0] - wanted, axis=1)
+
+    error = distance(rgb, xyz)
+
+    for _ in range(rounds):
+        # Step 2: what color does the current guess produce, and how far off is it?
+        predicted, slopes = _evaluate(rgb, curves)
+        gap = (xyz - predicted)[..., None]
+
+        # Step 3: the change to R, G, B that the slopes say would close the gap. If some
+        # channel's light does not change at its current input (a slope of zero), there
+        # is no exact answer; `pinv` then gives the change that closes as much as it can.
+        try:
+            change = np.linalg.solve(slopes, gap)[..., 0]
+        except np.linalg.LinAlgError:
+            change = (np.linalg.pinv(slopes) @ gap)[..., 0]
+
+        # Step 4: apply it, without leaving the range the display accepts...
+        candidate = np.clip(rgb + change, 0.0, 1.0)
+        candidate_error = distance(candidate, xyz)
+
+        # ...and where that made a guess worse, try half the change, and half again
+        for _ in range(halvings):
+            worse = candidate_error > error
+            if not worse.any():
+                break
+            change[worse] /= 2
+            candidate[worse] = np.clip(rgb[worse] + change[worse], 0.0, 1.0)
+            candidate_error[worse] = distance(candidate[worse], xyz[worse])
+
+        # Keep a new guess only where it is at least as close as the old one
+        better = candidate_error <= error
+        rgb[better] = candidate[better]
+        error[better] = candidate_error[better]
+
+    return rgb.reshape(shape), error.reshape(shape[:-1])
 
 
 def differences(measured, expected):

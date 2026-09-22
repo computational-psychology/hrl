@@ -28,7 +28,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .colorimetry import RGB_to_XYZ
+from .colorimetry import RGB_to_XYZ, _evaluate
 from .triplets import channel_sweeps
 
 
@@ -680,23 +680,32 @@ def predict_from_channels(measurements):
         )
     black = xyz[lit == 0].mean(axis=0)
 
-    # Every prediction starts at black; each channel adds its own light to it
-    wanted = measurements[:, :3]
-    predicted = np.tile(black, (len(wanted), 1))
+    # Each channel's curve: what it adds above black at each level it was measured at,
+    # read the way `RGB_to_XYZ(per_level=True)` reads a CLUT's
+    curves = {"black_point": black, "levels": [], "light": []}
+    highest = np.zeros(3)
     for channel in range(3):
-        # The channel's curve: what it adds above black at each level it was measured at
+        # The channel's readings on its own, in order of level, starting from black
         alone = (lit == 1) & (rgb[:, channel] > 0.0)
-        levels = np.concatenate([[0.0], rgb[alone, channel]])
-        light = np.vstack([np.zeros((1, 3)), xyz[alone] - black])
-        order = np.argsort(levels)
-        levels, light = levels[order], light[order]
+        order = np.argsort(rgb[alone, channel])
+        levels = np.concatenate([[0.0], rgb[alone, channel][order]])
+        light = np.vstack([np.zeros((1, 3)), xyz[alone][order] - black])
 
-        # Add what the channel adds at each wanted level
-        on = wanted[:, channel] > 0.0
-        for axis in range(3):
-            predicted[on, axis] += np.interp(wanted[on, channel], levels, light[:, axis])
+        if len(levels) == 1:
+            # Never measured alone: a flat curve to read, but nothing lit is predicted below
+            levels, light = np.array([0.0, 1.0]), np.zeros((2, 3))
+        else:
+            # The highest level it was measured at, beyond which nothing is predicted
+            highest[channel] = levels[-1]
 
-        # No extrapolation: beyond the highest level measured, or never measured alone
-        predicted[on & (wanted[:, channel] > levels[-1])] = np.nan
+        curves["levels"].append(levels)
+        curves["light"].append(light)
+
+    # Black plus what each channel adds at its level
+    wanted = measurements[:, :3]
+    predicted = _evaluate(wanted, curves)[0]
+
+    # No extrapolation: beyond the highest level measured, or never measured alone
+    predicted[(wanted > highest).any(axis=1)] = np.nan
 
     return predicted

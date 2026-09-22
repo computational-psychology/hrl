@@ -1,9 +1,11 @@
 """Tests for `predict` and `predict_from_channels`: the color expected for measured inputs."""
 
+from pathlib import Path
+
 import numpy as np
 import pytest
 
-from hrl.cluts import differences
+from hrl.cluts import RGB_to_XYZ, differences
 from hrl.cluts.calibrate import predict, predict_from_channels
 from hrl.cluts.triplets import channel_mixtures
 from tests.cluts.conftest import BLACK_POINT, DISPLAY_CLUT, PRIMARIES_MATRIX
@@ -124,3 +126,20 @@ def test_needs_a_black_reading():
 
     with pytest.raises(ValueError, match="no reading at RGB"):
         predict_from_channels(without_black)
+
+
+def test_reads_its_channels_as_RGB_to_XYZ_reads_a_CLUT_per_level():
+    """Given a CLUT's own columns as readings, the two predict the same."""
+    clut = np.genfromtxt(Path(__file__).parent / "clut_8bit.csv", delimiter=",", skip_header=1)
+    sweeps = np.vstack(
+        [
+            np.column_stack([np.outer(clut[:, 0], np.eye(3)[c]), clut[:, 4 + 3 * c : 7 + 3 * c]])
+            for c in range(3)
+        ]
+    )
+    mixtures = np.random.default_rng(2).uniform(0.0, 1.0, size=(50, 3))
+    readings = np.vstack([sweeps, np.column_stack([mixtures, np.zeros((50, 3))])])
+
+    predicted = predict_from_channels(readings)[len(sweeps) :]
+
+    np.testing.assert_allclose(predicted, RGB_to_XYZ(mixtures, clut, per_level=True), atol=1e-9)

@@ -47,9 +47,9 @@ submodules, one per job:
     Can use this from the using ``python -m hrl.util clut ...``.
 `hrl.cluts.colorimetry`
     converting between input RGB and CIE XYZ with the primaries matrix a CLUT holds
-    (`RGB_to_XYZ`, `XYZ_to_RGB`; the matrix itself: `primaries_from_CLUT`).
-    Or, with ``per_level=True``, per level of input, following primaries whose color
-    drifts more.
+    (`RGB_to_XYZ`, `XYZ_to_RGB`, which says how close it got; the matrix itself:
+    `primaries_from_CLUT`). Or, with ``per_level=True``, per level of input, following
+    primaries whose color drifts more.
     How far measured colors are from expected ones: `differences`.
 `hrl.cluts.triplets`
     sets of RGB triplets to show and measure: each channel swept on its own

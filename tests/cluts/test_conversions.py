@@ -13,7 +13,7 @@ def test_XYZ_RGB_conversion_roundtrip(seed, shape):
     rgb = rng.random(shape)
 
     xyz = RGB_to_XYZ(rgb, CLUT)
-    rgb_back = XYZ_to_RGB(xyz, CLUT)
+    rgb_back = XYZ_to_RGB(xyz, CLUT)[0]
 
     assert xyz.shape == shape
     np.testing.assert_allclose(rgb_back, rgb, rtol=1e-12, atol=1e-12)
@@ -51,7 +51,18 @@ def test_XYZ_to_RGB_subtracts_black_point(dark):
     CLUT = create_clut(n=256, gamma=1.0, primaries_matrix=np.eye(3), black_point=dark)
     rgb = np.array([0.3, 0.2, 0.1])
 
-    np.testing.assert_allclose(XYZ_to_RGB(rgb + dark, CLUT), rgb, atol=1e-12)
+    np.testing.assert_allclose(XYZ_to_RGB(rgb + dark, CLUT)[0], rgb, atol=1e-12)
+
+
+def test_XYZ_to_RGB_keeps_inputs_in_range_and_says_how_far_off():
+    """A color the display cannot show: the inputs are clipped, and the error says so."""
+    CLUT = create_clut(n=256, gamma=2.2, primaries_matrix=np.eye(3) * 50.0)
+    white = RGB_to_XYZ(np.ones(3), CLUT)
+
+    rgb, error = XYZ_to_RGB(2 * white, CLUT)
+
+    np.testing.assert_allclose(rgb, 1.0)
+    np.testing.assert_allclose(error, np.linalg.norm(white), rtol=1e-12)
 
 
 def test_primaries_from_CLUT_is_per_unit_of_input_not_of_drive():
