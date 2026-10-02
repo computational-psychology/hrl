@@ -55,8 +55,9 @@ submodules, one per job:
     and how far measured colors are from expected ones (`differences`).
 `hrl.cluts.triplets`
     sets of RGB triplets to show and measure: each channel swept on its own
-    (`channel_sweeps`), and mixtures of the channels with their parts
-    (`channel_mixtures`).
+    (`channel_sweeps`), mixtures of the channels with their parts
+    (`channel_mixtures`), and colors around a background at its luminance
+    (`isoluminant_colors`).
 
 The usual path: measure the display and build its CLUT with ``python -m hrl.util clut``; show
 stimuli through it with ``Graphics_RGB(lut=...)``; and use `XYZ_to_RGB` to find the input

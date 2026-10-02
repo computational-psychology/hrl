@@ -7,12 +7,16 @@ Each function gives a set of input RGB triplets, each triplet once, for a purpos
 `channel_mixtures`
     mixtures of the channels, and greys, with the parts they are made of: what checks
     whether the channels add up.
+`isoluminant_colors`
+    colors around a background, at its luminance.
 
 How often each triplet is measured, and in what order, is up to whoever measures them
 (see `hrl.cluts.calibrate.measure`).
 """
 
 import numpy as np
+
+from .colorimetry import RGB_to_XYZ, XYZ_to_RGB, achromatic_RGB, max_excursion
 
 
 def channel_sweeps(levels=256):
@@ -109,3 +113,56 @@ def channel_mixtures(levels=(0.25, 0.5, 0.75, 1.0), grey_levels=None):
 
     # Black first, then the parts, then what is made of them
     return np.vstack([np.zeros((1, 3)), alone, mixtures, grey_triplets])
+
+
+def isoluminant_colors(
+    CLUT, background=None, directions=8, fractions=(0.25, 0.5, 0.9), per_level=False
+):
+    """Colors at the luminance of a background, around it.
+
+    Keeping luminance (Y) fixed leaves X and Z free to change, so the colors lie along
+    `directions` evenly spaced directions in the X-Z plane around the background --
+    more X and less Z, and so on -- at `fractions` of how far the display can go along
+    each (`hrl.cluts.colorimetry.max_excursion`).
+
+    For a stimulus that varies in color at a fixed luminance; and, measured, for checking
+    a CLUT where such stimuli rely on it most: their inputs come from running the CLUT's
+    model backwards, and the luminance they share is what the experiment holds fixed.
+
+    Parameters
+    ----------
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    background : array-like, optional
+        input RGB of the color to go around, shape (3,); by default the achromatic grey
+        at half of white's luminance (`hrl.cluts.colorimetry.achromatic_RGB`)
+    directions : int, optional
+        how many evenly spaced directions in the X-Z plane, by default 8
+    fractions : sequence of float, optional
+        how far along each direction, as fractions of the furthest the display can go
+        along it, by default 0.25, 0.5 and 0.9
+    per_level : bool, optional
+        work per level of input, rather than with the primaries matrix (see
+        `hrl.cluts.colorimetry.RGB_to_XYZ`); by default False
+
+    Returns
+    -------
+    numpy.ndarray
+        shape ``(1 + directions * len(fractions), 3)``, columns ``R, G, B``: the
+        background first, then each direction's colors, nearest first
+    """
+    if background is None:
+        white = RGB_to_XYZ(np.ones(3), CLUT, per_level=per_level)
+        background = achromatic_RGB(CLUT, white[1] / 2, per_level=per_level)
+    background = np.asarray(background, dtype=float).reshape(3)
+    center = RGB_to_XYZ(background, CLUT, per_level=per_level)
+
+    colors = []
+    for angle in np.linspace(0.0, 2 * np.pi, directions, endpoint=False):
+        # Only X and Z change, so Y -- the luminance -- stays that of the background
+        direction = np.array([np.cos(angle), 0.0, np.sin(angle)])
+        furthest = max_excursion(center, direction, CLUT, per_level=per_level)
+        colors += [center + fraction * furthest * direction for fraction in fractions]
+
+    rgb, _ = XYZ_to_RGB(np.array(colors), CLUT, per_level=per_level)
+    return np.vstack([background, rgb])
