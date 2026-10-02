@@ -18,6 +18,14 @@ parser = argparse.ArgumentParser(
         luminance (Up and Down change the luminance).
     directions: ramps from the grey along single directions in color space:
         luminance, and colors at the grey's luminance.
+    stripes: pairs of colors in stripes, from coarse to fine, ending in a solid
+        patch the CLUT says matches their average.
+
+    The stripes are the check that does not depend on who is looking: viewed
+    from far enough that the stripes blur, each striped patch matches its solid
+    one if, and only if, the CLUT describes the display. The others show what
+    the CLUT predicts for the CIE standard observer, which a particular viewer
+    can differ from.
 
     What each screen shows, and what to look for, is printed in the terminal.
     Escape quits.
@@ -210,7 +218,76 @@ def direction_ramps(clut, luminance, steps=256):
     return ramps
 
 
+def stripe_pairs(clut, luminance, fraction=0.8):
+    """Pairs of colors to show in stripes, and the solid color that should match them.
+
+    Viewed from far enough that stripes of colors A and B blur, they emit the average of
+    the two. The solid patch is the input `XYZ_to_RGB` (per level) gives for that average, so the two
+    match if, and only if, the CLUT describes the display -- its curves, the inverse, and
+    whether the channels add up -- for any observer.
+
+    The pairs: black and white; each two primaries at full input, which mixes channels
+    and so tests whether they add up; and, around the grey, pairs at its luminance on
+    opposite sides along `directions`, `fraction` of the way to the nearer edge.
+
+    Not every average can be shown as a solid color: the average of two primaries at
+    full input needs each at half strength, and a primary's color at half strength need
+    not be half of its color at full. Such pairs come back with their error, so they
+    can be left out and said why.
+
+    Returns
+    -------
+    list of (str, numpy.ndarray, numpy.ndarray, numpy.ndarray, float)
+        name, input RGB of A, of B, and of the solid (each shape (3,)), and how far, in
+        XYZ, the solid is from the average -- zero where it can match
+    """
+    # Black and white, and each two primaries at full input
+    pairs = [
+        ("black and white", np.zeros(3), np.ones(3)),
+        ("red and green", np.array([1.0, 0, 0]), np.array([0, 1.0, 0])),
+        ("green and blue", np.array([0, 1.0, 0]), np.array([0, 0, 1.0])),
+        ("red and blue", np.array([1.0, 0, 0]), np.array([0, 0, 1.0])),
+    ]
+
+    # The grey at the chosen luminance, the center of the pairs around it
+    grey = hrl.cluts.RGB_to_XYZ(
+        hrl.cluts.achromatic_RGB(clut, luminance, per_level=True), clut, per_level=True
+    )
+
+    # Around the grey: along each direction at its luminance, a color on either side, the
+    # same distance away, and as far as both sides can reach
+    for name, direction in directions(clut, luminance)[1:]:
+        reach = fraction * min(
+            hrl.cluts.max_excursion(grey, direction, clut, per_level=True),
+            hrl.cluts.max_excursion(grey, -direction, clut, per_level=True),
+        )
+        ends, _ = hrl.cluts.XYZ_to_RGB(
+            np.stack([grey + reach * direction, grey - reach * direction]), clut, per_level=True
+        )
+        pairs.append((f"either side of the grey along {name.split(' at')[0]}", ends[0], ends[1]))
+
+    # For each pair: the solid color for their average, and how close it gets
+    checks = []
+    for name, a, b in pairs:
+        average = hrl.cluts.RGB_to_XYZ(np.stack([a, b]), clut, per_level=True).mean(axis=0)
+        solid, error = hrl.cluts.XYZ_to_RGB(average, clut, per_level=True)
+        checks.append((name, a, b, solid, float(error)))
+
+    return checks
+
+
+def stripe_patch(a, b, size, width):
+    """A square of vertical stripes, alternating `a` and `b`, each `width` pixels wide."""
+    columns = (np.arange(size) // width) % 2 == 0
+    patch = np.where(columns[None, :, None], a, b)
+    return np.broadcast_to(patch, (size, size, 3)).copy()
+
+
 ### SCREENS
+
+# Stripe widths, in pixels, from coarse to fine
+STRIPE_WIDTHS = (8, 4, 2, 1)
+
 # Each returns what to draw -- (input RGB image, (x, y) of its top-left corner) -- the
 # background to draw it on, and what to print about it. `state` holds the settings,
 # such as the luminance.
@@ -307,10 +384,54 @@ def directions_screen(clut, state, background_rgb, width, height):
     return items, background_rgb, text
 
 
+def stripes_screen(clut, state, background_rgb, width, height):
+    checks = stripe_pairs(clut, state["luminance"])
+    shown = [check for check in checks if check[4] <= _TOLERANCE]
+    left_out = [check for check in checks if check[4] > _TOLERANCE]
+
+    # One bar per pair: a square of stripes at each width, coarse to fine, and then the
+    # solid square, all touching. Each square holds whole periods of the widest stripes.
+    sections = len(STRIPE_WIDTHS) + 1
+    period = 2 * max(STRIPE_WIDTHS)
+    size = int(min(0.85 * width / sections, 0.85 * height / (1.25 * len(shown))))
+    size = max(period, size - size % period)
+    gap = size // 4
+    left = (width - sections * size) // 2
+    top = (height - len(shown) * (size + gap) + gap) // 2
+
+    items = []
+    text = [
+        "Each bar: stripes of two colors, getting finer from left to right "
+        f"({', '.join(str(w) for w in STRIPE_WIDTHS)} pixels wide),",
+        "and at its right end, touching the finest, a solid patch the CLUT says matches",
+        "their average. The finer the stripes, the more they blend: if the CLUT describes",
+        "the display, they approach the solid patch, until the finest are hard to tell",
+        "from it -- for anyone, from where you stand. If only the finest stripes differ,",
+        "suspect neighbouring pixels on the screen affecting each other, not the CLUT.",
+        "Top to bottom:",
+    ]
+    for index, (name, a, b, solid, _) in enumerate(shown):
+        y = top + index * (size + gap)
+        for section, stripe_width in enumerate(STRIPE_WIDTHS):
+            items.append((stripe_patch(a, b, size, stripe_width), (left + section * size, y)))
+        items.append((np.tile(solid, (size, size, 1)), (left + len(STRIPE_WIDTHS) * size, y)))
+        text.append(f"  {index + 1}. {name}")
+    for name, a, b, solid, error in left_out:
+        text.append(
+            f"  Left out: {name}. No solid color matches their average: it is {error:.2f} "
+            "out of reach, in XYZ."
+        )
+
+    # A darker background than the grey: several solid patches match the grey itself
+    white_Y = hrl.cluts.RGB_to_XYZ(np.ones(3), clut, per_level=True)[1]
+    return items, hrl.cluts.achromatic_RGB(clut, 0.1 * white_Y, per_level=True), text
+
+
 SCREENS = [
     ("gamut", gamut_screen),
     ("isoluminant plane", plane_screen),
     ("directions", directions_screen),
+    ("stripes", stripes_screen),
 ]
 
 

@@ -74,10 +74,46 @@ def test_ramps_change_only_luminance_or_only_chromaticity():
         )
 
 
+def test_each_solid_patch_is_the_average_of_its_stripes():
+    checks = show.stripe_pairs(CLUT, LUMINANCE)
+
+    assert len(checks) == 8
+    for name, a, b, solid, error in checks:
+        average = RGB_to_XYZ(np.stack([a, b]), CLUT, per_level=True).mean(axis=0)
+        assert error <= 1e-6, f"{name}: a display with fixed primaries can match every pair"
+        np.testing.assert_allclose(RGB_to_XYZ(solid, CLUT, per_level=True), average, atol=1e-6)
+
+
+def test_stripes_alternate_at_the_requested_width():
+    a, b = np.zeros(3), np.ones(3)
+
+    patch = show.stripe_patch(a, b, size=12, width=3)
+
+    assert patch.shape == (12, 12, 3)
+    np.testing.assert_array_equal(patch[0, :, 0], [0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1])
+    assert np.all(patch == patch[:1])
+
+
+def test_each_stripes_bar_runs_coarse_to_fine_into_its_solid_patch():
+    items, _, _ = show.stripes_screen(CLUT, {"luminance": LUMINANCE}, GREY, 1920, 1080)
+
+    sections = len(show.STRIPE_WIDTHS) + 1
+    assert len(items) == sections * 8, "every pair of a display with fixed primaries is shown"
+    for bar in range(8):
+        images, positions = zip(*items[bar * sections : (bar + 1) * sections])
+        size = images[0].shape[0]
+        assert all(
+            x == positions[0][0] + i * size for i, (x, _) in enumerate(positions)
+        ), "touching"
+        assert len({y for _, y in positions}) == 1, "in one row"
+        assert size % (2 * max(show.STRIPE_WIDTHS)) == 0, "whole periods of the widest stripes"
+        assert np.all(images[-1] == images[-1][0, 0]), "ends in a solid patch"
+
+
 @pytest.mark.parametrize("name,screen", show.SCREENS)
 def test_every_screen_fits_on_the_screen(name, screen):
     width, height = 1024, 768
-    state = {"luminance": LUMINANCE, "stripe_width": 2}
+    state = {"luminance": LUMINANCE}
 
     items, background, text = screen(CLUT, state, GREY, width, height)
 
@@ -102,7 +138,7 @@ def test_keys_step_through_the_screens_and_their_settings(tmp_path, capsys):
         textures.append(texture)
         return texture
 
-    keys = iter(["Right", "Up", "Right", "Left", "Left", "Escape"])
+    keys = iter(["Right", "Up", "Right", "Right", "Up", "Left", "Left", "Left", "Escape"])
     graphics = types.SimpleNamespace(
         width=1024,
         height=768,
@@ -128,6 +164,9 @@ def test_keys_step_through_the_screens_and_their_settings(tmp_path, capsys):
         "gamut",
         "isoluminant plane",
         "isoluminant plane",
+        "directions",
+        "stripes",
+        "stripes",
         "directions",
         "isoluminant plane",
         "gamut",
