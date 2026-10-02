@@ -16,6 +16,8 @@ parser = argparse.ArgumentParser(
     gamut: every chromaticity the display can show, each at its brightest.
     isoluminant plane: every color at one luminance, around a grey of that
         luminance (Up and Down change the luminance).
+    directions: ramps from the grey along single directions in color space:
+        luminance, and colors at the grey's luminance.
 
     What each screen shows, and what to look for, is printed in the terminal.
     Escape quits.
@@ -162,6 +164,52 @@ def isoluminant_plane_image(clut, luminance, background_rgb, size=161):
     return rgb.reshape(size, size, 3), reachable.reshape(size, size), half_width
 
 
+def directions(clut, luminance):
+    """Directions from a grey, as XYZ differences: luminance, and four at the grey's luminance.
+
+    Returns
+    -------
+    list of (str, numpy.ndarray)
+        name, and direction (shape (3,)) as an XYZ difference
+    """
+    grey = hrl.cluts.RGB_to_XYZ(
+        hrl.cluts.achromatic_RGB(clut, luminance, per_level=True), clut, per_level=True
+    )
+    found = [("luminance (the grey, brighter and darker)", grey / np.linalg.norm(grey))]
+    for name, angle in [("+X", 0), ("+X +Z", 45), ("+Z", 90), ("-X +Z", 135)]:
+        radians = np.deg2rad(angle)
+        found.append(
+            (f"{name} at the grey's luminance", np.array([np.cos(radians), 0.0, np.sin(radians)]))
+        )
+    return found
+
+
+def direction_ramps(clut, luminance, steps=256):
+    """Ramps from a grey along single directions, each as far as the display can go.
+
+    Each ramp runs from the furthest reachable color on one side of the grey, through
+    the grey in the middle, to the furthest on the other side; the two sides are not
+    the same distance, so the grey is not always at the centre.
+
+    Returns
+    -------
+    list of (str, numpy.ndarray)
+        name of the direction, and the ramp's input RGB, shape (steps, 3)
+    """
+    grey = hrl.cluts.RGB_to_XYZ(
+        hrl.cluts.achromatic_RGB(clut, luminance, per_level=True), clut, per_level=True
+    )
+
+    ramps = []
+    for name, direction in directions(clut, luminance):
+        down = hrl.cluts.max_excursion(grey, -direction, clut, per_level=True)
+        up = hrl.cluts.max_excursion(grey, direction, clut, per_level=True)
+        scales = np.linspace(-down, up, steps)
+        rgb, _ = hrl.cluts.XYZ_to_RGB(grey + scales[:, None] * direction, clut, per_level=True)
+        ramps.append((name, rgb))
+    return ramps
+
+
 ### SCREENS
 # Each returns what to draw -- (input RGB image, (x, y) of its top-left corner) -- the
 # background to draw it on, and what to print about it. `state` holds the settings,
@@ -240,9 +288,29 @@ def plane_screen(clut, state, background_rgb, width, height):
     return [_centred(image, width, height)], background_rgb, text
 
 
+def directions_screen(clut, state, background_rgb, width, height):
+    ramps = direction_ramps(clut, state["luminance"])
+    step = max(1, int(0.85 * width // len(ramps[0][1])))
+    thickness = int(0.85 * height // (1.5 * len(ramps)))
+
+    items, text = [], ["Ramps from the grey, as far as the display can go each way, top to bottom:"]
+    top = (height - int(thickness * (1.5 * len(ramps) - 0.5))) // 2
+    for index, (name, rgb) in enumerate(ramps):
+        image = np.repeat(np.repeat(rgb[None], thickness, axis=0), step, axis=1)
+        items.append((image, ((width - image.shape[1]) // 2, top + int(1.5 * index * thickness))))
+        text.append(f"  {index + 1}. {name}")
+    text += [
+        "The first changes only luminance, so it should keep one hue throughout. The others",
+        "keep the grey's luminance, so they should change only in hue and saturation, with",
+        "no brightness step where they pass the grey (for a standard observer).",
+    ]
+    return items, background_rgb, text
+
+
 SCREENS = [
     ("gamut", gamut_screen),
     ("isoluminant plane", plane_screen),
+    ("directions", directions_screen),
 ]
 
 

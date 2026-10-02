@@ -60,6 +60,20 @@ def test_plane_has_axes_through_the_grey_with_round_ticks():
     assert np.isclose(mantissa, [1, 2, 5, 10]).any(), "a round step"
 
 
+def test_ramps_change_only_luminance_or_only_chromaticity():
+    ramps = show.direction_ramps(CLUT, LUMINANCE, steps=32)
+
+    name, luminance_ramp = ramps[0]
+    xyz = RGB_to_XYZ(luminance_ramp, CLUT, per_level=True)
+    np.testing.assert_allclose(_xy(xyz), _xy(xyz[:1]).repeat(len(xyz), axis=0), atol=1e-6)
+    assert np.ptp(xyz[:, 1]) > 0.5 * WHITE_Y
+
+    for name, ramp in ramps[1:]:
+        np.testing.assert_allclose(
+            RGB_to_XYZ(ramp, CLUT, per_level=True)[:, 1], LUMINANCE, rtol=1e-6
+        )
+
+
 @pytest.mark.parametrize("name,screen", show.SCREENS)
 def test_every_screen_fits_on_the_screen(name, screen):
     width, height = 1024, 768
@@ -88,7 +102,7 @@ def test_keys_step_through_the_screens_and_their_settings(tmp_path, capsys):
         textures.append(texture)
         return texture
 
-    keys = iter(["Right", "Up", "Left", "Escape"])
+    keys = iter(["Right", "Up", "Right", "Left", "Left", "Escape"])
     graphics = types.SimpleNamespace(
         width=1024,
         height=768,
@@ -113,6 +127,8 @@ def test_keys_step_through_the_screens_and_their_settings(tmp_path, capsys):
     assert screens == [
         "gamut",
         "isoluminant plane",
+        "isoluminant plane",
+        "directions",
         "isoluminant plane",
         "gamut",
     ]
