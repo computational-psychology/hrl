@@ -14,6 +14,8 @@ parser = argparse.ArgumentParser(
     calibration. Its screens, stepped through with Left and Right:
 
     gamut: every chromaticity the display can show, each at its brightest.
+    isoluminant plane: every color at one luminance, around a grey of that
+        luminance (Up and Down change the luminance).
 
     What each screen shows, and what to look for, is printed in the terminal.
     Escape quits.
@@ -35,6 +37,10 @@ parser.add_argument(
     default=None,
     help="luminance of the grey background, by default half of white's",
 )
+
+
+# How far each color may be from what was asked for and still count as shown
+_TOLERANCE = 1e-6
 
 
 def _enlarge(image, factor):
@@ -106,6 +112,56 @@ def gamut_image(clut, background_rgb, size=160, samples=400):
     return image, extent, (int(white_row[0]), int(white_column[0]))
 
 
+def isoluminant_plane_image(clut, luminance, background_rgb, size=161):
+    """Every color at one luminance, around a grey of that luminance.
+
+    Keeping luminance (Y) fixed leaves X and Z free: this is the plane they span, with
+    the grey at its centre, X increasing rightwards and Z upwards, on the same scale.
+    Each pixel's input is solved with `XYZ_to_RGB` (per level); colors the display cannot show at
+    this luminance are left as the background.
+
+    Parameters
+    ----------
+    clut : Array[float]
+        the CLUT, shape (L, 13)
+    luminance : float
+        luminance (Y) of the plane
+    background_rgb : array-like
+        input RGB for colors out of reach, shape (3,)
+    size : int, optional
+        pixels along each side, by default 161; an odd number puts the grey on a pixel
+
+    Returns
+    -------
+    image : numpy.ndarray
+        input RGB, shape (size, size, 3)
+    reachable : numpy.ndarray
+        shape (size, size), whether the display can show each pixel's color
+    half_width : float
+        how far the plane extends from the grey, in X and in Z
+    """
+    grey = hrl.cluts.RGB_to_XYZ(
+        hrl.cluts.achromatic_RGB(clut, luminance, per_level=True), clut, per_level=True
+    )
+
+    # Make the plane just wide enough for the furthest reachable color
+    angles = np.linspace(0, 2 * np.pi, 16, endpoint=False)
+    half_width = 1.05 * max(
+        hrl.cluts.max_excursion(grey, np.array([np.cos(a), 0.0, np.sin(a)]), clut, per_level=True)
+        for a in angles
+    )
+
+    offsets = np.linspace(-half_width, half_width, size)
+    X, Z = np.meshgrid(offsets, offsets[::-1])  # Z increases upwards
+    xyz = np.column_stack([grey[0] + X.ravel(), np.full(X.size, grey[1]), grey[2] + Z.ravel()])
+
+    rgb, error = hrl.cluts.XYZ_to_RGB(xyz, clut, per_level=True)
+    reachable = error <= _TOLERANCE
+    rgb[~reachable] = background_rgb
+
+    return rgb.reshape(size, size, 3), reachable.reshape(size, size), half_width
+
+
 ### SCREENS
 # Each returns what to draw -- (input RGB image, (x, y) of its top-left corner) -- the
 # background to draw it on, and what to print about it. `state` holds the settings,
@@ -140,8 +196,53 @@ def gamut_screen(clut, state, background_rgb, width, height):
     return [_centred(image, width, height)], background_rgb, text
 
 
+def _tick_step(half_width):
+    """A round step -- 1, 2 or 5 times a power of ten -- giving a few ticks either side."""
+    rough = half_width / 4
+    power = 10 ** np.floor(np.log10(rough))
+    return float(min((1, 2, 5, 10), key=lambda m: abs(m * power - rough)) * power)
+
+
+def _draw_axes(image, size, factor, half_width, step, tick=6):
+    """Draw axes through the centre of an enlarged plane image, with ticks every `step`.
+
+    The plane was computed on a `size` by `size` grid spanning `half_width` either side
+    of its centre, and enlarged `factor` times; `size` is odd, so the centre is a pixel.
+    """
+    centre = (size // 2) * factor + factor // 2
+    pixels_per_unit = factor * (size - 1) / (2 * half_width)
+
+    image[centre, :] = 0.0
+    image[:, centre] = 0.0
+    for multiple in range(1, int(half_width // step) + 1):
+        for sign in (-1, 1):
+            at = int(round(centre + sign * multiple * step * pixels_per_unit))
+            image[centre - tick : centre + tick + 1, at] = 0.0  # on the X axis
+            image[at, centre - tick : centre + tick + 1] = 0.0  # on the Z axis
+    return image
+
+
+def plane_screen(clut, state, background_rgb, width, height):
+    image, reachable, half_width = isoluminant_plane_image(clut, state["luminance"], background_rgb)
+    size, factor = image.shape[0], _fit(image.shape[0], width, height)
+    step = _tick_step(half_width)
+    image = _draw_axes(_enlarge(image, factor), size, factor, half_width, step)
+    text = [
+        f"Every color the display can show at Y = {state['luminance']:.1f}, around a grey of",
+        f"that luminance: X rightwards, Z upwards, each {half_width:.1f} either side of the",
+        "grey, which is at the centre and blends into the background.",
+        f"The axes cross at the grey; ticks are every {step:g} in X and in Z.",
+        "For an observer like the CIE standard observer, nothing here should look",
+        "brighter or darker than the background: only hue and saturation change.",
+        "A particular viewer can differ; the stripes screen does not depend on that.",
+        "Up / Down: luminance up or down by 5% of white's.",
+    ]
+    return [_centred(image, width, height)], background_rgb, text
+
+
 SCREENS = [
     ("gamut", gamut_screen),
+    ("isoluminant plane", plane_screen),
 ]
 
 
@@ -191,7 +292,7 @@ def command(parsed_args):
         print("\n".join(text))
         print("Left / Right: previous / next screen. Escape: quit.")
 
-        key, _ = ihrl.inputs.readButton(btns=["Left", "Right", "Escape"])
+        key, _ = ihrl.inputs.readButton(btns=["Left", "Right", "Up", "Down", "Escape"])
         for texture in textures:
             texture.delete()
 
@@ -199,6 +300,11 @@ def command(parsed_args):
             break
         if key in ("Left", "Right"):
             state["screen"] = (state["screen"] + (1 if key == "Right" else -1)) % len(SCREENS)
+        elif name == "isoluminant plane":
+            change = 0.05 * white_Y * (1 if key == "Up" else -1)
+            state["luminance"] = float(
+                np.clip(state["luminance"] + change, 0.05 * white_Y, 0.95 * white_Y)
+            )
 
     ihrl.close()
 

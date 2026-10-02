@@ -34,6 +34,32 @@ def test_gamut_shows_each_chromaticity_at_its_brightest():
     assert shown[row, column], "white is inside the gamut"
 
 
+def test_isoluminant_plane_is_at_one_luminance_around_the_grey():
+    image, reachable, half_width = show.isoluminant_plane_image(CLUT, LUMINANCE, GREY, size=41)
+
+    Y = RGB_to_XYZ(image[reachable], CLUT, per_level=True)[:, 1]
+    np.testing.assert_allclose(Y, LUMINANCE, rtol=1e-6)
+    np.testing.assert_allclose(image[20, 20], GREY, atol=1e-9)
+    assert np.all(image[~reachable] == GREY)
+    assert 0.1 < reachable.mean() < 0.9, "the plane extends past what the display can show"
+    assert half_width > 0
+
+
+def test_plane_has_axes_through_the_grey_with_round_ticks():
+    width, height = 1024, 768
+    items, _, text = show.plane_screen(CLUT, {"luminance": LUMINANCE}, GREY, width, height)
+
+    image = items[0][0]
+    centre = image.shape[0] // 2
+    assert np.all(image[centre, :] == 0.0) and np.all(image[:, centre] == 0.0)
+
+    step = float(
+        next(line for line in text if "ticks are every" in line).split("every ")[1].split()[0]
+    )
+    mantissa = step / 10 ** np.floor(np.log10(step))
+    assert np.isclose(mantissa, [1, 2, 5, 10]).any(), "a round step"
+
+
 @pytest.mark.parametrize("name,screen", show.SCREENS)
 def test_every_screen_fits_on_the_screen(name, screen):
     width, height = 1024, 768
@@ -62,7 +88,7 @@ def test_keys_step_through_the_screens_and_their_settings(tmp_path, capsys):
         textures.append(texture)
         return texture
 
-    keys = iter(["Right", "Left", "Escape"])
+    keys = iter(["Right", "Up", "Left", "Escape"])
     graphics = types.SimpleNamespace(
         width=1024,
         height=768,
@@ -86,7 +112,9 @@ def test_keys_step_through_the_screens_and_their_settings(tmp_path, capsys):
     ]
     assert screens == [
         "gamut",
-        "gamut",
+        "isoluminant plane",
+        "isoluminant plane",
         "gamut",
     ]
+    assert f"Y = {LUMINANCE + 0.05 * WHITE_Y:.1f}" in output, "Up raised the luminance"
     assert all(texture.deleted for texture in textures), "every texture was freed"
