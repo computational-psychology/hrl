@@ -1,4 +1,4 @@
-"""Color LookUp table (CLUT) utilities for gamma correction and color correction.
+"""Color LookUp Tables (CLUTs): calibrating a color display, and using the result.
 
 HRL uses CLUTs to perform gamma correction on color images,
 mapping input intensities to linearized output intensities.
