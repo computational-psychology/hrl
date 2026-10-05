@@ -199,8 +199,8 @@ class MockColorimeter(Colorimeter):
             color_matrix, dark_chromaticity = XYZ_from_CLUT(clut)
             self._clut_func = lambda r, g, b: RGB_to_XYZ(
                 gamma_correct_RGB(np.array([r, g, b]).reshape(1, 1, 3), clut),
-                color_matrix=color_matrix,
-                dark_chromaticity=dark_chromaticity,
+                primaries_matrix=color_matrix,
+                black_point=dark_chromaticity,
             ).flatten()
         else:
             raise ValueError(

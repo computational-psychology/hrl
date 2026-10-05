@@ -42,7 +42,7 @@ create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=N
 
 import numpy as np
 
-from .colorimetry import RGB_to_XYZ, XYZ_from_CLUT, XYZ_to_RGB, invert_color_matrix
+from .colorimetry import RGB_to_XYZ, XYZ_from_CLUT, XYZ_to_RGB, invert_primaries_matrix
 
 
 def gamma_correct_RGB(img, CLUT):
@@ -82,8 +82,8 @@ def gamma_correct_RGB(img, CLUT):
 def create_clut(
     n=256,
     gamma=[1.0, 1.0, 1.0],
-    color_matrix=None,
-    dark_chromaticity=None,
+    primaries_matrix=None,
+    black_point=None,
 ):
     """Create a parametric CLUT with gamma correction and color conversion.
 
@@ -93,9 +93,9 @@ def create_clut(
         number of entries in the CLUT, by default 256.
     gamma : [float, float, float] or float, optional
         gamma exponents for R, G, B correction, by default [1.0, 1.0, 1.0].
-    color_matrix : Array, optional
+    primaries_matrix : Array, optional
         3x3 color transformation matrix, by default identity (XYZ=RGB).
-    dark_chromaticity : Array, optional
+    black_point : Array, optional
         3-element vector for dark state chromaticity (XYZ at black), by default zeros (no dark light).
 
     Returns
@@ -103,14 +103,14 @@ def create_clut(
     Array
         with 13 columns [intensity_in, R_out, G_out, B_out, 9 matrix values]:
             R_out, G_out, B_out = intensity_in^(1/gamma[i]) for each channel
-            First row's 3x3 matrix represents dark_chromaticity as the black point
-            Last row's 3x3 matrix is color_matrix
+            First row's 3x3 matrix represents black_point as the black point
+            Last row's 3x3 matrix is primaries_matrix
             Intermediate rows linearly interpolate between dark and full color
     """
-    if dark_chromaticity is None:
-        dark_chromaticity = np.zeros(3)
-    if color_matrix is None:
-        color_matrix = np.eye(3)
+    if black_point is None:
+        black_point = np.zeros(3)
+    if primaries_matrix is None:
+        primaries_matrix = np.eye(3)
     if isinstance(gamma, (int, float)):
         gamma = [gamma, gamma, gamma]
 
@@ -120,9 +120,9 @@ def create_clut(
 
     # RGB->XYZ matrices per entry: linearly interpolate from dark to full color
     # At x=0: dark chromaticity as diagonal (simplified representation)
-    # At x=1: full color_matrix
-    dark_matrix = np.diag(dark_chromaticity)
-    matrices = x[:, None, None] * (color_matrix - dark_matrix) + dark_matrix
+    # At x=1: full primaries_matrix
+    dark_matrix = np.diag(black_point)
+    matrices = x[:, None, None] * (primaries_matrix - dark_matrix) + dark_matrix
     matrices_flat = matrices.reshape(n, -1)
 
     # Combine all columns
@@ -135,5 +135,5 @@ __all__ = [
     "XYZ_to_RGB",
     "create_clut",
     "gamma_correct_RGB",
-    "invert_color_matrix",
+    "invert_primaries_matrix",
 ]
