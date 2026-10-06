@@ -12,6 +12,12 @@ These CLUTs are structured as 2D NumPy arrays with 13 columns, one row per input
 4-12: 3x3 color transformation (RGB -> XYZ) matrix values, flattened row-wise:
     [X_R, X_G, X_B, Y_R, Y_G, Y_B, Z_R, Z_G, Z_B]
 
+Columns 4-12 are what a calibration measures: each channel swept on its own. Every
+channel's XYZ includes the light the screen gives off at black, so in the first row,
+input 0, all three channels hold the same XYZ: that of the black screen. It is the
+color counterpart of a grayscale LUT's luminance column, which also includes the dark
+luminance, in its first row.
+
 Generally, these CLUTs are created by measuring a display
 and linearization of the resulting measurements.
 Here, we do provide a function to create parametric CLUTs (`create_clut`)
