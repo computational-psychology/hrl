@@ -1,20 +1,57 @@
 """Fixtures for the CLUT tests: CLUTs, and a simulated display to measure."""
 
+import types
+
 import numpy as np
 import pytest
 
 from hrl.cluts import create_clut
+from hrl.photometer.photometer import MockColorimeter
 
 # Standard gamma exponent for all gamma-related fixtures and tests
 DEFAULT_GAMMA = 2.2
 BLACK_POINT = np.array([0.01, 0.012, 0.015])
 PRIMARIES_MATRIX = np.array(
     [
-        [0.85, 0.05, 0.01],
-        [0.03, 0.87, 0.04],
-        [0.02, 0.06, 0.84],
+        [0.80, 0.05, 0.02],
+        [0.03, 0.90, 0.04],
+        [0.02, 0.05, 0.88],
     ]
 )
+
+# The simulated display measured in tests: each channel has a gamma of its own, so
+# that mixing them up shows, and the primaries matrix and black point above
+DISPLAY_GAMMA = np.array([2.0, 2.2, 1.8])
+
+
+def display_xyz(rgb):
+    """The CIE XYZ the simulated display shows for input RGB, shape (..., 3)."""
+    return np.asarray(rgb, dtype=float) ** DISPLAY_GAMMA @ PRIMARIES_MATRIX.T + BLACK_POINT
+
+
+@pytest.fixture
+def mock_hrl():
+    """A minimal stand-in for HRL, whose colorimeter reads the simulated display.
+
+    Factory fixture: ``mock_hrl()`` gives the stand-in; `noise` and `rng` go to
+    `MockColorimeter`.
+    """
+
+    def _make(noise=0.0, rng=None):
+        ihrl = types.SimpleNamespace()
+        ihrl.photometer = MockColorimeter(
+            color_mapping=lambda r, g, b: tuple(display_xyz([r, g, b])), noise=noise, rng=rng
+        )
+        ihrl.graphics = types.SimpleNamespace(gamma_correct=lambda x: x)
+        ihrl.inputs = None
+        return ihrl
+
+    return _make
+
+
+def mock_draw(ihrl, triplet):
+    """Draw stub: sets the colorimeter's current triplet instead of drawing to screen."""
+    ihrl.photometer.current_triplet = np.asarray(ihrl.graphics.gamma_correct(triplet), dtype=float)
 
 
 @pytest.fixture
