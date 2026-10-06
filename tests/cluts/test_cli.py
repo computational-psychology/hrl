@@ -106,6 +106,7 @@ def test_measure(tmp_path):
     assert measurements.shape == (3 * n_samples * 2**bit_depth, 6)
 
 
+
 ### STEP 1: PROCESS MEASUREMENTS
 def test_smooth_output_format(tmp_path):
     """Output CSV file structure and data validity for clut smooth command."""

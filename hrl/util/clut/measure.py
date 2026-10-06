@@ -7,7 +7,8 @@ from timeit import default_timer as timer
 import numpy as np
 
 from hrl import HRL
-from hrl.cluts.calibrate import _draw_uniform_rgb_square, channel_sweeps, measure
+from hrl.cluts.calibrate import _draw_uniform_rgb_square, measure
+from hrl.cluts.triplets import channel_sweeps
 
 rgb_graphics_argparser = argparse.ArgumentParser(add_help=False)
 rgb_graphics_arggroup = rgb_graphics_argparser.add_argument_group("Graphics settings")

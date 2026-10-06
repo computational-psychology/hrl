@@ -3,7 +3,8 @@
 import numpy as np
 import pytest
 
-from hrl.cluts.calibrate import _monotonic, average, channel_sweeps, make_monotonic
+from hrl.cluts.calibrate import _monotonic, average, make_monotonic
+from hrl.cluts.triplets import channel_sweeps
 from tests.cluts.conftest import display_xyz
 
 

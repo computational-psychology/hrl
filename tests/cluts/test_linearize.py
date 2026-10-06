@@ -7,12 +7,12 @@ import pytest
 
 from hrl.cluts.calibrate import (
     average,
-    channel_sweeps,
     linearize,
     make_monotonic,
     remove_outliers,
     smooth,
 )
+from hrl.cluts.triplets import channel_sweeps
 from tests.cluts.conftest import BLACK_POINT, DISPLAY_GAMMA, PRIMARIES_MATRIX, display_xyz
 
 TEST_DIR = Path(__file__).parent

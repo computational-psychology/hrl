@@ -25,6 +25,11 @@ However, for displays whose primaries drift more with input, no single matrix ca
 In that case, the second approach is a true LookUp Table: look up the actually measured XYZ
 per channel, per level (``per_level=True``).
 For levels between the tabulated ones, it interpolates along a straight line between them.
+
+Either approach assumes that the display's channels add up:
+the color is the black point plus what each channel adds.
+Whether a display's channels really do add up is an empirical question,
+and can be checked with `hrl.cluts.calibrate.predict_from_channels`.
 """
 
 import numpy as np

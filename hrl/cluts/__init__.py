@@ -41,7 +41,9 @@ submodules, one per job:
 
 `hrl.cluts.calibrate`
     making a CLUT from measurements: `measure`, `remove_outliers`, `average`,
-    `linearize`.
+    `linearize`;
+    and checking one: `predict` (what a CLUT expects for measured inputs) and
+    `predict_from_channels` (what the inputs should give if the channels add up).
     Can use this from the using ``python -m hrl.util clut ...``.
 `hrl.cluts.colorimetry`
     converting between input RGB and CIE XYZ with the primaries matrix a CLUT holds
@@ -49,6 +51,10 @@ submodules, one per job:
     Or, with ``per_level=True``, per level of input, following primaries whose color
     drifts more.
     How far measured colors are from expected ones: `differences`.
+`hrl.cluts.triplets`
+    sets of RGB triplets to show and measure: each channel swept on its own
+    (`channel_sweeps`), and mixtures of the channels with their parts
+    (`channel_mixtures`).
 
 The usual path: measure the display and build its CLUT with ``python -m hrl.util clut``; show
 stimuli through it with ``Graphics_RGB(lut=...)``; and use `XYZ_to_RGB` to find the input

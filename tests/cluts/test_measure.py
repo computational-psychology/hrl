@@ -3,7 +3,8 @@
 import numpy as np
 import pytest
 
-from hrl.cluts.calibrate import channel_sweeps, measure
+from hrl.cluts.calibrate import measure
+from hrl.cluts.triplets import channel_sweeps
 from tests.cluts.conftest import display_xyz, mock_draw
 
 
@@ -31,25 +32,6 @@ def test_measure_csv_output(tmp_path, mock_hrl):
     measured_csv = np.genfromtxt(out_file, delimiter=",", skip_header=1)
     assert measured_csv.shape == (len(triplets), 6)
     np.testing.assert_allclose(measured_csv[:, :3], triplets, atol=1e-12)
-
-
-def test_channel_sweeps_light_one_channel_at_a_time():
-    triplets = channel_sweeps(8)
-
-    assert triplets.shape == (3 * 8, 3)
-    assert np.all((triplets > 0.0).sum(axis=1) <= 1)
-    for channel in range(3):
-        np.testing.assert_allclose(
-            triplets[8 * channel : 8 * (channel + 1), channel], np.linspace(0, 1, 8)
-        )
-
-
-def test_channel_sweeps_takes_the_levels_themselves():
-    levels = [0.0, 0.2, 0.9]
-
-    triplets = channel_sweeps(levels)
-
-    np.testing.assert_allclose(triplets[3:6, 1], levels)
 
 
 def test_measure_repeats_each_triplet_n_samples_times(mock_hrl):

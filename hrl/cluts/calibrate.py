@@ -3,7 +3,7 @@
 The usual path:
 
 1. `measure` the color (CIE XYZ) of each channel on its own, swept across its input
-   range (`channel_sweeps`), several times per input.
+   range (`hrl.cluts.triplets.channel_sweeps`), several times per input.
 2. `remove_outliers` and `average` the repeated readings.
 3. `smooth` each channel's readings over neighbouring inputs.
 4. `make_monotonic`: fit each channel's readings with curves that never go down.
@@ -12,6 +12,11 @@ The usual path:
 To check a CLUT, measure again with it applied (``python -m hrl.util clut measure --lut CLUT``):
 `predict` gives the color the CLUT expects for each reading, and
 `hrl.cluts.colorimetry.differences` says how far apart they are.
+
+`predict_from_channels` predicts the same readings without a CLUT, from their own single
+channels: whether the display's channels add up when lit together, which a CLUT assumes
+but cannot check, measured on mixtures of the channels and their parts
+(`hrl.cluts.triplets.channel_mixtures`).
 """
 
 from functools import partial
@@ -19,34 +24,7 @@ from pathlib import Path
 
 import numpy as np
 
-
-def channel_sweeps(levels=256):
-    """Each channel (R, G, B) on its own, at each `levels`.
-
-    Parameters
-    ----------
-    levels : int or array-like, optional
-        the input levels each channel is swept through: a number of levels evenly spaced
-        from 0 to 1, or the levels themselves; by default 256
-
-    Returns
-    -------
-    numpy.ndarray
-        shape ``(3 * len(levels), 3)``, columns ``R, G, B``: the red sweep, the green
-        sweep, then the blue sweep. A level of 0 gives black, once per channel.
-    """
-    # If levels is a single number, create that many evenly spaced levels from 0 to 1
-    if np.ndim(levels) == 0:
-        levels = np.linspace(0.0, 1.0, int(levels))
-
-    levels = np.asarray(levels, dtype=float).reshape(-1)
-
-    # Construct triplets
-    triplets = np.zeros((3, len(levels), 3))
-    for channel in range(3):
-        triplets[channel, :, channel] = levels
-
-    return triplets.reshape(-1, 3)
+from .triplets import channel_sweeps
 
 
 def _draw_uniform_rgb_square(ihrl, triplet, patch_size=0.5):
@@ -597,4 +575,86 @@ def predict(measurements, CLUT):
         predicted[on] = np.column_stack(
             [np.interp(rgb[on, channel], CLUT[:, 0], alone[:, axis]) for axis in range(3)]
         )
+    return predicted
+
+
+def predict_from_channels(measurements):
+    """The color each input should give, from the same measurements' single channels.
+
+    No CLUT involved: the prediction is the black reading, plus what each lit channel adds
+    at its level, as measured on its own in these same measurements -- read along a
+    straight line between the levels it was measured at, the way
+    `hrl.cluts.colorimetry.RGB_to_XYZ` reads a CLUT per level. So it is what the color
+    would be if the channels add up. For a mixture, the difference from what was measured
+    is how far they do not (see `hrl.cluts.triplets.channel_mixtures` for a set to
+    measure); for a single channel, it is that channel's own reading.
+
+    Both ways `hrl.cluts.colorimetry` reads a display -- the primaries matrix and per
+    level -- assume the channels add up, so whatever this finds is an error neither can
+    represent, however well a CLUT is fitted.
+
+    Parameters
+    ----------
+    measurements : array-like
+        table with columns ``R, G, B, X, Y, Z``, including black (R = G = B = 0) and each
+        channel on its own; repeated readings are averaged
+
+    Returns
+    -------
+    numpy.ndarray
+        shape (N, 3): the XYZ predicted for each row, row for row. NaN where a lit
+        channel was not measured on its own, or is lit beyond the highest level it was.
+
+    Raises
+    ------
+    ValueError
+        if there is no black reading
+
+    Notes
+    -----
+    A prediction includes the black point, as a measurement does. So the difference
+    between the two is the excess directly, but their ratio is diluted by black: for a
+    fractional excess, divide the difference by the prediction above black.
+
+    A mixture brighter than the sum of its parts is the direction to be suspicious of:
+    power or thermal limits make a display dimmer under load, not brighter. Before
+    concluding that the channels do not add up, rule out the colorimeter changing range
+    between dim single channels and bright mixtures, and stray light.
+    """
+    measurements = np.asarray(measurements, dtype=float)
+    if measurements.ndim != 2 or measurements.shape[1] != 6:
+        raise ValueError("measurements must be a 2D array with 6 columns: R,G,B,X,Y,Z")
+
+    # One reading per triplet, and how many channels each has on
+    averaged = average(measurements)
+    rgb, xyz = averaged[:, :3], averaged[:, 3:]
+    lit = (rgb > 0.0).sum(axis=1)
+
+    # The black point: the reading with every channel off
+    if not (lit == 0).any():
+        raise ValueError(
+            "no reading at RGB (0, 0, 0); without it a channel's own contribution "
+            "cannot be separated from the display's black point"
+        )
+    black = xyz[lit == 0].mean(axis=0)
+
+    # Every prediction starts at black; each channel adds its own light to it
+    wanted = measurements[:, :3]
+    predicted = np.tile(black, (len(wanted), 1))
+    for channel in range(3):
+        # The channel's curve: what it adds above black at each level it was measured at
+        alone = (lit == 1) & (rgb[:, channel] > 0.0)
+        levels = np.concatenate([[0.0], rgb[alone, channel]])
+        light = np.vstack([np.zeros((1, 3)), xyz[alone] - black])
+        order = np.argsort(levels)
+        levels, light = levels[order], light[order]
+
+        # Add what the channel adds at each wanted level
+        on = wanted[:, channel] > 0.0
+        for axis in range(3):
+            predicted[on, axis] += np.interp(wanted[on, channel], levels, light[:, axis])
+
+        # No extrapolation: beyond the highest level measured, or never measured alone
+        predicted[on & (wanted[:, channel] > levels[-1])] = np.nan
+
     return predicted

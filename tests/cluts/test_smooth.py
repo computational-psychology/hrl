@@ -2,7 +2,8 @@
 
 import numpy as np
 
-from hrl.cluts.calibrate import average, channel_sweeps, smooth
+from hrl.cluts.calibrate import average, smooth
+from hrl.cluts.triplets import channel_sweeps
 from tests.cluts.conftest import display_xyz
 
 

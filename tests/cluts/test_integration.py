@@ -9,13 +9,13 @@ import numpy as np
 
 from hrl.cluts.calibrate import (
     average,
-    channel_sweeps,
     linearize,
     make_monotonic,
     measure,
     remove_outliers,
     smooth,
 )
+from hrl.cluts.triplets import channel_sweeps
 from tests.cluts.conftest import BLACK_POINT, DISPLAY_GAMMA, PRIMARIES_MATRIX, mock_draw
 
 TEST_DIR = Path(__file__).parent
