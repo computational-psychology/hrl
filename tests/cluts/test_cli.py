@@ -127,3 +127,37 @@ def test_linearize_output_format(tmp_path):
     assert result.shape[1] == 13
     assert not np.any(np.isnan(result))
     assert np.all(result[:, 0] >= 0) and np.all(result[:, 0] <= 1)
+
+
+### STEP 3: VERIFY, BY MEASURING WITH THE CLUT APPLIED
+def test_measure_with_a_clut_applied(tmp_path):
+    """measure --lut opens HRL with the CLUT applied, and measures as usual."""
+    from hrl.util.clut.measure import command, parser
+
+    clut_file = TEST_DIR / "clut_8bit.csv"
+    clut = np.genfromtxt(clut_file, skip_header=1, delimiter=",")
+    out_file = tmp_path / "verify.csv"
+
+    args = parser.parse_args(
+        ["--lut", str(clut_file), "--out_file", str(out_file), "--n_samples", "1"]
+    )
+
+    mock_ihrl = types.SimpleNamespace(
+        photometer=MockColorimeter(color_mapping=clut),
+        graphics=types.SimpleNamespace(
+            gamma_correct=lambda x: gamma_correct_RGB(
+                np.asarray(x).reshape(1, 1, 3), CLUT=clut
+            ).flatten()
+        ),
+        inputs=None,
+        close=lambda: None,
+    )
+
+    with patch("hrl.util.clut.measure.HRL", return_value=mock_ihrl) as HRL:
+        with patch("hrl.util.clut.measure._draw_uniform_rgb_square", _mock_draw):
+            command(args)
+
+    assert HRL.call_args.kwargs["lut"] == clut_file
+    # each channel on its own, at every level of an 8-bit CLUT
+    measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
+    assert measurements.shape == (3 * 2**8, 6)

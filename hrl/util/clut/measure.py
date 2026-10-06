@@ -88,6 +88,8 @@ parser = argparse.ArgumentParser(
     Measure the relationship between RGB triplets (channel-isolated sweeps)
     and CIE XYZ tristimulus values, and save to 'measure.csv'.
     This is the first step in generating a CLUT.
+
+    With a CLUT applied (--lut), the same measurements check that CLUT.
     """,
     add_help=False,
     parents=[measurement_argparser],
@@ -144,6 +146,13 @@ parser.add_argument(
     default="measure.csv",
     help="path to output measurements csv, by default 'measure.csv'",
 )
+parser.add_argument(
+    "-l",
+    "--lut",
+    type=Path,
+    default=None,
+    help="CLUT to apply while measuring, to check it; by default none",
+)
 
 
 def command(parsed_args):
@@ -153,6 +162,7 @@ def command(parsed_args):
 
     ihrl = HRL(
         graphics=parsed_args.graphics,
+        lut=parsed_args.lut,
         inputs="keyboard",
         photometer=parsed_args.photometer,
         wdth=parsed_args.width,
@@ -169,7 +179,9 @@ def command(parsed_args):
     )
     print(
         f"Measuring {len(triplets)} RGB triplets, {parsed_args.n_samples} times each "
-        f"([{parsed_args.int_min}, {parsed_args.int_max}] per channel sweep)..."
+        f"([{parsed_args.int_min}, {parsed_args.int_max}] per channel sweep)"
+        + (f", with CLUT {parsed_args.lut} applied" if parsed_args.lut else "")
+        + "..."
     )
 
     measure(
