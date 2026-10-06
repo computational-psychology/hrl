@@ -3,14 +3,15 @@ from pathlib import Path
 
 import numpy as np
 
-from hrl.cluts.calibrate import average, remove_outliers, smooth
+from hrl.cluts.calibrate import average, make_monotonic, remove_outliers, smooth
 
 parser = argparse.ArgumentParser(
     prog="smooth",
     description="""
     Process CLUT measurements: remove outliers, average repeated readings of each
-    RGB triplet, and average each channel's readings over neighbouring input
-    levels. Saves the result to 'smooth.csv', ready for 'linearize'.
+    RGB triplet, average each channel's readings over neighbouring input
+    levels, and fit each channel's readings with curves that never go down.
+    Saves the result to 'smooth.csv', ready for 'linearize'.
     """,
     add_help=False,
 )
@@ -49,6 +50,7 @@ def command(parsed_args):
     measurements = remove_outliers(measurements)
     measurements = average(measurements)
     measurements = smooth(measurements, width=parsed_args.width)
+    measurements = make_monotonic(measurements)
 
     out_file = parsed_args.out_file.expanduser().resolve()
     print(f"Saving to {out_file} ...")

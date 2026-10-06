@@ -3,8 +3,16 @@
 from pathlib import Path
 
 import numpy as np
+import pytest
 
-from hrl.cluts.calibrate import average, channel_sweeps, linearize, remove_outliers, smooth
+from hrl.cluts.calibrate import (
+    average,
+    channel_sweeps,
+    linearize,
+    make_monotonic,
+    remove_outliers,
+    smooth,
+)
 from tests.cluts.conftest import BLACK_POINT, DISPLAY_GAMMA, PRIMARIES_MATRIX, display_xyz
 
 TEST_DIR = Path(__file__).parent
@@ -69,13 +77,14 @@ def test_linearize_records_each_channel_measured_alone():
 
 
 def _processed_measurements():
-    """The fixture measurements after `remove_outliers`, `average` and `smooth`.
+    """The fixture measurements after `remove_outliers`, `average`, `smooth` and
+    `make_monotonic`.
 
     The CLUT fixtures are what the documented pipeline produces, smoothing included, so a
     regression test has to start from the same place.
     """
     measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
-    return smooth(average(remove_outliers(measurements)))
+    return make_monotonic(smooth(average(remove_outliers(measurements))))
 
 
 def test_linearize_8bit_regression():
@@ -90,3 +99,25 @@ def test_linearize_10bit_regression():
     result = linearize(_processed_measurements(), bit_depth=10)
     expected = np.genfromtxt(TEST_DIR / "clut_10bit.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
+
+
+def test_linearize_refuses_a_channel_whose_luminance_goes_down():
+    measurements = _make_measurements(256)
+    green = np.flatnonzero((measurements[:, 1] > 0.5) & (measurements[:, 0] == 0.0))[0]
+    measurements[green, 4] -= 10.0  # one green reading darker than the one before it
+
+    with pytest.raises(ValueError, match="G channel's luminance goes down"):
+        linearize(measurements, bit_depth=8)
+
+
+def test_input_0_drives_every_channel_at_0_when_its_curve_starts_flat():
+    """A display gives no measurable light at its lowest drive values: the first row is black."""
+    measurements = _make_measurements(256)
+    channel_alone = (measurements[:, :3] > 0).sum(axis=1) == 1
+    first_steps = channel_alone & (measurements[:, :3].max(axis=1) <= 4 / 255)
+    measurements[first_steps, 3:] = BLACK_POINT  # flat at black up to drive 4/255
+
+    clut = linearize(make_monotonic(average(measurements)), bit_depth=8)
+
+    np.testing.assert_array_equal(clut[0, 1:4], 0.0)
+    np.testing.assert_allclose(clut[0, 4:13], np.tile(BLACK_POINT, 3))
