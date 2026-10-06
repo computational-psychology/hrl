@@ -29,6 +29,8 @@ luminance, in its first row.
 
 Generally, these CLUTs are created by measuring a display
 and linearization of the resulting measurements.
+This can be directly from the command-line through ``python -m hrl.util clut``,
+which uses the functionality in `hrl.cluts.calibrate`.
 Here, we do provide a function to create parametric CLUTs (`create_clut`)
 based on standard gamma correction formulas
 -- this is useful for testing and simulation, but should not be used
@@ -37,9 +39,17 @@ for real display characterization!
 The rest of the package is in
 submodules, one per job:
 
+`hrl.cluts.calibrate`
+    making a CLUT from measurements: `measure`, `remove_outliers`, `average`,
+    `linearize`.
+    Can use this from the using ``python -m hrl.util clut ...``.
 `hrl.cluts.colorimetry`
     converting between input RGB and CIE XYZ with the primaries matrix a CLUT holds.
     How far measured colors are from expected ones: `differences`.
+
+The usual path: measure the display and build its CLUT with ``python -m hrl.util clut``; show
+stimuli through it with ``Graphics_RGB(lut=...)``; and use `XYZ_to_RGB` to find the input
+for the colors an experiment calls for.
 
 Functions
 ---------
