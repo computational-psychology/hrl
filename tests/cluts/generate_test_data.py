@@ -17,8 +17,7 @@ from pathlib import Path
 
 import numpy as np
 
-from hrl.cluts import average, linearize, remove_outliers
-from hrl.cluts.calibrate import channel_sweeps
+from hrl.cluts.calibrate import average, channel_sweeps, linearize, remove_outliers, smooth
 from tests.cluts.conftest import display_xyz
 
 TEST_DIR = Path(__file__).parent
@@ -80,9 +79,10 @@ def _build_fixtures():
     averaged_outliers = average(remove_outliers(measurements_outliers))
 
     # Final linearized CLUT fixtures
-    clut_8bit = linearize(average(remove_outliers(measurements_8bit)), bit_depth=8)
+    processed = smooth(average(remove_outliers(measurements_8bit)))
+    clut_8bit = linearize(processed, bit_depth=8)
 
-    clut_10bit = linearize(average(remove_outliers(measurements_8bit)), bit_depth=10)
+    clut_10bit = linearize(processed, bit_depth=10)
 
     return {
         "measurements_8bit.csv": measurements_8bit,

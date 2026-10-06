@@ -5,7 +5,8 @@ The usual path:
 1. `measure` the color (CIE XYZ) of each channel on its own, swept across its input
    range (`channel_sweeps`), several times per input.
 2. `remove_outliers` and `average` the repeated readings.
-3. `linearize` them into a CLUT.
+3. `smooth` each channel's readings over neighbouring inputs.
+4. `linearize` them into a CLUT.
 
 To check a CLUT, measure again with it applied (``python -m hrl.util clut measure --lut CLUT``):
 `predict` gives the color the CLUT expects for each reading, and
@@ -256,6 +257,75 @@ def average(measurements):
     )
 
     return np.column_stack([unique_rgb, xyz_avg])
+
+
+def smooth(measurements, width=5):
+    """Average each channel's measurements over neighbouring input levels.
+
+    The counterpart of `hrl.luts.smooth` for color measurements. A colorimeter reading
+    carries several percent of noise, and averaging repeats at one level only takes that
+    down by the square root of the repeat count. Neighbouring levels are measuring
+    almost the same thing, so averaging across them removes more of it, at the cost of
+    input resolution.
+
+    Each channel's ramp starts at the black reading (every channel at 0), which takes
+    part in the average as the ramp's first level, but is itself left as measured: it
+    belongs to all three ramps at once.
+
+    Parameters
+    ----------
+    measurements : array-like
+        table with columns ``R, G, B, X, Y, Z``, channel-isolated, one row per triplet,
+        as `average` returns
+    width : int, optional
+        how many neighbouring levels to average over, by default 5, matching the
+        five-tap kernel `hrl.luts.smooth` uses. 1 leaves the measurements alone.
+
+    Returns
+    -------
+    numpy.ndarray
+        the same table with X, Y and Z smoothed along each channel's own ramp
+
+    Notes
+    -----
+    Rows that are not channel-isolated are left untouched.
+    """
+    measurements = np.asarray(measurements, dtype=float)
+    if width <= 1:
+        return measurements.copy()
+
+    smoothed = measurements.copy()
+
+    # A moving average over `width` levels, centered on each level
+    kernel = np.ones(width) / width
+    lead, trail = width // 2, width - 1 - width // 2
+
+    # The black reading, which starts every channel's ramp but is left as measured
+    black = np.all(np.isclose(measurements[:, :3], 0.0, atol=1e-10), axis=1)
+
+    for channel in range(3):
+        # This channel's ramp: its rows with the other two channels off
+        others = [index for index in range(3) if index != channel]
+        rows = np.flatnonzero(
+            np.isclose(measurements[:, others[0]], 0.0, atol=1e-10)
+            & np.isclose(measurements[:, others[1]], 0.0, atol=1e-10)
+        )
+        # Too few levels to average over: leave the ramp as it is
+        if len(rows) < width:
+            continue
+
+        # In order of input level, from black up
+        rows = rows[np.argsort(measurements[rows, channel])]
+        lit = ~black[rows]
+
+        # Average X, Y and Z, each along the ramp
+        for axis in range(3):
+            # Pad each end with its own value, so the ends are averaged over fewer levels
+            padded = np.pad(measurements[rows, 3 + axis], (lead, trail), mode="edge")
+            averaged = np.convolve(padded, kernel, "valid")
+            smoothed[rows[lit], 3 + axis] = averaged[lit]
+
+    return smoothed
 
 
 def _channel_subset(measurements, channel, atol=1e-10):

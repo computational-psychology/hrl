@@ -35,7 +35,13 @@ def _mock_draw(ihrl, triplet, patch_size=None):
 def test_full_pipeline(tmp_path, bit_depth):
     """Complete CLI workflow: smooth -> linearize."""
     measure_file = TEST_DIR / "measurements_8bit.csv"
+    smooth_file = tmp_path / "smooth.csv"
     clut_file = tmp_path / f"clut_{bit_depth}bit.csv"
+
+    subprocess.run(
+        CLI + ["clut", "smooth", "--in_file", str(measure_file), "--out_file", str(smooth_file)],
+        check=True,
+    )
 
     subprocess.run(
         CLI
@@ -43,7 +49,7 @@ def test_full_pipeline(tmp_path, bit_depth):
             "clut",
             "linearize",
             "--in_file",
-            str(measure_file),
+            str(smooth_file),
             "--out_file",
             str(clut_file),
             "--bit_depth",
@@ -98,6 +104,39 @@ def test_measure(tmp_path):
 
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
     assert measurements.shape == (3 * n_samples * 2**bit_depth, 6)
+
+
+### STEP 1: PROCESS MEASUREMENTS
+def test_smooth_output_format(tmp_path):
+    """Output CSV file structure and data validity for clut smooth command."""
+    out_file = tmp_path / "smooth.csv"
+
+    subprocess.run(
+        CLI
+        + [
+            "clut",
+            "smooth",
+            "--in_file",
+            str(TEST_DIR / "measurements_8bit.csv"),
+            "--out_file",
+            str(out_file),
+        ],
+        check=True,
+    )
+
+    with open(out_file) as f:
+        assert f.readline().strip() == "R,G,B,X,Y,Z"
+    result = np.genfromtxt(out_file, skip_header=1, delimiter=",")
+    assert result.shape[1] == 6
+    assert not np.any(np.isnan(result))
+
+
+def test_smooth_fails_on_missing_input(tmp_path):
+    result = subprocess.run(
+        CLI + ["clut", "smooth", "--in_file", str(tmp_path / "nonexistent.csv")],
+        capture_output=True,
+    )
+    assert result.returncode != 0
 
 
 ### STEP 2: LINEARIZE

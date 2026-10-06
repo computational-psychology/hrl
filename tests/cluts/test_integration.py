@@ -1,10 +1,17 @@
-"""Integration tests for the CLUT pipeline: measure -> remove_outliers -> average -> linearize."""
+"""Integration tests for the CLUT pipeline: measure -> remove_outliers -> average -> smooth -> linearize."""
 
 from pathlib import Path
 
 import numpy as np
 
-from hrl.cluts.calibrate import average, channel_sweeps, linearize, measure, remove_outliers
+from hrl.cluts.calibrate import (
+    average,
+    channel_sweeps,
+    linearize,
+    measure,
+    remove_outliers,
+    smooth,
+)
 from tests.cluts.conftest import BLACK_POINT, DISPLAY_GAMMA, PRIMARIES_MATRIX, mock_draw
 
 TEST_DIR = Path(__file__).parent
@@ -46,7 +53,7 @@ def test_pipeline_regression_from_saved_measurements():
     """Regression: saved measurements run through full pipeline to known-good CLUT."""
     measurements = np.genfromtxt(TEST_DIR / "measurements_8bit.csv", skip_header=1, delimiter=",")
 
-    result = linearize(average(remove_outliers(measurements)), bit_depth=8)
+    result = linearize(smooth(average(remove_outliers(measurements))), bit_depth=8)
     expected = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
 
     np.testing.assert_array_almost_equal(result, expected, decimal=10)
