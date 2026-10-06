@@ -130,8 +130,8 @@ def test_linearize_output_format(tmp_path):
 
 
 ### STEP 3: VERIFY, BY MEASURING WITH THE CLUT APPLIED
-def test_measure_with_a_clut_applied(tmp_path):
-    """measure --lut opens HRL with the CLUT applied, and measures as usual."""
+def test_measure_with_a_clut_applied(tmp_path, capsys):
+    """measure --lut opens HRL with the CLUT applied, measures as usual, and reports."""
     from hrl.util.clut.measure import command, parser
 
     clut_file = TEST_DIR / "clut_8bit.csv"
@@ -161,3 +161,34 @@ def test_measure_with_a_clut_applied(tmp_path):
     # each channel on its own, at every level of an 8-bit CLUT
     measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
     assert measurements.shape == (3 * 2**8, 6)
+
+    report = capsys.readouterr().out
+    for line in ["red alone", "green alone", "blue alone", "all"]:
+        assert line in report
+
+
+### EVALUATE
+def test_evaluate_reports_each_channel(tmp_path):
+    clut_file = TEST_DIR / "clut_8bit.csv"
+    clut = np.genfromtxt(clut_file, skip_header=1, delimiter=",")
+
+    # Readings exactly as the CLUT records them: each channel on its own, at its levels
+    rows = [
+        np.column_stack([np.outer(clut[:, 0], np.eye(3)[c]), clut[:, 4 + 3 * c : 7 + 3 * c]])
+        for c in range(3)
+    ]
+    in_file = tmp_path / "verify.csv"
+    np.savetxt(in_file, np.vstack(rows), delimiter=",", header="R,G,B,X,Y,Z", comments="")
+
+    result = subprocess.run(
+        CLI + ["clut", "evaluate", "--lut", str(clut_file), "--in_file", str(in_file)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    for line in ["red alone", "green alone", "blue alone", "all"]:
+        assert line in result.stdout
+    assert "none measured" not in result.stdout
+    all_line = next(line for line in result.stdout.splitlines() if line.strip().startswith("all"))
+    assert "+0.00%   0.00%   0.0000" in all_line, "no difference from the CLUT's own columns"

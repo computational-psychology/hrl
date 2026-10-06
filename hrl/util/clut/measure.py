@@ -89,7 +89,8 @@ parser = argparse.ArgumentParser(
     and CIE XYZ tristimulus values, and save to 'measure.csv'.
     This is the first step in generating a CLUT.
 
-    With a CLUT applied (--lut), the same measurements check that CLUT.
+    With a CLUT applied (--lut), the same measurements check that CLUT:
+    'evaluate' compares them with what it predicts.
     """,
     add_help=False,
     parents=[measurement_argparser],

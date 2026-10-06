@@ -1,6 +1,6 @@
 """CLUT (Color Lookup Table) utilities for color calibration."""
 
-from . import linearize, measure
+from . import evaluate, linearize, measure
 
 
 def register_clut_commands(parent_subparsers):
@@ -21,7 +21,7 @@ def register_clut_commands(parent_subparsers):
         help="Available CLUT operations",
     )
 
-    for module in [measure, linearize]:
+    for module in [measure, linearize, evaluate]:
         p = clut_subparsers.add_parser(
             module.parser.prog,
             description=module.parser.description,
