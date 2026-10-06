@@ -24,12 +24,18 @@ def XYZ_from_CLUT(CLUT):
     Returns
     -------
     primaries_matrix : Array[float]
-        primaries matrix (XYZ CIE 1931 from RGB) with shape (3, 3).
+        shape (3, 3); column c is what channel c adds per unit of input.
     black_point : Array[float]
-        black point (XYZ CIE 1931 for the "black" state) with shape (3, 3).
+        shape (3, 3); the black point's XYZ, on the diagonal.
     """
-    primaries_matrix = CLUT[-1, 4:13].reshape(3, 3)
-    black_point = CLUT[0, 4:13].reshape((3, 3))
+    black = CLUT[0, 4:7]
+    primaries_matrix = np.column_stack(
+        [
+            (CLUT[-1, 4 + 3 * channel : 7 + 3 * channel] - black) / CLUT[-1, 1 + channel]
+            for channel in range(3)
+        ]
+    )
+    black_point = np.diag(black)
 
     return primaries_matrix, black_point
 

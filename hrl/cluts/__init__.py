@@ -7,10 +7,19 @@ This module provides functions to create and apply these CLUTs.
 The Color LUTs map input R, G, B intensities to linearized RGB values
 and provide a color transformation matrix for each intensity level.
 These CLUTs are structured as 2D NumPy arrays with 13 columns, one row per input level:
-0: `intensity_in`: Input intensities (ranging between [0.0, 1.0])
-1-3: `R_out`, `G_out`, `B_out`: Gamma-corrected output RGB values
-4-12: 3x3 color transformation (RGB -> XYZ) matrix values, flattened row-wise:
-    [X_R, X_G, X_B, Y_R, Y_G, Y_B, Z_R, Z_G, Z_B]
+
+0: ``intensity_in``
+    input intensity, from 0.0 to 1.0. This is the value you ask graphics for.
+1-3: ``R_out``, ``G_out``, ``B_out``
+    the value each channel is driven at to show that input. Graphics reads only
+    these first four columns, to gamma-correct images (`gamma_correct_RGB`).
+4-6: ``R_X``, ``R_Y``, ``R_Z``
+    the color (CIE XYZ) the screen shows with only the red channel at this input,
+    and green and blue at 0.
+7-9: ``G_X``, ``G_Y``, ``G_Z``
+    the same, with only green on.
+10-12: ``B_X``, ``B_Y``, ``B_Z``
+    the same, with only blue on.
 
 Columns 4-12 are what a calibration measures: each channel swept on its own. Every
 channel's XYZ includes the light the screen gives off at black, so in the first row,
@@ -101,7 +110,8 @@ def create_clut(
     gamma : [float, float, float] or float, optional
         gamma exponents for R, G, B, by default [1.0, 1.0, 1.0].
     primaries_matrix : Array, optional
-        3x3 color transformation matrix, by default identity (XYZ=RGB).
+        3x3 matrix whose column c is the XYZ that channel c adds, above black, at full
+        input; by default identity (XYZ = RGB).
     black_point : Array, optional
         XYZ of the black screen, 3 values; by default zeros (no light at black).
 
@@ -109,10 +119,8 @@ def create_clut(
     -------
     Array
         with 13 columns, see the module docstring:
-            R_out, G_out, B_out = intensity_in^(1/gamma[i]) for each channel
-            First row's 3x3 matrix represents black_point as the black point
-            Last row's 3x3 matrix is primaries_matrix
-            Intermediate rows linearly interpolate between dark and full color
+            R_out, G_out, B_out = intensity_in ** (1 / gamma[c])
+            channel c's XYZ = dark + intensity_in * color_matrix[:, c]
     """
     if black_point is None:
         black_point = np.zeros(3)
@@ -120,20 +128,16 @@ def create_clut(
         primaries_matrix = np.eye(3)
     if isinstance(gamma, (int, float)):
         gamma = [gamma, gamma, gamma]
+    black = np.asarray(black_point, dtype=float)
+    primaries_matrix = np.asarray(primaries_matrix, dtype=float)
 
     x = np.linspace(0.0, 1.0, n)
-    corrected = [x ** (1 / g) for g in gamma]
-    rgb = np.column_stack(corrected)
+    drive = np.column_stack([x ** (1 / g) for g in gamma])
 
-    # RGB->XYZ matrices per entry: linearly interpolate from dark to full color
-    # At x=0: dark chromaticity as diagonal (simplified representation)
-    # At x=1: full primaries_matrix
-    dark_matrix = np.diag(black_point)
-    matrices = x[:, None, None] * (primaries_matrix - dark_matrix) + dark_matrix
-    matrices_flat = matrices.reshape(n, -1)
+    # Each channel's XYZ with only it on: black, plus its light, linear in the input
+    alone = [black + x[:, None] * primaries_matrix[:, channel] for channel in range(3)]
 
-    # Combine all columns
-    return np.column_stack([x, rgb, matrices_flat])
+    return np.column_stack([x, drive, *alone])
 
 
 __all__ = [

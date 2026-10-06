@@ -77,7 +77,7 @@ def test_linear_clut(linear_clut, triplet):
         black_point=np.diag(BLACK_POINT),
     ).flatten()
 
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), desired_tristimulus)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -92,7 +92,7 @@ def test_linear_conversion_clut(linear_conversion_clut, triplet):
         triplet.reshape((1, 1, 3)), primaries_matrix=PRIMARIES_MATRIX, black_point=np.zeros(3)
     ).flatten()
 
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), desired_tristimulus)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -111,7 +111,7 @@ def test_nonlinear_clut(nonlinear_clut, triplet):
         black_point=np.diag(BLACK_POINT),
     ).flatten()
 
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), desired_tristimulus)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)

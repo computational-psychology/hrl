@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from hrl.cluts import RGB_to_XYZ, XYZ_from_CLUT, XYZ_to_RGB, invert_primaries_matrix
+from hrl.cluts import RGB_to_XYZ, XYZ_from_CLUT, XYZ_to_RGB, create_clut, invert_primaries_matrix
 
 
 @pytest.mark.parametrize(
@@ -30,34 +30,18 @@ def test_XYZ_RGB_conversion_roundtrip_image(seed, shape):
     [
         (
             np.array([[0.9, 0.1, 0.0], [0.2, 0.7, 0.1], [0.0, 0.3, 0.8]]),
-            np.array([[0.01, 0.02, 0.03], [0.04, 0.05, 0.06], [0.07, 0.08, 0.09]]),
+            np.array([0.01, 0.02, 0.03]),
         ),
-        (
-            np.eye(3) * 0.8,
-            np.array([[0.0, 0.0, 0.0], [0.02, 0.0, 0.01], [0.0, 0.03, 0.0]]),
-        ),
+        (np.eye(3) * 0.8, np.array([0.0, 0.02, 0.01])),
     ],
 )
 def test_XYZ_from_CLUT(M, dark):
-    x = np.linspace(0.0, 1.0, 5)
-    rgb = np.column_stack([x, x, x])
-
-    rows = []
-    for i, xi in enumerate(x):
-        if i == 0:
-            mat = dark
-        elif i == len(x) - 1:
-            mat = M
-        else:
-            mat = np.zeros((3, 3))
-        row = np.concatenate([[xi], rgb[i], mat.reshape(-1)])
-        rows.append(row)
-    CLUT = np.vstack(rows)
+    CLUT = create_clut(n=5, gamma=1.0, primaries_matrix=M, black_point=dark)
 
     color_matching_matrix, black_point = XYZ_from_CLUT(CLUT)
 
     np.testing.assert_allclose(color_matching_matrix, M, atol=1e-12)
-    np.testing.assert_allclose(black_point, dark, atol=1e-12)
+    np.testing.assert_allclose(black_point, np.diag(dark), atol=1e-12)
 
 
 @pytest.mark.parametrize(
