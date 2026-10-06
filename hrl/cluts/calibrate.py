@@ -5,6 +5,7 @@ The usual path:
 1. `measure` the color (CIE XYZ) of each channel on its own, swept across its input
    range (`channel_sweeps`), several times per input.
 2. `remove_outliers` and `average` the repeated readings.
+3. `linearize` them into a CLUT.
 """
 
 from functools import partial
@@ -251,3 +252,102 @@ def average(measurements):
     )
 
     return np.column_stack([unique_rgb, xyz_avg])
+
+
+def _channel_subset(measurements, channel, atol=1e-10):
+    """Extract channel-isolated rows for a given RGB channel index."""
+    other = [idx for idx in range(3) if idx != channel]
+    mask = np.isclose(measurements[:, other[0]], 0.0, atol=atol) & np.isclose(
+        measurements[:, other[1]], 0.0, atol=atol
+    )
+    subset = measurements[mask]
+    subset = subset[np.argsort(subset[:, channel])]
+    return subset
+
+
+def linearize(measurements, bit_depth=8):
+    """Turn channel-isolated XYZ measurements into a CLUT.
+
+    For each channel, finds the drive values at which its luminance goes up in equal
+    steps, from its darkest to its brightest. Those drive values are the CLUT's
+    ``R_out``, ``G_out``, ``B_out``; with them applied, each channel's luminance is a
+    straight line in the input. The XYZ the channel shows at each of them is recorded
+    alongside.
+
+    Parameters
+    ----------
+    measurements : array-like
+        averaged measurements with columns ``R, G, B, X, Y, Z``
+    bit_depth : int, optional
+        target CLUT input resolution, by default 8
+
+    Returns
+    -------
+    numpy.ndarray
+        CLUT with 13 columns, see `hrl.cluts.clut`:
+        ``intensity_in, R_out, G_out, B_out, R_X, R_Y, R_Z, G_X, G_Y, G_Z, B_X, B_Y, B_Z``
+    """
+    measurements = np.asarray(measurements, dtype=float)
+    if measurements.ndim != 2 or measurements.shape[1] != 6:
+        raise ValueError("measurements must be a 2D array with 6 columns: R,G,B,X,Y,Z")
+
+    n_samples = 2**bit_depth
+    intensity_in = np.linspace(0.0, 1.0, n_samples)
+
+    # Determine dark tristimulus from explicit black triplet if available.
+    black_mask = np.isclose(measurements[:, :3], 0.0, atol=1e-10).all(axis=1)
+    if np.any(black_mask):
+        dark_xyz = np.mean(measurements[black_mask, 3:], axis=0)
+    else:
+        dark_idx = np.argmin(np.sum(measurements[:, :3], axis=1))
+        dark_xyz = measurements[dark_idx, 3:]
+
+    channel_out = []
+    channel_xyz = []
+
+    for channel in range(3):
+        subset = _channel_subset(measurements, channel)
+        if len(subset) < 2:
+            raise RuntimeError(
+                "linearize requires at least two measurements per isolated channel "
+                f"for channel index {channel}"
+            )
+
+        ch_input = subset[:, channel]
+        ch_xyz = subset[:, 3:]
+
+        # Collapse repeated measurements at identical channel input before interpolation.
+        unique_input, inverse = np.unique(ch_input, return_inverse=True)
+        counts = np.bincount(inverse)
+        ch_xyz = np.column_stack(
+            [
+                np.bincount(inverse, weights=ch_xyz[:, 0]) / counts,
+                np.bincount(inverse, weights=ch_xyz[:, 1]) / counts,
+                np.bincount(inverse, weights=ch_xyz[:, 2]) / counts,
+            ]
+        )
+        ch_input = unique_input
+
+        # Linearize using Y (luminance) progression per channel.
+        # Enforce non-decreasing Y to make interpolation stable under measurement noise.
+        y_vals = np.maximum.accumulate(ch_xyz[:, 1])
+        desired_y = np.linspace(np.min(y_vals), np.max(y_vals), n_samples)
+
+        channel_out.append(np.interp(desired_y, y_vals, ch_input))
+        channel_xyz.append(
+            np.column_stack(
+                [
+                    np.interp(desired_y, y_vals, ch_xyz[:, 0]),
+                    np.interp(desired_y, y_vals, ch_xyz[:, 1]),
+                    np.interp(desired_y, y_vals, ch_xyz[:, 2]),
+                ]
+            )
+        )
+
+    rgb_out = np.column_stack(channel_out)
+
+    # At input 0 every channel is off, so the first row holds the black screen for all three
+    for xyz in channel_xyz:
+        xyz[0] = dark_xyz
+
+    return np.column_stack([intensity_in, rgb_out, *channel_xyz])
