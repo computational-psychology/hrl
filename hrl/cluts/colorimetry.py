@@ -11,6 +11,20 @@ This is the XYZ tristimulus values for what "black" means on the display.
 
 The RGB here is always the *input*: the values as they are passed to Graphics
 (where the CLUT is applied).
+
+There are two approaches to reading a display's color from its CLUT; both are used in this module.
+The first uses a _primaries matrix_:
+a single 3x3 matrix that describes what each channel adds, above black, per unit of input.
+This is the simple model that is easily inverted,
+and it's what `RGB_to_XYZ` and `XYZ_to_RGB` use by default (the matrix itself:
+`primaries_from_CLUT`).
+It assumes that each channel's color is constant, independent of its input (no drift);
+it'll be a good approximation for displays whose primaries are stable.
+
+However, for displays whose primaries drift more with input, no single matrix can describe them.
+In that case, the second approach is a true LookUp Table: look up the actually measured XYZ
+per channel, per level (``per_level=True``).
+For levels between the tabulated ones, it interpolates along a straight line between them.
 """
 
 import numpy as np
@@ -58,11 +72,17 @@ def primaries_from_CLUT(CLUT):
     return primaries_matrix, black_point
 
 
-def RGB_to_XYZ(rgb, CLUT):
+def RGB_to_XYZ(rgb, CLUT, per_level=False, gamma_correct=True):
     """The color (CIE XYZ) a display shows for given input RGB.
 
-    Uses the display's primaries matrix (see `primaries_from_CLUT`): the black point, plus each
-    channel's column of the matrix, times its input.
+    By default, uses the display's primaries matrix (see `primaries_from_CLUT`): the black
+    point, plus each channel's column of the matrix, times its input.
+
+    With ``per_level=True``, uses what the CLUT records instead: the black point, plus the
+    light each channel adds at its input, as measured at each of the CLUT's input levels.
+    This is a true LookUp Table, which follows primaries whose color drifts with their
+    input. For levels between the tabulated ones, it interpolates along a straight line
+    between them.
 
     Parameters
     ----------
@@ -71,6 +91,13 @@ def RGB_to_XYZ(rgb, CLUT):
         image
     CLUT : Array[float]
         Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    per_level : bool, optional
+        read each channel's color per level of input, rather than from the primaries
+        matrix; by default False, which is faster
+    gamma_correct : bool, optional
+        If True (default), `rgb` are the values passed to graphics, which applies this
+        CLUT. If False, `rgb` are drive values sent to the screen directly, as if no
+        CLUT were loaded.
 
     Returns
     -------
@@ -85,16 +112,46 @@ def RGB_to_XYZ(rgb, CLUT):
         else:
             raise ValueError("expected 3 values along the last axis, shape (..., 3)")
 
-    # Get the primaries matrix and black point from the CLUT
-    primaries_matrix, black_point = primaries_from_CLUT(CLUT)
+    CLUT = np.asarray(CLUT, dtype=float)
 
-    # Convert RGB to XYZ: multiply by primaries matrix
-    XYZ = rgb @ primaries_matrix.T
+    if not per_level:
+        if not gamma_correct:
+            # The matrix works on inputs: look up which input each drive value belongs to
+            rgb = np.stack(
+                [np.interp(rgb[..., c], CLUT[:, 1 + c], CLUT[:, 0]) for c in range(3)], axis=-1
+            )
+        primaries_matrix, black_point = primaries_from_CLUT(CLUT)
+        return rgb @ primaries_matrix.T + black_point
 
-    # Add black point
-    XYZ += black_point
+    shape = rgb.shape
+    rgb = rgb.reshape(-1, 3)
 
-    return XYZ
+    # Columns 4-12 hold, per channel, the XYZ with only that channel on: [row, channel, axis]
+    alone = CLUT[:, 4:13].reshape(-1, 3, 3)
+
+    # At input 0 every channel is off, so all three hold the black point
+    black_point = alone[0, 0]
+
+    # The inputs each channel's curve is tabulated at: what graphics is passed, or, without
+    # the CLUT, the drive values it turns them into
+    levels = np.tile(CLUT[:, 0], (3, 1)) if gamma_correct else CLUT[:, 1:4].T
+
+    # Start from the black point, and add what each channel adds at its input
+    xyz = np.tile(black_point, (len(rgb), 1))
+    for channel in range(3):
+        light = alone[:, channel] - black_point
+        value = np.clip(rgb[:, channel], levels[channel, 0], levels[channel, -1])
+
+        # Find the straight piece each input falls on: between levels[i] and levels[i + 1]
+        i = np.clip(np.searchsorted(levels[channel], value) - 1, 0, len(levels[channel]) - 2)
+
+        # Slope of that piece: how much this channel's light changes per unit of input
+        slope = (light[i + 1] - light[i]) / (levels[channel, i + 1] - levels[channel, i])[:, None]
+
+        # Light at the input: start of the piece, plus slope times the distance along it
+        xyz += light[i] + slope * (value - levels[channel, i])[:, None]
+
+    return xyz.reshape(shape)
 
 
 def XYZ_to_RGB(xyz, CLUT):

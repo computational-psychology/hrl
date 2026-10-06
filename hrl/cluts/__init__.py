@@ -44,7 +44,10 @@ submodules, one per job:
     `linearize`.
     Can use this from the using ``python -m hrl.util clut ...``.
 `hrl.cluts.colorimetry`
-    converting between input RGB and CIE XYZ with the primaries matrix a CLUT holds.
+    converting between input RGB and CIE XYZ with the primaries matrix a CLUT holds
+    (`RGB_to_XYZ`, `XYZ_to_RGB`; the matrix itself: `primaries_from_CLUT`).
+    Or, with ``per_level=True``, per level of input, following primaries whose color
+    drifts more.
     How far measured colors are from expected ones: `differences`.
 
 The usual path: measure the display and build its CLUT with ``python -m hrl.util clut``; show
