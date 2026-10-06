@@ -85,23 +85,30 @@ def create_clut(
     primaries_matrix=None,
     black_point=None,
 ):
-    """Create a parametric CLUT with gamma correction and color conversion.
+    """Create a parametric CLUT, for a display with a gamma and fixed primaries.
+
+    Describes a display whose channels each respond to their drive value with a power
+    law (``drive ** gamma``).
+    Optionally, the CLUT can also describe how the display's channels mix to produce color,
+    and what the display's black point is.
+
+    The color counterpart of `hrl.luts.create_lut`.
 
     Parameters
     ----------
     n : int, optional
         number of entries in the CLUT, by default 256.
     gamma : [float, float, float] or float, optional
-        gamma exponents for R, G, B correction, by default [1.0, 1.0, 1.0].
+        gamma exponents for R, G, B, by default [1.0, 1.0, 1.0].
     primaries_matrix : Array, optional
         3x3 color transformation matrix, by default identity (XYZ=RGB).
     black_point : Array, optional
-        3-element vector for dark state chromaticity (XYZ at black), by default zeros (no dark light).
+        XYZ of the black screen, 3 values; by default zeros (no light at black).
 
     Returns
     -------
     Array
-        with 13 columns [intensity_in, R_out, G_out, B_out, 9 matrix values]:
+        with 13 columns, see the module docstring:
             R_out, G_out, B_out = intensity_in^(1/gamma[i]) for each channel
             First row's 3x3 matrix represents black_point as the black point
             Last row's 3x3 matrix is primaries_matrix
