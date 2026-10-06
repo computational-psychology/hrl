@@ -6,16 +6,15 @@ This module provides functions to create and apply these CLUTs.
 
 The Color LUTs map input R, G, B intensities to linearized RGB values
 and provide a color transformation matrix for each intensity level.
-These CLUTs are structured as 2D NumPy arrays with thirteen columns:
+These CLUTs are structured as 2D NumPy arrays with 13 columns, one row per input level:
 0: `intensity_in`: Input intensities (ranging between [0.0, 1.0])
 1-3: `R_out`, `G_out`, `B_out`: Gamma-corrected output RGB values
 4-12: 3x3 color transformation (RGB -> XYZ) matrix values, flattened row-wise:
     [X_R, X_G, X_B, Y_R, Y_G, Y_B, Z_R, Z_G, Z_B]
 
-Generally, these CLUTs are created through measurement of a display
+Generally, these CLUTs are created by measuring a display
 and linearization of the resulting measurements.
-This can be done using the `hrl-util`, documented elsewhere.
-Here, we do provide a function to create parametric CLUTs
+Here, we do provide a function to create parametric CLUTs (`create_clut`)
 based on standard gamma correction formulas
 -- this is useful for testing and simulation, but should not be used
 for real display characterization!
