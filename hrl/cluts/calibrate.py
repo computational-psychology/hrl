@@ -6,6 +6,10 @@ The usual path:
    range (`channel_sweeps`), several times per input.
 2. `remove_outliers` and `average` the repeated readings.
 3. `linearize` them into a CLUT.
+
+To check a CLUT, measure again with it applied (``python -m hrl.util clut measure --lut CLUT``):
+`predict` gives the color the CLUT expects for each reading, and
+`hrl.cluts.colorimetry.differences` says how far apart they are.
 """
 
 from functools import partial
@@ -351,3 +355,42 @@ def linearize(measurements, bit_depth=8):
         xyz[0] = dark_xyz
 
     return np.column_stack([intensity_in, rgb_out, *channel_xyz])
+
+
+def predict(measurements, CLUT):
+    """The color a CLUT expects for each measured input.
+
+    For black, or a channel on its own, that is what the CLUT records: black is its first
+    row, and a channel on its own is that channel's columns, read at its input -- between
+    tabulated inputs, along a straight line.
+
+    Parameters
+    ----------
+    measurements : array-like
+        table with columns ``R, G, B, X, Y, Z`` (or just ``R, G, B``), where R, G, B are
+        the inputs passed to graphics with this CLUT applied, each with at most one
+        channel on
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+
+    Returns
+    -------
+    numpy.ndarray
+        shape (N, 3): the XYZ expected for each row, row for row
+
+    See Also
+    --------
+    hrl.cluts.colorimetry.differences : how far the measured colors are from these.
+    """
+    rgb = np.asarray(measurements, dtype=float)[:, :3]
+    CLUT = np.asarray(CLUT, dtype=float)
+
+    # With every channel off, the screen is black: the CLUT's first row
+    predicted = np.tile(CLUT[0, 4:7], (len(rgb), 1))
+    for channel in range(3):
+        on = rgb[:, channel] > 0.0
+        alone = CLUT[:, 4 + 3 * channel : 7 + 3 * channel]
+        predicted[on] = np.column_stack(
+            [np.interp(rgb[on, channel], CLUT[:, 0], alone[:, axis]) for axis in range(3)]
+        )
+    return predicted

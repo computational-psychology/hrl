@@ -114,3 +114,44 @@ def XYZ_to_RGB(xyz, CLUT):
     rgb = rgb @ np.linalg.inv(primaries_matrix).T
 
     return rgb
+
+
+def differences(measured, expected):
+    """How far measured colors are from expected ones: overall, in luminance, and in chromaticity.
+
+    Parameters
+    ----------
+    measured, expected : array-like
+        colors as CIE XYZ, shape (..., 3), compared row for row
+
+    Returns
+    -------
+    numpy.ndarray
+        shape (..., 3), columns:
+
+        - XYZ: the distance between the two, in XYZ, in the units they were measured in.
+        - Y: measured luminance relative to the expected, minus 1. 0.02 means 2% brighter
+          than expected.
+        - xy: the distance between their chromaticities, CIE 1931 x, y -- the xy of xyY,
+          which leaves luminance out.
+
+    Examples
+    --------
+    >>> differences([102.0, 100.0, 98.0], [100.0, 100.0, 100.0]).round(4)
+    array([2.8284, 0.    , 0.0067])
+    """
+    measured = np.asarray(measured, dtype=float)
+    expected = np.asarray(expected, dtype=float)
+
+    def xy(xyz):
+        """CIE 1931 x, y chromaticity."""
+        return xyz[..., :2] / xyz.sum(axis=-1, keepdims=True)
+
+    return np.stack(
+        [
+            np.linalg.norm(measured - expected, axis=-1),
+            measured[..., 1] / expected[..., 1] - 1.0,
+            np.linalg.norm(xy(measured) - xy(expected), axis=-1),
+        ],
+        axis=-1,
+    )

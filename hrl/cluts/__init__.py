@@ -39,6 +39,7 @@ submodules, one per job:
 
 `hrl.cluts.colorimetry`
     converting between input RGB and CIE XYZ with the primaries matrix a CLUT holds.
+    How far measured colors are from expected ones: `differences`.
 
 Functions
 ---------
@@ -51,7 +52,7 @@ create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=N
 
 import numpy as np
 
-from .colorimetry import RGB_to_XYZ, XYZ_to_RGB, primaries_from_CLUT
+from .colorimetry import RGB_to_XYZ, XYZ_to_RGB, differences, primaries_from_CLUT
 
 
 def gamma_correct_RGB(img, CLUT):
@@ -144,6 +145,7 @@ __all__ = [
     "RGB_to_XYZ",
     "XYZ_to_RGB",
     "create_clut",
+    "differences",
     "gamma_correct_RGB",
     "primaries_from_CLUT",
 ]

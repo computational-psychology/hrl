@@ -22,6 +22,9 @@ PRIMARIES_MATRIX = np.array(
 # The simulated display measured in tests: each channel has a gamma of its own, so
 # that mixing them up shows, and the primaries matrix and black point above
 DISPLAY_GAMMA = np.array([2.0, 2.2, 1.8])
+DISPLAY_CLUT = create_clut(
+    n=256, gamma=DISPLAY_GAMMA, primaries_matrix=PRIMARIES_MATRIX, black_point=BLACK_POINT
+)
 
 
 def display_xyz(rgb):
