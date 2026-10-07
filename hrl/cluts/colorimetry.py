@@ -13,7 +13,7 @@ This is the XYZ tristimulus values for what "black" means on the display.
 import numpy as np
 
 
-def XYZ_from_CLUT(CLUT):
+def primaries_from_CLUT(CLUT):
     """Extract XYZ primaries matrix and black point from a provided Color LUT.
 
     Parameters
@@ -26,98 +26,91 @@ def XYZ_from_CLUT(CLUT):
     primaries_matrix : Array[float]
         shape (3, 3); column c is what channel c adds per unit of input.
     black_point : Array[float]
-        shape (3, 3); the black point's XYZ, on the diagonal.
+        shape (3,); XYZ values for what "black" means on the display.
     """
-    black = CLUT[0, 4:7]
+    black_point = CLUT[0, 4:7]
     primaries_matrix = np.column_stack(
         [
-            (CLUT[-1, 4 + 3 * channel : 7 + 3 * channel] - black) / CLUT[-1, 1 + channel]
+            (CLUT[-1, 4 + 3 * channel : 7 + 3 * channel] - black_point) / CLUT[-1, 1 + channel]
             for channel in range(3)
         ]
     )
-    black_point = np.diag(black)
-
     return primaries_matrix, black_point
 
 
-def RGB_to_XYZ(img, primaries_matrix, black_point=np.zeros((3, 3))):
-    """Convert RGB image to CIE 1931 XYZ color space using provided color matching functions.
+def RGB_to_XYZ(rgb, CLUT):
+    """The color (CIE XYZ) a display shows for given input RGB.
+
+    Uses the display's primaries matrix (see `primaries_from_CLUT`): the black point, plus each
+    channel's column of the matrix, times its input.
 
     Parameters
     ----------
-    img : Array[float]
-        RGB image with values between [0.0, 1.0].
-        Shape: (H, W, 3).
-    primaries_matrix : Array[float]
-        primaries matrix (XYZ CIE 1931 from RGB) with shape (3, 3).
-    black_point : Array[float], optional
-        black point (XYZ CIE 1931 for the "black" state) with shape (3, 3), by default: None
+    rgb : array-like
+        input RGB, values in [0.0, 1.0], shape (..., 3): one triplet, a list of them, or an
+        image
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
 
     Returns
     -------
     Array[float]
-        XYZ CIE 1931 image with shape (H, W, 3).
+        XYZ, the same shape as `rgb`
     """
-    # Reshape image to (H*W, 3) for matrix multiplication
-    H, W, _ = img.shape
-    img_reshaped = img.reshape(-1, 3)
+    # Check or reshape the input to be (..., 3)
+    rgb = np.asarray(rgb, dtype=float)
+    if rgb.shape[-1] != 3:
+        if rgb.size == 3:
+            rgb = rgb.reshape((1, 3))
+        else:
+            raise ValueError("expected 3 values along the last axis, shape (..., 3)")
 
-    # Convert RGB to XYZ
-    XYZ_reshaped = img_reshaped @ primaries_matrix.T
+    # Get the primaries matrix and black point from the CLUT
+    primaries_matrix, black_point = primaries_from_CLUT(CLUT)
+
+    # Convert RGB to XYZ: multiply by primaries matrix
+    XYZ = rgb @ primaries_matrix.T
 
     # Add black point
-    XYZ_reshaped += black_point.sum(axis=0)
-
-    # Reshape back to (H, W, 3)
-    XYZ = XYZ_reshaped.reshape(H, W, 3)
+    XYZ += black_point
 
     return XYZ
 
 
-def invert_primaries_matrix(XYZ_from_RGB_matrix):
-    """Compute the inverse of a primaries matrix.
+def XYZ_to_RGB(xyz, CLUT):
+    """The input RGB that shows a wanted color (CIE XYZ) on a display.
+
+    Runs the primaries matrix backwards (see `primaries_from_CLUT`): takes off the black point,
+    and multiplies by the matrix's inverse. A color the display cannot show comes out with
+    inputs outside [0, 1].
 
     Parameters
     ----------
-    XYZ_from_RGB_matrix : Array[float]
-        primaries matrix (XYZ CIE 1931 from RGB) with shape (3, 3).
+    xyz : array-like
+        wanted color(s), CIE XYZ, shape (..., 3): one, a list of them, or an image
+    CLUT : Array[float]
+        Color Lookup Table with shape (L, 13), see `hrl.cluts`.
 
     Returns
     -------
     Array[float]
-        inverted primaries matrix (RGB from XYZ CIE 1931) with shape (3, 3).
+        input RGB, the same shape as `xyz`
     """
-    return np.linalg.inv(XYZ_from_RGB_matrix)
+    # Check or reshape the input to be (..., 3)
+    xyz = np.asarray(xyz, dtype=float)
+    if xyz.shape[-1] != 3:
+        if xyz.size == 3:
+            xyz = xyz.reshape((1, 3))
+        else:
+            raise ValueError("expected 3 values along the last axis, shape (..., 3)")
 
-
-def XYZ_to_RGB(XYZ, inv_primaries_matrix, black_point=np.zeros((3, 3))):
-    """Convert CIE 1931 XYZ image to RGB color space using provided inverse primaries matrix.
-
-    Parameters
-    ----------
-    XYZ : Array[float]
-        XYZ CIE 1931 image with shape (H, W, 3).
-    inv_primaries_matrix : Array[float]
-        inverse primaries matrix (RGB from XYZ CIE 1931) with shape (3, 3).
-    black_point : Array[float], optional
-        black point (XYZ CIE 1931 for the "black" state) with shape (3, 3), by default: None
-
-    Returns
-    -------
-    Array[float]
-        RGB image with values between [0.0, 1.0] and shape (H, W, 3).
-    """
-    # Reshape image to (H*W, 3) for matrix multiplication
-    H, W, _ = XYZ.shape
-    XYZ_reshaped = XYZ.reshape(-1, 3)
+    # Get the primaries matrix and black point from the CLUT
+    primaries_matrix, black_point = primaries_from_CLUT(CLUT)
 
     # Subtract black point
-    XYZ_reshaped -= black_point.sum(axis=0)
+    rgb = xyz - black_point
 
-    # Convert XYZ to RGB
-    RGB_reshaped = XYZ_reshaped @ inv_primaries_matrix.T
+    # Convert XYZ to RGB: multiply by the inverse of the primaries matrix
+    rgb = rgb @ np.linalg.inv(primaries_matrix).T
 
-    # Reshape back to (H, W, 3)
-    RGB = RGB_reshaped.reshape(H, W, 3)
-
-    return RGB
+    return rgb

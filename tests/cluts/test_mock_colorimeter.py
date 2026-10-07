@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from hrl.cluts import RGB_to_XYZ, gamma_correct_RGB
+from hrl.cluts import gamma_correct_RGB
 from hrl.photometer.photometer import MockColorimeter
 
 N_TRIPLETS = 20
@@ -71,11 +71,7 @@ def test_linear_clut(linear_clut, triplet):
 
     colorimeter.current_triplet = triplet
 
-    desired_tristimulus = RGB_to_XYZ(
-        triplet.reshape((1, 1, 3)),
-        primaries_matrix=np.eye(3),
-        black_point=np.diag(BLACK_POINT),
-    ).flatten()
+    desired_tristimulus = triplet + BLACK_POINT
 
     np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
@@ -88,9 +84,7 @@ def test_linear_conversion_clut(linear_conversion_clut, triplet):
 
     colorimeter.current_triplet = triplet
 
-    desired_tristimulus = RGB_to_XYZ(
-        triplet.reshape((1, 1, 3)), primaries_matrix=PRIMARIES_MATRIX, black_point=np.zeros(3)
-    ).flatten()
+    desired_tristimulus = PRIMARIES_MATRIX @ triplet
 
     np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
@@ -105,11 +99,7 @@ def test_nonlinear_clut(nonlinear_clut, triplet):
 
     # compute desired tristimulus using the nonlinear CLUT
     gamma_corrected = gamma_correct_RGB(triplet.reshape((1, 1, 3)), nonlinear_clut)
-    desired_tristimulus = RGB_to_XYZ(
-        gamma_corrected,
-        primaries_matrix=PRIMARIES_MATRIX,
-        black_point=np.diag(BLACK_POINT),
-    ).flatten()
+    desired_tristimulus = PRIMARIES_MATRIX @ gamma_corrected.flatten() + BLACK_POINT
 
     np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 

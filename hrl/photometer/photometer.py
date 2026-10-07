@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from hrl.cluts import RGB_to_XYZ, XYZ_from_CLUT, gamma_correct_RGB
+from hrl.cluts import RGB_to_XYZ, gamma_correct_RGB
 
 
 class Photometer(ABC):
@@ -196,12 +196,9 @@ class MockColorimeter(Colorimeter):
         elif color_mapping.shape[1] == 13:
             # Full 13-column LUT (intensity_in, R_out, G_out, B_out, and 9 columns for color matrix):
             clut = np.asarray(color_mapping)
-            color_matrix, dark_chromaticity = XYZ_from_CLUT(clut)
             self._clut_func = lambda r, g, b: RGB_to_XYZ(
-                gamma_correct_RGB(np.array([r, g, b]).reshape(1, 1, 3), clut),
-                primaries_matrix=color_matrix,
-                black_point=dark_chromaticity,
-            ).flatten()
+                gamma_correct_RGB(np.array([r, g, b]), clut), clut
+            )
         else:
             raise ValueError(
                 "color_mapping must be a callable or an array-like with 4 or 13 columns."

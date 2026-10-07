@@ -51,7 +51,7 @@ create_clut(n=256, gamma=[1.0, 1.0, 1.0], color_matrix=None, dark_chromaticity=N
 
 import numpy as np
 
-from .colorimetry import RGB_to_XYZ, XYZ_from_CLUT, XYZ_to_RGB, invert_primaries_matrix
+from .colorimetry import RGB_to_XYZ, XYZ_to_RGB, primaries_from_CLUT
 
 
 def gamma_correct_RGB(img, CLUT):
@@ -142,9 +142,8 @@ def create_clut(
 
 __all__ = [
     "RGB_to_XYZ",
-    "XYZ_from_CLUT",
     "XYZ_to_RGB",
     "create_clut",
     "gamma_correct_RGB",
-    "invert_primaries_matrix",
+    "primaries_from_CLUT",
 ]
