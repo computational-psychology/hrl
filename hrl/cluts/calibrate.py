@@ -28,6 +28,7 @@ from pathlib import Path
 
 import numpy as np
 
+from .colorimetry import RGB_to_XYZ
 from .triplets import channel_sweeps
 
 
@@ -591,21 +592,20 @@ def linearize(measurements, bit_depth=8):
     return np.column_stack([intensity_in, rgb_out, *channel_xyz])
 
 
-def predict(measurements, CLUT):
+def predict(measurements, CLUT, per_level=True):
     """The color a CLUT expects for each measured input.
-
-    For black, or a channel on its own, that is what the CLUT records: black is its first
-    row, and a channel on its own is that channel's columns, read at its input -- between
-    tabulated inputs, along a straight line.
 
     Parameters
     ----------
     measurements : array-like
         table with columns ``R, G, B, X, Y, Z`` (or just ``R, G, B``), where R, G, B are
-        the inputs passed to graphics with this CLUT applied, each with at most one
-        channel on
+        the inputs passed to graphics with this CLUT applied
     CLUT : Array[float]
         Color Lookup Table with shape (L, 13), see `hrl.cluts`.
+    per_level : bool, optional
+        predict from what the CLUT records per level of input, rather than from its
+        primaries matrix (see `hrl.cluts.colorimetry.RGB_to_XYZ`); by default True, since
+        checking a CLUT is checking its record
 
     Returns
     -------
@@ -616,18 +616,8 @@ def predict(measurements, CLUT):
     --------
     hrl.cluts.colorimetry.differences : how far the measured colors are from these.
     """
-    rgb = np.asarray(measurements, dtype=float)[:, :3]
-    CLUT = np.asarray(CLUT, dtype=float)
-
-    # With every channel off, the screen is black: the CLUT's first row
-    predicted = np.tile(CLUT[0, 4:7], (len(rgb), 1))
-    for channel in range(3):
-        on = rgb[:, channel] > 0.0
-        alone = CLUT[:, 4 + 3 * channel : 7 + 3 * channel]
-        predicted[on] = np.column_stack(
-            [np.interp(rgb[on, channel], CLUT[:, 0], alone[:, axis]) for axis in range(3)]
-        )
-    return predicted
+    measurements = np.asarray(measurements, dtype=float)
+    return RGB_to_XYZ(measurements[:, :3], CLUT, per_level=per_level)
 
 
 def predict_from_channels(measurements):

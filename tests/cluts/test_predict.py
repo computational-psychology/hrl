@@ -57,6 +57,13 @@ def test_a_uniformly_brighter_display_differs_only_in_luminance():
     np.testing.assert_allclose(chromaticity, 0.0, atol=1e-9)
 
 
+def test_mixtures_of_channels_are_predicted_too():
+    """For a display whose channels add up, the CLUT predicts mixtures as well."""
+    readings = _readings(np.random.default_rng(1).uniform(0.0, 1.0, size=(50, 3)))
+
+    np.testing.assert_allclose(predict(readings, CLUT), readings[:, 3:], atol=1e-9)
+
+
 # --- predict_from_channels, from the measurements themselves ------------------------------------
 
 

@@ -14,6 +14,7 @@ import pytest
 
 from hrl.cluts import gamma_correct_RGB
 from hrl.cluts.calibrate import read_measurements
+from hrl.cluts.triplets import channel_sweeps
 from hrl.photometer.photometer import MockColorimeter
 
 TEST_DIR = Path(__file__).parent
@@ -253,6 +254,13 @@ def test_measure_triplets_from_a_file_besides_sets(tmp_path):
 
 
 ### EVALUATE
+def _readings(clut, triplets):
+    """What a display exactly as `clut` describes it would measure for `triplets`."""
+    from hrl.cluts import RGB_to_XYZ
+
+    return np.column_stack([triplets, RGB_to_XYZ(triplets, clut, per_level=True)])
+
+
 def test_evaluate_reports_each_channel(tmp_path):
     clut_file = TEST_DIR / "clut_8bit.csv"
     clut = np.genfromtxt(clut_file, skip_header=1, delimiter=",")
@@ -272,8 +280,80 @@ def test_evaluate_reports_each_channel(tmp_path):
         check=True,
     )
 
-    for line in ["red alone", "green alone", "blue alone", "all"]:
-        assert line in result.stdout
-    assert "none measured" not in result.stdout
+    for name in ["red alone", "green alone", "blue alone", "all"]:
+        line = next(line for line in result.stdout.splitlines() if line.strip().startswith(name))
+        assert "none measured" not in line
     all_line = next(line for line in result.stdout.splitlines() if line.strip().startswith("all"))
     assert "+0.00%   0.00%   0.0000" in all_line, "no difference from the CLUT's own columns"
+
+
+def test_evaluate_reads_labels_and_checks_additivity_on_the_set_labelled_for_it(tmp_path):
+    from hrl.cluts.triplets import channel_mixtures
+
+    clut_file = TEST_DIR / "clut_8bit.csv"
+    clut = np.genfromtxt(clut_file, skip_header=1, delimiter=",")
+    sweeps, mixtures = channel_sweeps(16), channel_mixtures()
+    readings = _readings(clut, np.vstack([sweeps, mixtures]))
+    labels = ["channels"] * len(sweeps) + ["additivity"] * len(mixtures)
+    in_file = tmp_path / "verify.csv"
+    lines = [
+        ",".join(f"{v:.18e}" for v in row) + f",{label}" for row, label in zip(readings, labels)
+    ]
+    in_file.write_text("R,G,B,X,Y,Z,label\n" + "\n".join(lines) + "\n")
+
+    result = subprocess.run(
+        CLI + ["clut", "evaluate", "--lut", str(clut_file), "--in_file", str(in_file)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    for group in ["red alone", "greys (R = G = B)", "other mixtures", "all"]:
+        assert group in result.stdout
+    mixtures_line = next(l for l in result.stdout.splitlines() if l.strip().startswith("mixtures "))
+    assert mixtures_line.split()[1] == "64", "the 64 mixtures of the additivity set"
+
+
+def test_evaluate_checks_nothing_in_particular_without_labels():
+    from hrl.cluts.triplets import channel_mixtures
+    from hrl.util.clut.evaluate import report
+
+    clut = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+
+    text = report(_readings(clut, channel_mixtures()), clut)
+
+    assert "other mixtures" in text
+    assert "sum of their parts" not in text
+
+
+def test_evaluate_shows_only_the_kinds_of_reading_measured():
+    from hrl.util.clut.evaluate import report
+
+    clut = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    triplets = np.random.default_rng(0).uniform(0.2, 1.0, size=(20, 3))
+
+    text = report(_readings(clut, triplets), clut)
+
+    assert "other mixtures" in text
+    for kind in ["red alone", "green alone", "blue alone", "greys", "none measured"]:
+        assert kind not in text
+
+
+def test_evaluate_without_a_clut_checks_only_whether_the_channels_add_up(tmp_path):
+    from hrl.cluts.triplets import channel_mixtures
+
+    clut = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    readings = _readings(clut, channel_mixtures())
+    in_file = tmp_path / "mixtures.csv"
+    lines = [",".join(f"{v:.18e}" for v in row) + ",additivity" for row in readings]
+    in_file.write_text("R,G,B,X,Y,Z,label\n" + "\n".join(lines) + "\n")
+
+    result = subprocess.run(
+        CLI + ["clut", "evaluate", "--in_file", str(in_file)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    assert "sum of their parts" in result.stdout
+    assert "CLUT's prediction" not in result.stdout
