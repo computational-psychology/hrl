@@ -29,7 +29,8 @@ For levels between the tabulated ones, it interpolates along a straight line bet
 Either approach assumes that the display's channels add up:
 the color is the black point plus what each channel adds.
 Whether a display's channels really do add up is an empirical question,
-and can be checked with `hrl.cluts.calibrate.predict_from_channels`.
+and can be checked with `hrl.cluts.calibrate.predict_from_channels`
+on what ``python -m hrl.util clut measure --sets mixtures`` measures.
 """
 
 import numpy as np

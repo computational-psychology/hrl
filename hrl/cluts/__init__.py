@@ -40,8 +40,8 @@ The rest of the package is in
 submodules, one per job:
 
 `hrl.cluts.calibrate`
-    making a CLUT from measurements: `measure`, `remove_outliers`, `average`,
-    `linearize`;
+    making a CLUT from measurements: `measure` (and `read_measurements`),
+    `remove_outliers`, `average`, `linearize`;
     and checking one: `predict` (what a CLUT expects for measured inputs) and
     `predict_from_channels` (what the inputs should give if the channels add up).
     Can use this from the using ``python -m hrl.util clut ...``.

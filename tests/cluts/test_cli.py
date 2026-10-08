@@ -13,6 +13,7 @@ import numpy as np
 import pytest
 
 from hrl.cluts import gamma_correct_RGB
+from hrl.cluts.calibrate import read_measurements
 from hrl.photometer.photometer import MockColorimeter
 
 TEST_DIR = Path(__file__).parent
@@ -102,9 +103,9 @@ def test_measure(tmp_path):
         with patch("hrl.util.clut.measure._draw_uniform_rgb_square", _mock_draw):
             command(args)
 
-    measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
+    measurements, labels = read_measurements(out_file)
     assert measurements.shape == (3 * n_samples * 2**bit_depth, 6)
-
+    assert (labels == "channels").all()
 
 
 ### STEP 1: PROCESS MEASUREMENTS
@@ -170,8 +171,9 @@ def test_linearize_output_format(tmp_path):
 
 
 ### STEP 3: VERIFY, BY MEASURING WITH THE CLUT APPLIED
-def test_measure_with_a_clut_applied(tmp_path, capsys):
-    """measure --lut opens HRL with the CLUT applied, measures as usual, and reports."""
+def _run_measure(tmp_path, *extra_args):
+    """Run the measure command with the 8-bit CLUT applied and HRL mocked; return the
+    CLUT and what was saved."""
     from hrl.util.clut.measure import command, parser
 
     clut_file = TEST_DIR / "clut_8bit.csv"
@@ -179,7 +181,7 @@ def test_measure_with_a_clut_applied(tmp_path, capsys):
     out_file = tmp_path / "verify.csv"
 
     args = parser.parse_args(
-        ["--lut", str(clut_file), "--out_file", str(out_file), "--n_samples", "1"]
+        ["--lut", str(clut_file), "--out_file", str(out_file), "--n_samples", "1", *extra_args]
     )
 
     mock_ihrl = types.SimpleNamespace(
@@ -198,13 +200,30 @@ def test_measure_with_a_clut_applied(tmp_path, capsys):
             command(args)
 
     assert HRL.call_args.kwargs["lut"] == clut_file
-    # each channel on its own, at every level of an 8-bit CLUT
-    measurements = np.genfromtxt(out_file, delimiter=",", skip_header=1)
-    assert measurements.shape == (3 * 2**8, 6)
+    return clut, *read_measurements(out_file)
 
-    report = capsys.readouterr().out
-    for line in ["red alone", "green alone", "blue alone", "all"]:
-        assert line in report
+
+def test_measure_with_a_clut_applied(tmp_path):
+    """measure --lut measures with the CLUT applied."""
+    clut, measurements, labels = _run_measure(tmp_path)
+
+    # each channel on its own, at every level of an 8-bit CLUT
+    assert measurements.shape == (3 * 2**8, 6)
+    assert (labels == "channels").all()
+
+
+def test_measure_mixtures_with_a_clut_applied(tmp_path):
+    clut, measurements, labels = _run_measure(tmp_path, "--sets", "sweeps", "mixtures")
+
+    # each channel at every level; the mixtures: black, each channel alone at the 4
+    # mixture levels and the 15 grey levels between black and white, 64 mixtures and those
+    # 15 greys
+    assert measurements.shape == (3 * 2**8 + 1 + 3 * (4 + 15) + 64 + 15, 6)
+    for label, count in [
+        ("channels", 3 * 2**8),
+        ("additivity", 1 + 3 * (4 + 15) + 64 + 15),
+    ]:
+        assert (labels == label).sum() == count, label
 
 
 ### EVALUATE

@@ -41,7 +41,7 @@ parser.add_argument(
 def command(parsed_args):
     in_file = parsed_args.in_file.expanduser().resolve()
     print(f"Loading measurements from {in_file} ...")
-    measurements = np.genfromtxt(in_file, delimiter=",", skip_header=1)
+    measurements, _ = hrl.cluts.calibrate.read_measurements(in_file)
 
     linearized_clut = hrl.cluts.calibrate.linearize(measurements, bit_depth=parsed_args.bit_depth)
 

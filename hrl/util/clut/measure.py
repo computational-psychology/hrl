@@ -8,7 +8,7 @@ import numpy as np
 
 from hrl import HRL
 from hrl.cluts.calibrate import _draw_uniform_rgb_square, measure
-from hrl.cluts.triplets import channel_sweeps
+from hrl.cluts.triplets import channel_mixtures, channel_sweeps
 
 rgb_graphics_argparser = argparse.ArgumentParser(add_help=False)
 rgb_graphics_arggroup = rgb_graphics_argparser.add_argument_group("Graphics settings")
@@ -86,9 +86,13 @@ patch_arggroup.add_argument(
 parser = argparse.ArgumentParser(
     prog="measure",
     description="""
-    Measure the relationship between RGB triplets (channel-isolated sweeps)
-    and CIE XYZ tristimulus values, and save to 'measure.csv'.
-    This is the first step in generating a CLUT.
+    Measure CIE XYZ tristimulus values for sets of RGB triplets, and save them,
+    each labelled with the set it is from, to 'measure.csv'.
+
+    The sets (--sets): 'sweeps', each channel on its own at every level, which
+    is the first step in generating a CLUT; and 'mixtures' of the three
+    channels, and greys, with each channel alone at the levels they use, which
+    check whether the channels add up.
 
     With a CLUT applied (--lut), the same measurements check that CLUT:
     'evaluate' compares them with what it predicts.
@@ -155,6 +159,32 @@ parser.add_argument(
     default=None,
     help="CLUT to apply while measuring, to check it; by default none",
 )
+parser.add_argument(
+    "-s",
+    "--sets",
+    nargs="+",
+    choices=["sweeps", "mixtures"],
+    default=["sweeps"],
+    help="sets of triplets to measure, by default 'sweeps'",
+)
+
+mixtures_arggroup = parser.add_argument_group("Mixtures (--sets mixtures)")
+mixtures_arggroup.add_argument(
+    "-gs",
+    "--grey_steps",
+    type=int,
+    default=17,
+    help="number of greys (R = G = B), evenly spaced over the sweep levels, by default 17",
+)
+mixtures_arggroup.add_argument(
+    "-al",
+    "--additivity_levels",
+    type=float,
+    nargs="+",
+    default=[0.25, 0.5, 0.75, 1.0],
+    help="per-channel intensities to cross into mixtures, by default 0.25 0.5 0.75 1.0, "
+    "which is 64 mixtures plus the readings they are compared against",
+)
 
 
 def command(parsed_args):
@@ -176,12 +206,26 @@ def command(parsed_args):
         scrn=parsed_args.screen,
     )
 
-    triplets = channel_sweeps(
-        np.linspace(parsed_args.int_min, parsed_args.int_max, 2**parsed_args.bit_depth)
-    )
+    # The levels each channel is swept over; greys are measured at some of them too
+    levels = np.linspace(parsed_args.int_min, parsed_args.int_max, 2**parsed_args.bit_depth)
+
+    # The triplets to measure, each labelled with the set it is from
+    triplets, labels = np.empty((0, 3)), []
+    if "sweeps" in parsed_args.sets:
+        sweeps = channel_sweeps(levels)
+        triplets = np.vstack([triplets, sweeps])
+        labels += ["channels"] * len(sweeps)
+    if "mixtures" in parsed_args.sets:
+        # Greys at sweep levels, so that each channel is also measured alone at levels a
+        # CLUT made from the sweeps tabulates
+        steps = np.linspace(0, len(levels) - 1, parsed_args.grey_steps).round().astype(int)
+        mixtures = channel_mixtures(levels=parsed_args.additivity_levels, grey_levels=levels[steps])
+        triplets = np.vstack([triplets, mixtures])
+        labels += ["additivity"] * len(mixtures)
+
     print(
-        f"Measuring {len(triplets)} RGB triplets, {parsed_args.n_samples} times each "
-        f"([{parsed_args.int_min}, {parsed_args.int_max}] per channel sweep)"
+        f"Measuring {len(triplets)} RGB triplets ({', '.join(parsed_args.sets)}), "
+        f"{parsed_args.n_samples} times each"
         + (f", with CLUT {parsed_args.lut} applied" if parsed_args.lut else "")
         + "..."
     )
@@ -189,6 +233,7 @@ def command(parsed_args):
     measure(
         ihrl,
         triplets=triplets,
+        labels=labels,
         stim_draw_func=partial(_draw_uniform_rgb_square, patch_size=parsed_args.patch_size),
         out_file=parsed_args.out_file,
         sleep_time=parsed_args.sleep_time,

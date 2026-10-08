@@ -25,7 +25,7 @@ def test_full_clut_pipeline_with_repeats_and_outliers(mock_hrl):
     ihrl = mock_hrl(noise=0.0, rng=42)
     triplets = np.repeat(channel_sweeps(256), 3, axis=0)
 
-    measurements = measure(ihrl, triplets=triplets, stim_draw_func=mock_draw)
+    measurements, _ = measure(ihrl, triplets=triplets, stim_draw_func=mock_draw)
 
     cleaned = remove_outliers(measurements)
     averaged = average(cleaned)

@@ -3,7 +3,13 @@ from pathlib import Path
 
 import numpy as np
 
-from hrl.cluts.calibrate import average, make_monotonic, remove_outliers, smooth
+from hrl.cluts.calibrate import (
+    average,
+    make_monotonic,
+    read_measurements,
+    remove_outliers,
+    smooth,
+)
 
 parser = argparse.ArgumentParser(
     prog="smooth",
@@ -44,7 +50,7 @@ def command(parsed_args):
     for file in parsed_args.in_file:
         filename = file.expanduser().resolve()
         print(f"Loading from {filename} ...")
-        measurements.append(np.genfromtxt(filename, delimiter=",", skip_header=1))
+        measurements.append(read_measurements(filename)[0])
     measurements = np.vstack(measurements)
 
     measurements = remove_outliers(measurements)

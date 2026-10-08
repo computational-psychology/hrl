@@ -9,6 +9,9 @@ The usual path:
 4. `make_monotonic`: fit each channel's readings with curves that never go down.
 5. `linearize` them into a CLUT.
 
+`measure` can label each reading with what it was measured for; `read_measurements` reads
+the readings and their labels back.
+
 To check a CLUT, measure again with it applied (``python -m hrl.util clut measure --lut CLUT``):
 `predict` gives the color the CLUT expects for each reading, and
 `hrl.cluts.colorimetry.differences` says how far apart they are.
@@ -19,6 +22,7 @@ but cannot check, measured on mixtures of the channels and their parts
 (`hrl.cluts.triplets.channel_mixtures`).
 """
 
+import csv
 from functools import partial
 from pathlib import Path
 
@@ -54,6 +58,7 @@ def _draw_uniform_rgb_square(ihrl, triplet, patch_size=0.5):
 def measure(
     ihrl,
     triplets,
+    labels=None,
     stim_draw_func=partial(_draw_uniform_rgb_square, patch_size=0.5),
     out_file=None,
     sleep_time=200,
@@ -68,7 +73,10 @@ def measure(
     ihrl : HRL
         HRL instance with a configured colorimeter.
     triplets : array-like
-        RGB triplets to measure, shape ``(N, 3)``, each once.
+        RGB triplets to measure, shape ``(N, 3)``, each once (see `hrl.cluts.triplets`).
+    labels : sequence of str, optional
+        what each triplet is measured for, one per triplet, e.g. which set it is from;
+        written as a ``label`` column, and repeated and ordered along with the triplets
     stim_draw_func : callable, optional
         function with signature ``(ihrl, triplet)`` that draws the stimulus,
         by default a centered uniform square patch.
@@ -85,17 +93,32 @@ def measure(
 
     Returns
     -------
-    numpy.ndarray
-        table with columns ``R, G, B, X, Y, Z``, in the order measured.
+    measurements : numpy.ndarray
+        table with columns ``R, G, B, X, Y, Z``, in the order measured
+    labels : numpy.ndarray
+        each row's label, empty if none were given
+
+    See Also
+    --------
+    read_measurements : reads what this writes.
     """
     triplets = np.asarray(triplets, dtype=float)
 
+    has_labels = labels is not None
+    labels = np.asarray(labels if has_labels else [""] * len(triplets), dtype=str)
+    if labels.shape != (len(triplets),):
+        raise ValueError("labels must give one label per triplet")
+    if any("," in label or "\n" in label for label in labels):
+        raise ValueError("labels cannot contain commas or line breaks")
+
     # Apply repeats and ordering
     triplets = np.repeat(triplets, n_samples, axis=0)
+    labels = np.repeat(labels, n_samples)
     if shuffle:
-        triplets = triplets[np.random.permutation(len(triplets))]
+        shuffled = np.random.permutation(len(triplets))
+        triplets, labels = triplets[shuffled], labels[shuffled]
     if reverse:
-        triplets = triplets[::-1]
+        triplets, labels = triplets[::-1], labels[::-1]
 
     # Write to file?
     if out_file is not None:
@@ -121,19 +144,48 @@ def measure(
         measurements[idx_triplet, 3:] = xyz
 
         # Write measured samples to file
-        if out_file is not None:
-            np.savetxt(
-                out_file,
-                measurements,
-                delimiter=",",
-                header="R,G,B,X,Y,Z",
-                comments="",
-            )
+        if out_file is not None and not has_labels:
+            np.savetxt(out_file, measurements, delimiter=",", header="R,G,B,X,Y,Z", comments="")
+        elif out_file is not None:
+            lines = [
+                ",".join(f"{v:.18e}" for v in row) + f",{label}"
+                for row, label in zip(measurements, labels)
+            ]
+            out_file.write_text("R,G,B,X,Y,Z,label\n" + "\n".join(lines) + "\n")
 
         if ihrl.inputs is not None and ihrl.inputs.checkEscape():
             break
 
-    return measurements
+    return measurements, labels
+
+
+def read_measurements(path):
+    """Read a table of measurements, as `measure` writes it, with its labels if any.
+
+    Parameters
+    ----------
+    path : str or Path
+        CSV with a header, columns ``R, G, B, X, Y, Z``, and optionally ``label``
+
+    Returns
+    -------
+    measurements : numpy.ndarray
+        table with columns ``R, G, B, X, Y, Z``
+    labels : numpy.ndarray
+        each row's label; empty strings if the file has no ``label`` column
+    """
+    path = Path(path)
+    with path.open(newline="") as f:
+        rows = list(csv.reader(f))
+    header, rows = [name.strip() for name in rows[0]], [row for row in rows[1:] if row]
+
+    measurements = np.array([[float(value) for value in row[:6]] for row in rows]).reshape(-1, 6)
+    if "label" in header:
+        column = header.index("label")
+        labels = np.array([row[column] if len(row) > column else "" for row in rows], dtype=str)
+    else:
+        labels = np.full(len(rows), "", dtype=str)
+    return measurements, labels
 
 
 def remove_outliers(measurements, abs_tol=0.075, rel_tol=0.0075):

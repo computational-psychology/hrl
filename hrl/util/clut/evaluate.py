@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from hrl.cluts import differences
-from hrl.cluts.calibrate import average, predict
+from hrl.cluts.calibrate import average, predict, read_measurements
 
 parser = argparse.ArgumentParser(
     prog="evaluate",
@@ -101,7 +101,7 @@ def command(parsed_args):
     print(f"Loading CLUT from {clut_file} and measurements from {in_file} ...\n")
 
     clut = np.genfromtxt(clut_file, delimiter=",", skip_header=1)
-    measurements = np.genfromtxt(in_file, delimiter=",", skip_header=1)
+    measurements, _ = read_measurements(in_file)
 
     print(report(measurements, clut, min_level=parsed_args.min_level))
 
