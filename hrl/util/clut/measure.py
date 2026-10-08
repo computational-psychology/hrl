@@ -1,4 +1,5 @@
 import argparse
+import csv
 from datetime import timedelta
 from functools import partial
 from pathlib import Path
@@ -92,7 +93,8 @@ parser = argparse.ArgumentParser(
     The sets (--sets): 'sweeps', each channel on its own at every level, which
     is the first step in generating a CLUT; and 'mixtures' of the three
     channels, and greys, with each channel alone at the levels they use, which
-    check whether the channels add up.
+    check whether the channels add up. Any other triplets can be given in a CSV
+    file (--triplets).
 
     With a CLUT applied (--lut), the same measurements check that CLUT:
     'evaluate' compares them with what it predicts.
@@ -164,8 +166,16 @@ parser.add_argument(
     "--sets",
     nargs="+",
     choices=["sweeps", "mixtures"],
-    default=["sweeps"],
-    help="sets of triplets to measure, by default 'sweeps'",
+    default=None,
+    help="sets of triplets to measure, by default 'sweeps', or none if --triplets is given",
+)
+parser.add_argument(
+    "-t",
+    "--triplets",
+    type=Path,
+    default=None,
+    help="CSV file of triplets to measure as well, with columns R, G and B, and "
+    "optionally a label for each; by default none",
 )
 
 mixtures_arggroup = parser.add_argument_group("Mixtures (--sets mixtures)")
@@ -209,22 +219,35 @@ def command(parsed_args):
     # The levels each channel is swept over; greys are measured at some of them too
     levels = np.linspace(parsed_args.int_min, parsed_args.int_max, 2**parsed_args.bit_depth)
 
+    # The sets to measure: sweeps, unless asked for others or given triplets
+    sets = parsed_args.sets
+    if sets is None:
+        sets = [] if parsed_args.triplets is not None else ["sweeps"]
+
     # The triplets to measure, each labelled with the set it is from
     triplets, labels = np.empty((0, 3)), []
-    if "sweeps" in parsed_args.sets:
+    if "sweeps" in sets:
         sweeps = channel_sweeps(levels)
         triplets = np.vstack([triplets, sweeps])
         labels += ["channels"] * len(sweeps)
-    if "mixtures" in parsed_args.sets:
+    if "mixtures" in sets:
         # Greys at sweep levels, so that each channel is also measured alone at levels a
         # CLUT made from the sweeps tabulates
         steps = np.linspace(0, len(levels) - 1, parsed_args.grey_steps).round().astype(int)
         mixtures = channel_mixtures(levels=parsed_args.additivity_levels, grey_levels=levels[steps])
         triplets = np.vstack([triplets, mixtures])
         labels += ["additivity"] * len(mixtures)
+    if parsed_args.triplets is not None:
+        # Triplets from a file: its R, G and B columns, and its labels, if it has any
+        with open(parsed_args.triplets, newline="") as f:
+            rows = list(csv.DictReader(f, skipinitialspace=True))
+        given = np.array([[float(row[c]) for c in "RGB"] for row in rows]).reshape(-1, 3)
+        triplets = np.vstack([triplets, given])
+        labels += [row.get("label") or "" for row in rows]
+        sets = sets + [str(parsed_args.triplets)]
 
     print(
-        f"Measuring {len(triplets)} RGB triplets ({', '.join(parsed_args.sets)}), "
+        f"Measuring {len(triplets)} RGB triplets ({', '.join(sets)}), "
         f"{parsed_args.n_samples} times each"
         + (f", with CLUT {parsed_args.lut} applied" if parsed_args.lut else "")
         + "..."

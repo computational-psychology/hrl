@@ -226,6 +226,32 @@ def test_measure_mixtures_with_a_clut_applied(tmp_path):
         assert (labels == label).sum() == count, label
 
 
+def test_measure_triplets_from_a_file(tmp_path):
+    triplets_file = tmp_path / "triplets.csv"
+    triplets_file.write_text("R,G,B,label\n0.5,0.5,0.5,grey\n1,0,0,red\n0.2,0.4,0.6,\n")
+
+    clut, measurements, labels = _run_measure(tmp_path, "--triplets", str(triplets_file))
+
+    # only the file's triplets, as no sets were asked for; with their labels, if any
+    np.testing.assert_array_equal(
+        measurements[:, :3], [[0.5, 0.5, 0.5], [1, 0, 0], [0.2, 0.4, 0.6]]
+    )
+    np.testing.assert_array_equal(labels, ["grey", "red", ""])
+
+
+def test_measure_triplets_from_a_file_besides_sets(tmp_path):
+    triplets_file = tmp_path / "triplets.csv"
+    triplets_file.write_text("R,G,B\n0.5,0.5,0.5\n")
+
+    clut, measurements, labels = _run_measure(
+        tmp_path, "--sets", "sweeps", "--triplets", str(triplets_file)
+    )
+
+    assert measurements.shape == (3 * 2**8 + 1, 6)
+    np.testing.assert_array_equal(measurements[-1, :3], [0.5, 0.5, 0.5])
+    assert labels[-1] == ""
+
+
 ### EVALUATE
 def test_evaluate_reports_each_channel(tmp_path):
     clut_file = TEST_DIR / "clut_8bit.csv"
