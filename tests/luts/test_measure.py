@@ -1,40 +1,14 @@
 """Tests for hrl.lut.measure using MockPhotometer."""
 
-import types
 from pathlib import Path
 
 import numpy as np
 import pytest
 
 from hrl.luts import create_lut, measure
-from hrl.photometer.photometer import MockPhotometer
+from tests.luts.conftest import mock_draw
 
 TEST_DIR = Path(__file__).parent
-
-
-@pytest.fixture
-def mock_hrl():
-    """Mock a minimal HRL object stand-in.
-
-    No actual graphics or inputs; mock photometer to simulate luminance readings based on a LUT.
-
-    Factory fixture: call mock_hrl(lut) to get a minimal hrl stand-in.
-    """
-
-    def _make(lut):
-        ihrl = types.SimpleNamespace()
-        ihrl.photometer = MockPhotometer(luminance_mapping=lut)
-        ihrl.graphics = types.SimpleNamespace(gamma_correct=lambda x: x)
-        ihrl.inputs = None
-        return ihrl
-
-    return _make
-
-
-def mock_draw(ihrl, intensity):
-    """Draw stub: updates photometer's current_intensity instead of actually drawing to screen."""
-    intensity_out = ihrl.graphics.gamma_correct(intensity)
-    ihrl.photometer.current_intensity = intensity_out
 
 
 # LUT configurations: (n, gamma, k, dark, id)

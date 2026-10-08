@@ -3,14 +3,14 @@
 import numpy as np
 import pytest
 
-from hrl.cluts import RGB_to_XYZ, gamma_correct_RGB
+from hrl.cluts import gamma_correct_RGB
 from hrl.photometer.photometer import MockColorimeter
 
 N_TRIPLETS = 20
 rng = np.random.default_rng(0)
 random_triplets = [rng.random(3) for _ in range(N_TRIPLETS)]
 
-from conftest import COLOR_MATRIX, DARK_CHROMATICITY, DEFAULT_GAMMA
+from tests.cluts.conftest import BLACK_POINT, PRIMARIES_MATRIX
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
@@ -56,7 +56,7 @@ def test_identity_array(triplet):
 
 @pytest.mark.parametrize("triplet", random_triplets)
 def test_identity_clut(identity_clut, triplet):
-    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for color matrix)
+    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for primaries matrix)
     colorimeter = MockColorimeter(color_mapping=identity_clut)
 
     colorimeter.current_triplet = triplet
@@ -65,39 +65,33 @@ def test_identity_clut(identity_clut, triplet):
 
 @pytest.mark.parametrize("triplet", random_triplets)
 def test_linear_clut(linear_clut, triplet):
-    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for color matrix)
+    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for primaries matrix)
     # linear: no gamma, but dark light
     colorimeter = MockColorimeter(color_mapping=linear_clut)
 
     colorimeter.current_triplet = triplet
 
-    desired_tristimulus = RGB_to_XYZ(
-        triplet.reshape((1, 1, 3)),
-        color_matrix=np.eye(3),
-        dark_chromaticity=np.diag(DARK_CHROMATICITY),
-    ).flatten()
+    desired_tristimulus = triplet + BLACK_POINT
 
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), desired_tristimulus)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
 def test_linear_conversion_clut(linear_conversion_clut, triplet):
-    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for color matrix)
+    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for primaries matrix)
     # linear: no gamma, no dark light, but channel crosstalk
     colorimeter = MockColorimeter(color_mapping=linear_conversion_clut)
 
     colorimeter.current_triplet = triplet
 
-    desired_tristimulus = RGB_to_XYZ(
-        triplet.reshape((1, 1, 3)), color_matrix=COLOR_MATRIX, dark_chromaticity=np.zeros(3)
-    ).flatten()
+    desired_tristimulus = PRIMARIES_MATRIX @ triplet
 
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), desired_tristimulus)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)
 def test_nonlinear_clut(nonlinear_clut, triplet):
-    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for color matrix)
+    # as full CLUT table (intensity_in, R_out, G_out, B_out, and additional 9 columns for primaries matrix)
     # nonlinear: gamma, dark light, and channel crosstalk
     colorimeter = MockColorimeter(color_mapping=nonlinear_clut)
 
@@ -105,13 +99,9 @@ def test_nonlinear_clut(nonlinear_clut, triplet):
 
     # compute desired tristimulus using the nonlinear CLUT
     gamma_corrected = gamma_correct_RGB(triplet.reshape((1, 1, 3)), nonlinear_clut)
-    desired_tristimulus = RGB_to_XYZ(
-        gamma_corrected,
-        color_matrix=COLOR_MATRIX,
-        dark_chromaticity=np.diag(DARK_CHROMATICITY),
-    ).flatten()
+    desired_tristimulus = PRIMARIES_MATRIX @ gamma_corrected.flatten() + BLACK_POINT
 
-    np.testing.assert_array_equal(colorimeter.readTristimulus(), desired_tristimulus)
+    np.testing.assert_allclose(colorimeter.readTristimulus(), desired_tristimulus, atol=1e-12)
 
 
 @pytest.mark.parametrize("triplet", random_triplets)

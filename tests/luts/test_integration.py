@@ -1,6 +1,5 @@
 """Tests for the complete measurement → smooth → linearize pipeline."""
 
-import types
 from pathlib import Path
 
 import numpy as np
@@ -14,27 +13,12 @@ from hrl.luts import (
     remove_outliers,
     smooth,
 )
-from hrl.photometer.photometer import MockPhotometer
+from tests.luts.conftest import mock_draw
 
 TEST_DIR = Path(__file__).parent
 
 
-def _make_mock_hrl(lut, noise=0.0, rng=None):
-    ihrl = types.SimpleNamespace()
-    ihrl.photometer = MockPhotometer(luminance_mapping=lut, noise=noise, rng=rng)
-    ihrl.graphics = types.SimpleNamespace(gamma_correct=lambda x: x)
-    ihrl.inputs = None
-    return ihrl
-
-
-def mock_draw(ihrl, intensity):
-    ihrl.photometer.current_intensity = intensity
-
-
-TEST_DIR = Path(__file__).parent
-
-
-def test_full_pipeline():
+def test_full_pipeline(mock_hrl):
     """Complete pipeline from created LUT, through measurements, smoothing and linearization.
 
     The physical monitor response is simulated via create_lut (gamma=2.2).
@@ -55,7 +39,7 @@ def test_full_pipeline():
     raw_lut = create_lut(n=256, gamma=2.2, k=100.0, dark=1.0)
 
     # Configure noiseless mock with the gamma response (intensity_out → luminance)
-    ihrl = _make_mock_hrl(raw_lut, noise=0.0)
+    ihrl = mock_hrl(raw_lut, noise=0.0)
 
     # Step 0: simulate measurements at the raw (intensity_out) intensities, noiseless, 1 sample each
     measurements = measure(ihrl, intensities=raw_lut[:, 1], stim_draw_func=mock_draw)
@@ -93,9 +77,7 @@ def test_regression(bit_depth):
     measurements = smooth(measurements, order=0)
     result_lut = linearize(measurements, bit_depth=bit_depth)
 
-    expected_lut = np.genfromtxt(
-        TEST_DIR / f"lut_{bit_depth}bit.csv", skip_header=1, delimiter=","
-    )
+    expected_lut = np.genfromtxt(TEST_DIR / f"lut_{bit_depth}bit.csv", skip_header=1, delimiter=",")
     np.testing.assert_array_almost_equal(result_lut, expected_lut, decimal=10)
 
 
