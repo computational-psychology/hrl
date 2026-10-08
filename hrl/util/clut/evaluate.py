@@ -16,7 +16,9 @@ parser = argparse.ArgumentParser(
 
     Readings 'measure' labels for a particular check are also checked for it:
     mixtures labelled 'additivity' against the sum of their parts, measured
-    alone in the same session. That check needs no CLUT (--lut).
+    alone in the same session, which needs no CLUT (--lut); colors labelled
+    'isoluminant' against the luminance of the 'isoluminant background', as
+    measured in the same session.
     """,
     add_help=False,
 )
@@ -68,6 +70,8 @@ def report(measurements, clut=None, labels=None, min_level=0.1):
 
     - ``additivity``: mixtures against what their parts, measured alone in the same set,
       predict (`hrl.cluts.calibrate.predict_from_channels`).
+    - ``isoluminant background`` and ``isoluminant``: the colors' luminance against the
+      background's, as measured; this needs the CLUT.
 
     Only what the measurements include is reported.
 
@@ -144,6 +148,36 @@ def report(measurements, clut=None, labels=None, min_level=0.1):
                 "Mixtures against the sum of their parts, measured alone in this session:",
                 "",
                 _summary("mixtures", differences(additivity[mixtures, 3:], expected[mixtures])),
+            ]
+
+    # Colors meant to match the background's luminance, against the background as measured
+    background = comparison[labels == "isoluminant background"]
+    colors = comparison[labels == "isoluminant"]
+    if len(background) > 0 or len(colors) > 0:
+        if clut is None:
+            lines += ["", "Cannot check isoluminant colors without the CLUT they were made with."]
+        elif len(background) == 0 or len(colors) == 0:
+            lines += [
+                "",
+                "Cannot check isoluminant colors: need both the colors and their background.",
+            ]
+        else:
+            background = background[:1]
+
+            # The CLUT's prediction, rescaled to the background's luminance as measured
+            scale = background[0, 4] / predict(background, clut)[0, 1]
+
+            # How far each color is from that, and its luminance from the background's, in %
+            off = differences(colors[:, 3:], scale * predict(colors, clut))
+            luminance = 100 * off[:, 1]
+
+            lines += [
+                "",
+                f"Colors meant to match the background grey's luminance (measured Y = "
+                f"{background[0, 4]:.4g}), against that background:",
+                "",
+                _summary("isoluminant colors", off),
+                f"  {'':20s} {'':5s}   from {luminance.min():+.2f}% to {luminance.max():+.2f}%",
             ]
 
     if not lines:

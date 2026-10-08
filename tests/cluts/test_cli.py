@@ -337,6 +337,7 @@ def test_evaluate_shows_only_the_kinds_of_reading_measured():
     assert "other mixtures" in text
     for kind in ["red alone", "green alone", "blue alone", "greys", "none measured"]:
         assert kind not in text
+    assert "sum of their parts" not in text and "isoluminant" not in text
 
 
 def test_evaluate_without_a_clut_checks_only_whether_the_channels_add_up(tmp_path):
@@ -357,3 +358,50 @@ def test_evaluate_without_a_clut_checks_only_whether_the_channels_add_up(tmp_pat
 
     assert "sum of their parts" in result.stdout
     assert "CLUT's prediction" not in result.stdout
+
+
+def _isoluminant(clut):
+    """Readings of the isoluminant set, and their labels."""
+    from hrl.cluts.triplets import isoluminant_colors
+
+    triplets = isoluminant_colors(clut, per_level=True)
+    labels = ["isoluminant background"] + ["isoluminant"] * (len(triplets) - 1)
+    return _readings(clut, triplets), labels
+
+
+def test_evaluate_reports_isoluminant_colors_against_the_measured_background():
+    from hrl.util.clut.evaluate import report
+
+    clut = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    readings, labels = _isoluminant(clut)
+    readings[:, 3:] *= 0.97  # an overall offset between sessions, which should cancel
+    readings[1, 3:] *= 1.02  # one color brighter than the background
+
+    text = report(readings, clut, labels=labels)
+
+    assert "isoluminant colors      24" in text
+    assert "from +0.00% to +2.00%" in text
+
+
+def test_evaluate_finds_the_isoluminant_set_among_other_readings():
+    from hrl.util.clut.evaluate import report
+
+    clut = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    readings, labels = _isoluminant(clut)
+    others = _readings(clut, np.random.default_rng(0).uniform(0.0, 1.0, size=(100, 3)))
+
+    text = report(np.vstack([others, readings]), clut, labels=[""] * 100 + labels)
+
+    assert "isoluminant colors      24" in text
+    assert "from +0.00% to +0.00%" in text
+
+
+def test_evaluate_needs_the_background_to_check_isoluminant_colors():
+    from hrl.util.clut.evaluate import report
+
+    clut = np.genfromtxt(TEST_DIR / "clut_8bit.csv", skip_header=1, delimiter=",")
+    readings, labels = _isoluminant(clut)
+
+    text = report(readings[1:], clut, labels=labels[1:])
+
+    assert "Cannot check isoluminant colors: need both" in text
