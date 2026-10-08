@@ -227,6 +227,26 @@ def test_measure_mixtures_with_a_clut_applied(tmp_path):
         assert (labels == label).sum() == count, label
 
 
+def test_measure_isoluminant_colors_with_a_clut_applied(tmp_path):
+    clut, measurements, labels = _run_measure(tmp_path, "--sets", "isoluminant")
+
+    # a background grey, and 8 directions around it at 3 fractions
+    assert measurements.shape == (1 + 8 * 3, 6)
+    assert labels[0] == "isoluminant background"
+    assert (labels[1:] == "isoluminant").all()
+
+
+def test_measure_isoluminant_colors_needs_a_clut(tmp_path):
+    from hrl.util.clut.measure import command, parser
+
+    args = parser.parse_args(["--sets", "isoluminant", "--out_file", str(tmp_path / "m.csv")])
+
+    with patch("hrl.util.clut.measure.HRL") as HRL:
+        with pytest.raises(SystemExit, match="needs the CLUT"):
+            command(args)
+    HRL.assert_not_called()
+
+
 def test_measure_triplets_from_a_file(tmp_path):
     triplets_file = tmp_path / "triplets.csv"
     triplets_file.write_text("R,G,B,label\n0.5,0.5,0.5,grey\n1,0,0,red\n0.2,0.4,0.6,\n")

@@ -9,7 +9,8 @@ import numpy as np
 
 from hrl import HRL
 from hrl.cluts.calibrate import _draw_uniform_rgb_square, measure
-from hrl.cluts.triplets import channel_mixtures, channel_sweeps
+from hrl.cluts import RGB_to_XYZ, achromatic_RGB
+from hrl.cluts.triplets import channel_mixtures, channel_sweeps, isoluminant_colors
 
 rgb_graphics_argparser = argparse.ArgumentParser(add_help=False)
 rgb_graphics_arggroup = rgb_graphics_argparser.add_argument_group("Graphics settings")
@@ -91,10 +92,11 @@ parser = argparse.ArgumentParser(
     each labelled with the set it is from, to 'measure.csv'.
 
     The sets (--sets): 'sweeps', each channel on its own at every level, which
-    is the first step in generating a CLUT; and 'mixtures' of the three
-    channels, and greys, with each channel alone at the levels they use, which
-    check whether the channels add up. Any other triplets can be given in a CSV
-    file (--triplets).
+    is the first step in generating a CLUT; 'mixtures' of the three channels,
+    and greys, with each channel alone at the levels they use, which check
+    whether the channels add up; and 'isoluminant' colors around a background
+    grey that a CLUT (--lut) says share its luminance. Any other triplets can
+    be given in a CSV file (--triplets).
 
     With a CLUT applied (--lut), the same measurements check that CLUT:
     'evaluate' compares them with what it predicts.
@@ -165,7 +167,7 @@ parser.add_argument(
     "-s",
     "--sets",
     nargs="+",
-    choices=["sweeps", "mixtures"],
+    choices=["sweeps", "mixtures", "isoluminant"],
     default=None,
     help="sets of triplets to measure, by default 'sweeps', or none if --triplets is given",
 )
@@ -197,24 +199,36 @@ mixtures_arggroup.add_argument(
 )
 
 
+isoluminant_arggroup = parser.add_argument_group("Isoluminant colors (--sets isoluminant)")
+isoluminant_arggroup.add_argument(
+    "-iy",
+    "--isoluminant_Y",
+    type=float,
+    default=None,
+    help="luminance of the background grey and the colors around it, by default half of white's",
+)
+isoluminant_arggroup.add_argument(
+    "-id",
+    "--isoluminant_directions",
+    type=int,
+    default=8,
+    help="how many evenly spaced directions to place isoluminant colors along, by default 8",
+)
+isoluminant_arggroup.add_argument(
+    "-if",
+    "--isoluminant_fractions",
+    type=float,
+    nargs="+",
+    default=[0.25, 0.5, 0.9],
+    help="how far along each direction, as fractions of the furthest the display can go, "
+    "by default 0.25 0.5 0.9",
+)
+
+
 def command(parsed_args):
     """Measure the relationship between RGB triplets and XYZ tristimulus values."""
 
     start = timer()
-
-    ihrl = HRL(
-        graphics=parsed_args.graphics,
-        lut=parsed_args.lut,
-        inputs="keyboard",
-        photometer=parsed_args.photometer,
-        wdth=parsed_args.width,
-        hght=parsed_args.height,
-        bg=parsed_args.background,
-        fs=True,
-        wdth_offset=parsed_args.width_offset,
-        db=True,
-        scrn=parsed_args.screen,
-    )
 
     # The levels each channel is swept over; greys are measured at some of them too
     levels = np.linspace(parsed_args.int_min, parsed_args.int_max, 2**parsed_args.bit_depth)
@@ -223,6 +237,13 @@ def command(parsed_args):
     sets = parsed_args.sets
     if sets is None:
         sets = [] if parsed_args.triplets is not None else ["sweeps"]
+
+    # The CLUT to apply, if any; isoluminant colors are worked out from it
+    clut = None
+    if parsed_args.lut is not None:
+        clut = np.genfromtxt(parsed_args.lut, skip_header=1, delimiter=",")
+    if "isoluminant" in sets and clut is None:
+        raise SystemExit("measure: --sets isoluminant needs the CLUT (--lut) to find the colors")
 
     # The triplets to measure, each labelled with the set it is from
     triplets, labels = np.empty((0, 3)), []
@@ -237,6 +258,20 @@ def command(parsed_args):
         mixtures = channel_mixtures(levels=parsed_args.additivity_levels, grey_levels=levels[steps])
         triplets = np.vstack([triplets, mixtures])
         labels += ["additivity"] * len(mixtures)
+    if "isoluminant" in sets:
+        # Around the grey at the wanted luminance, by default half of white's
+        luminance = parsed_args.isoluminant_Y
+        if luminance is None:
+            luminance = RGB_to_XYZ(np.ones(3), clut, per_level=True)[1] / 2
+        isoluminant = isoluminant_colors(
+            clut,
+            background=achromatic_RGB(clut, luminance, per_level=True),
+            directions=parsed_args.isoluminant_directions,
+            fractions=parsed_args.isoluminant_fractions,
+            per_level=True,
+        )
+        triplets = np.vstack([triplets, isoluminant])
+        labels += ["isoluminant background"] + ["isoluminant"] * (len(isoluminant) - 1)
     if parsed_args.triplets is not None:
         # Triplets from a file: its R, G and B columns, and its labels, if it has any
         with open(parsed_args.triplets, newline="") as f:
@@ -245,6 +280,21 @@ def command(parsed_args):
         triplets = np.vstack([triplets, given])
         labels += [row.get("label") or "" for row in rows]
         sets = sets + [str(parsed_args.triplets)]
+
+    # Only now open the display, so that a request that cannot be measured fails first
+    ihrl = HRL(
+        graphics=parsed_args.graphics,
+        lut=parsed_args.lut,
+        inputs="keyboard",
+        photometer=parsed_args.photometer,
+        wdth=parsed_args.width,
+        hght=parsed_args.height,
+        bg=parsed_args.background,
+        fs=True,
+        wdth_offset=parsed_args.width_offset,
+        db=True,
+        scrn=parsed_args.screen,
+    )
 
     print(
         f"Measuring {len(triplets)} RGB triplets ({', '.join(sets)}), "
